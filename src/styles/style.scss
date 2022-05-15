@@ -1,0 +1,207 @@
+
+$background-color: #15202B;
+
+$main-color: #15202B;
+$main-border-color: #283c4e;
+
+$section-color: #172431;
+$section-border-color: #19293a;
+
+
+$card-color: #223344;
+$card-border-color: #273d52;
+
+$card-hover-color: #27394a;
+$card-hover-border-color: #304961;
+
+$card-height: 200px;
+$card-width: 160px;
+
+$radius-button: 5px;
+$radius-card: 5px;
+
+$text-main: #ffffff;
+$text-second: #617788;
+
+$overshadow: #000000c4;
+
+@mixin box-shadow {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+@mixin scroll {
+    &::-webkit-scrollbar {
+        width: 10px;
+        background-color: $card-hover-border-color;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: $card-hover-color;
+    }
+}
+
+@mixin flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+@mixin flex-center {
+    @include flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-start {
+    @include flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+
+
+
+
+
+
+
+  @mixin z-depth-transition() {
+    transition: box-shadow .28s cubic-bezier(.4, 0, .2, 1);
+  }
+  
+  @mixin z-depth-focus() {
+    box-shadow: 0 0 8px rgba(0, 0, 0, .18), 0 8px 16px rgba(0, 0, 0, .36);
+  }
+  
+  @mixin z-depth-2dp() {
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14),
+                0 1px 5px 0 rgba(0, 0, 0, .12),
+                0 3px 1px -2px rgba(0, 0, 0, .2);
+  }
+  
+  @mixin z-depth-3dp() {
+    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, .14),
+                0 1px 8px 0 rgba(0, 0, 0, .12),
+                0 3px 3px -2px rgba(0, 0, 0, .4);
+  }
+  
+  @mixin z-depth-4dp() {
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, .14),
+                0 1px 10px 0 rgba(0, 0, 0, .12),
+                0 2px 4px -1px rgba(0, 0, 0, .4);
+  }
+  
+  @mixin z-depth-6dp() {
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, .14),
+                0 1px 18px 0 rgba(0, 0, 0, .12),
+                0 3px 5px -1px rgba(0, 0, 0, .4);
+  }
+  
+  @mixin z-depth-8dp() {
+    box-shadow: 0 8px 10px 1px rgba(0, 0, 0, .14),
+                0 3px 14px 2px rgba(0, 0, 0, .12),
+                0 5px 5px -3px rgba(0, 0, 0, .4);
+  }
+  
+  @mixin z-depth-16dp() {
+    box-shadow: 0 16px 24px 2px rgba(0, 0, 0, .14),
+                0  6px 30px 5px rgba(0, 0, 0, .12),
+                0  8px 10px -5px rgba(0, 0, 0, .4);
+  }
+  
+  @mixin z-depth-24dp() {
+    box-shadow: 0  9px 46px  8px rgba(0, 0, 0, .14),
+                0 24px 38px  3px rgba(0, 0, 0, .12),
+                0 11px 15px -7px rgba(0, 0, 0, .4);
+  }
+  
+  @mixin z-depth($dp: 2) {
+    @if $dp == 2 {
+      @include z-depth-2dp();
+    } @else if $dp == 3 {
+      @include z-depth-3dp();
+    } @else if $dp == 4 {
+      @include z-depth-4dp();
+    } @else if $dp == 6 {
+      @include z-depth-6dp();
+    } @else if $dp == 8 {
+      @include z-depth-8dp();
+    } @else if $dp == 16 {
+      @include z-depth-16dp();
+    } @else if $dp == 24 {
+      @include z-depth-24dp();
+    }
+  }
+
+  @mixin focus() {
+    &:focus {
+      outline: 1px solid $color-outline-dark;
+      @include z-depth-focus();
+    }
+  }
+
+
+
+
+
+//цвет фона
+$color-dark-0: #141e29;
+//цвет цвет первой панели
+$color-dark-1: #16222e;
+$color-dark-2: #1a2835;
+$color-dark-3: #1e2f41;
+//цвет карты
+$color-dark-4: #223344;
+//цвет наведеннойй карты
+$color-dark-5: #27394a;
+
+$color-outline-dark: #497cac;
+
+$color-border-dark-1: #172635;
+$color-border-dark-2: #1a3042;
+$color-border-dark-3: #24384d;
+$color-border-dark-4: #26394b;
+$color-border-dark-5: #304961;
+
+$color-text-main: #cdccdb;
+$color-text-second: #617380;
+
+$color-success: #4eca73;
+$color-error: #c25344;
+
+$color-shadow: #000000a6;
+
+$card-height-big: 200px;
+$card-width-big: 160px;
+
+$card-height-small: 200px;
+$card-width-small: 160px;
+
+$padding-big: 5px;
+$padding-small: 3px;
+
+$margin-big: 5px;
+$margin-mall: 3px;
+
+$radius-big: 5px;
+
+
+// Font-Size
+$base-font-size: 1rem;
+
+// Line-Height
+$base-line-height: 1.5;
+$header-line-height: 1.25;
+
+// Breakpoints
+$bp-small: 48em; // 768px
+$bp-medium: 64em; // 1024px
+$bp-large: 85.375em; // 1366px
+$bp-xlarge: 120em; // 1920px
+$bp-xxlarge: 160em; // 2560px
+
+// Media Queries
+$mq-small: "(min-width: #{$bp-small})";
+$mq-medium: "(min-width: #{$bp-medium})";
+$mq-large: "(min-width: #{$bp-large})";
+$mq-xlarge: "(min-width: #{$bp-xlarge})";
+$mq-xxlarge: "(min-width: #{$bp-xxlarge})";
+$mq-retina: "(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)";
