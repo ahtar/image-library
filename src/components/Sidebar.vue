@@ -51,7 +51,7 @@ export default defineComponent({
              },
              onMouseLeave() {
                  if(sidebar.value != null) {
-                     disable();
+                    disable();
                     sidebar.value.style.transform = 'translateX(-100%) translateX(+1.5vw)';
                     sidebar.value.style.transition = '0.35s ease-in';
                 }

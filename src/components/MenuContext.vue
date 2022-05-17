@@ -46,6 +46,7 @@
                     menu.value!.style.left = `${props.event.clientX}px`;
                 }
 
+                //Сфокусироваться на меню.
                 nextTick(() => {
                     menu.value?.focus();
                 });

@@ -7,7 +7,7 @@
 
 
 <script lang="ts">
-import { defineComponent, onMounted, onUpdated, ref } from 'vue'
+import { defineComponent, onMounted, onUpdated, PropType, ref } from 'vue'
 
 import BaseCard from '@/components/base/BaseCard.vue'
 
@@ -16,7 +16,8 @@ import useImageRendering from '@/composables/image-rendering'
 export default defineComponent({
     props: {
         image: {
-            required: true
+            required: true,
+            type: Object as PropType<ImageSingle | ImageSet>
         }
     },
     components: {
@@ -28,14 +29,14 @@ export default defineComponent({
         const imgRef = ref<null | HTMLImageElement>(null);
 
 
+        //Прорисовка изображения при mounted.
         onMounted(async () => {
             try {
-                const image = props.image as ImageSingle | ImageSet;
-                if('set' in image.manifest) {
-                    const file = await (image as ImageSet).arr[0].getThumbnail();
+                if('arr' in props.image) {
+                    const file = await props.image.arr[0].getThumbnail();
                     renderImage(imgRef.value!, file);
                 } else {
-                    const file = await (image as ImageSingle).getThumbnail();
+                    const file = await props.image.getThumbnail();
                     renderImage(imgRef.value!, file);
                 }
             } catch(err) {
@@ -44,14 +45,14 @@ export default defineComponent({
             }
         });
 
+        //Прорисовка изображения при updated.
         onUpdated(async () => {
             try {
-                const image = props.image as ImageSingle | ImageSet;
-                if('set' in image.manifest) {
-                    const file = await (image as ImageSet).arr[0].getThumbnail();
+                if('arr' in props.image) {
+                    const file = await props.image.arr[0].getThumbnail();
                     renderImage(imgRef.value!, file);
                 } else {
-                    const file = await (image as ImageSingle).getThumbnail();
+                    const file = await props.image.getThumbnail();
                     renderImage(imgRef.value!, file);
                 }
             } catch(err) {
@@ -61,8 +62,7 @@ export default defineComponent({
         });
 
         function isSet() {
-            const image = props.image as ImageSingle | ImageSet;
-            return 'set' in image.manifest
+           return 'arr' in props.image
         }
         
         return {

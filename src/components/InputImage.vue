@@ -33,21 +33,11 @@ export default defineComponent({
 
         let blobObjectUrl: string;
 
+        //Чтение первого изображения из буфера обмена
         const pasteEvent = async () => {
             if(props.active) {
-                //получить изображение из clipboard в виде u8intArray
-                //let data: Uint8Array = await window.ipcRenderer.promises.once('clipboard-image');
-                //конвертировать в блоб
-                //if(data.length > 0) {
-                //    let blob = new Blob([data.buffer]);
-                //    emit('paste', blob);
-                //}
-
-
                 const item = await (navigator.clipboard as any).read();
-                console.log(item);
                 const type = item[0].types.find((t: any) => t.includes('image'));
-                console.log(type);
                 if(type) {
                     const b = await item[0].getType(type);
                     emit('paste', b);
@@ -55,7 +45,8 @@ export default defineComponent({
             }
         };
 
-        //при изменении data изменить img source
+        //Реагирование на изменение blob
+        //Перерисовка изображения.
             watch(() => props.blob, (newData) => {
             URL.revokeObjectURL(blobObjectUrl);
             if(props.blob != undefined) {
@@ -68,6 +59,7 @@ export default defineComponent({
             }
         });
 
+        //Инициализация.
         onMounted(() => {
             imageField.value?.addEventListener('paste', pasteEvent);
 
@@ -81,7 +73,7 @@ export default defineComponent({
 
         onUnmounted(() => {
             imageField.value?.removeEventListener('paste', pasteEvent);
-            //URL.revokeObjectURL(blobObjectUrl);
+            URL.revokeObjectURL(blobObjectUrl);
         });
         return {
             imageField,

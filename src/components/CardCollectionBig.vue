@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, PropType, ref } from 'vue'
 
 import BaseCard from '@/components/base/BaseCard.vue'
 
@@ -14,7 +14,8 @@ import useImageRendering from '@/composables/image-rendering'
 export default defineComponent({
     props: {
         fileHandle: {
-            required: true
+            required: true,
+            type: Object as PropType<FileSystemFileHandle>
         },
     },
     components: {
@@ -27,7 +28,7 @@ export default defineComponent({
 
 
         onMounted(() => {
-            renderImage(imgRef.value!, props.fileHandle as FileSystemFileHandle);
+            renderImage(imgRef.value!, props.fileHandle);
         });
 
         return {

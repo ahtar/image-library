@@ -12,17 +12,17 @@
         />
         <div class="tag-container">
             <div class="container">
-                <card-tag-small v-for="(tag, i) in tags" :key="i" @click="removeTag(tag, i)">{{tagName(tag)}}</card-tag-small>
+                <card-tag-small v-for="(tag, i) in tags" :key="i" :tag="getTagObject(tag)" @click="removeTag(tag, i)"/>
             </div>
         </div>
         <div class="suggestions" v-if="suggestionsVisible">
-            <card-tag-small v-for="(tag, i) in suggestedTags" :key="i" @click="getTag(tag)">{{tagName(tag)}}</card-tag-small>
+            <card-tag-small v-for="(tag, i) in suggestedTags" :key="i" :tag="tag" @click="getTag(tag)"/>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { computed, ComputedRef, defineComponent, onMounted, ref } from 'vue'
+import { computed, defineComponent, PropType, ref } from 'vue'
 
 import InputText from '@/components/InputText.vue'
 import CardTagSmall from '@/components/CardTagSmall.vue'
@@ -35,11 +35,11 @@ export default defineComponent({
 
     props: {
         tags: {
-            type: Array,
+            type: Array as PropType<string[]>,
             required: true,
         },
         definedTags: {
-            type: [Array],
+            type: Array as PropType<Tag[]>,
             default: () => {
                 return [];
             }
@@ -65,19 +65,6 @@ export default defineComponent({
         const input = ref<HTMLElement | null>(null);
 
         /**
-         * Массив с существующими тегами в коллекции.
-         * Используется в быстром наборе тегов.
-         * Если вместо массива дан объект, то получить массив с свойствами объекта.
-         */
-        const definedTags: ComputedRef<Array<Tag>> = computed(() => {
-            if(Array.isArray(props.definedTags)) {
-                return props.definedTags;
-            } else {
-                return Object.values(props.definedTags);
-            }
-        });
-
-        /**
          * Существующие теги, подходящие под запрос.
          */
         const filteredTags = computed(() => {
@@ -85,7 +72,7 @@ export default defineComponent({
                 return [];
             } else {
                 const input = item.value.toLowerCase();
-                return definedTags.value.filter((tag) => {
+                return props.definedTags.filter((tag) => {
                     if(tag.name.toLowerCase().includes(input)) return true;
                     return false;
                 });
@@ -144,7 +131,7 @@ export default defineComponent({
             }
         }
         /**
-         * Добавление предложенного тега.
+         * Событие на добавление предложенного тега.
          */
         function getTag(tag: any) {
             if(!props.tags?.includes(tag.name)) {
@@ -163,9 +150,22 @@ export default defineComponent({
             } 
         }
 
+        /**
+         * Получение объекта тега из существующих в коллекции тегов.
+         * @param tag Название тега.
+         */
+        function getTagObject(tag: string) {
+            const t = props.definedTags.find((t) => t.name == tag);
 
-
-
+            if(t) {
+                return t;
+            } else {
+                return {
+                    name: tag,
+                    count: 0
+                }
+            }
+        }
 
         return {
             item,
@@ -177,6 +177,7 @@ export default defineComponent({
             suggestedTags,
             getTag,
             quickSuggestion,
+            getTagObject,
         }
     },
 })

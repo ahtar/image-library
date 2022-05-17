@@ -14,7 +14,7 @@
                 <card-image-small 
                         v-for="(image) in doublicateImages"
                         :image="image" 
-                        :key="image.id"
+                        :key="image.manifest.id"
                         class="image-card"
                 />
             </div>

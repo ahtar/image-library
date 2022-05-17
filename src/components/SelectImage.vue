@@ -3,14 +3,14 @@
         <card-image-small v-for="(card, i) in set" draggable="true"
         @dragstart="drag($event, card)"
         @dragover="dragOver($event, card)"
-        :key="card.id" 
+        :key="card.manifest.id" 
         :image="card"
         @click="change(card, $event)" 
         :id="i"/>
     </div>
     <div class="select-images" v-else>
         <card-image-small v-for="(card, i) in set"
-        :key="card.id" 
+        :key="card.manifest.id" 
         :image="card"
         @click="change(card, $event)" 
         :id="i"/>
@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue'
+import { defineComponent, onMounted, PropType } from 'vue'
 
 import CardImageSmall from '@/components/CardImageSmall.vue'
 
@@ -28,7 +28,7 @@ export default defineComponent({
     },
     props: {
         set: {
-            type: Array,
+            type: Array as PropType<ImageSingle[]>,
             required: true
         },
         draggable: {
@@ -39,11 +39,14 @@ export default defineComponent({
     setup(props, { emit }) {
         let selectedImage: any = null;
         let dragOverId = '';
+
+        //Инициализация.
         onMounted(async () => {
             selectedImage = document.getElementById(`${0}`)?.children[0];
             selectedImage.classList.toggle('selected');
         });
 
+        //Начало Drag.
         function drag(event: DragEvent, card: ImageSingle) {
             event.dataTransfer!.effectAllowed = 'move';
             event.dataTransfer!.dropEffect = 'move';
@@ -57,6 +60,7 @@ export default defineComponent({
             }
         }
 
+        //Конец Drop.
         function drop(event: DragEvent) {
             const id = event.dataTransfer!.getData('id');
             const fromIndex = (props.set as ImageSingle[]).findIndex((image) => image.manifest.id == id);
@@ -71,6 +75,7 @@ export default defineComponent({
             });
         }
 
+        //Изменение активного изображения.
         function change(card: ImageSingle, event: any) {
             if(event.target != selectedImage) {
                 selectedImage.classList.toggle('selected');

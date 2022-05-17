@@ -43,22 +43,30 @@ export default defineComponent({
         const store = useImageEditStore();
         const storeCollections = useCollections();
 
-        const { addTag, removeTag, setTagRef, definedTags, tagsOnChange } = useTagActions();
+        const { addTag, removeTag, setTagRef, definedTags } = useTagActions();
         const { renderImage } = useRerenderImage();
 
+        //Ref на img.
         const img = ref<null | HTMLImageElement>(null);
         const image = ref<any>(store.image);
+
+        //Текущее активное изображение.
+        //Все изменения происходят на нем.
+        //Если основное изображение это ImageSet, то активным изображением будет 1 из элементов этого сета
+        //Если основное изображение это ImageSingle, то оно и будет активным.
         const activeImage = ref<ImageSingle | null>(null);
 
+        //Ссылка на активное изображение.
         const fileUrl = computed(() => {
             return activeImage.value?.manifest.fileUrl || ''
         });
 
+        //Теги активного изображения.
         const computedTags = computed(() => {
             return activeImage.value?.manifest.tags || []
         })
 
-
+        //Инициализация активного изображения, прорисовка изображения.
         onMounted(async () => {
             if(image.value != null) {
                 if('arr' in image.value) {
@@ -71,24 +79,14 @@ export default defineComponent({
             }
         });
 
+        //Смена активного изображения.
         async function changeActiveImage(image: ImageSingle) {
             activeImage.value = image;
             setTagRef(ref(activeImage.value.manifest.tags));
             renderImage(img.value!, await activeImage.value.getImage());
         }
 
-        tagsOnChange((value, oldValue) => {
-            //Add tag
-            if(value.length > oldValue.length) {
-                const data: Tag = (value.filter((x: any) => !oldValue.includes(x)).concat(oldValue.filter((x: any) => !value.includes(x))));
-                
-            } else {
-                //Remove tag
-                const data: Tag = (oldValue.filter((x: any) => !value.includes(x)).concat(value.filter((x: any) => !oldValue.includes(x))));
-                
-            }
-        });
-
+        //Является ли основное изображение ImageSet.
         function isSet() {
             if(image.value != null) {
                 if('arr' in image.value) {
@@ -98,6 +96,7 @@ export default defineComponent({
             return false;
         }
 
+        //Изменение порядка изображений в сете.
         function dragSort(obj: any) {
             if(store.image) {
                 if('arr' in store.image) {
@@ -107,31 +106,31 @@ export default defineComponent({
             }
         }
 
-        /**
-         * Separate image from set
-         */
+
+        //Отделение изображения из сета.
         async function separateImage() {
             if(image.value != null) {
                 console.log(activeImage.value);
                 if('arr' in image.value) {
                     const img: ImageSet = image.value;
-                    //Remove image from set.
+                    //Удаление ImageSingle из сета.
                     image.value.removeImage(activeImage.value!);
-                    //Save image manifest as separate file.
+                    //Сохранение манифеста ImageSingle отдельным файлом.
                     storeCollections.activeCollection?.updateImage(activeImage.value! as any);
-                    //Add image to collection array.
+                    //Добавление ImageSingle в массив с изображениями.
                     storeCollections.activeCollection?.addImage(activeImage.value! as any);
-                    //Change active image to the first image of array.
+                    //Изменение активного изображения на персове изображение в сете.
                     changeActiveImage(image.value.arr[0]);
-                    //Remove last image from set and delete set.
+                    //Если после удаления изображения из сета в сете останется лишь 1 изображение,
+                    //то сохранить его как отдельное изображение и удалить сет.
                     if(image.value.arr.length == 1) {
-                        //Remove image from set.
+                        //Удалить ImageSingle из сета.
                         image.value.removeImage(activeImage.value!);
-                        //Delete empty image set.
+                        //Удалить пустой сет.
                         await storeCollections.activeCollection?.deleteImage(image.value);
-                        //Save image manifest as separate file.
+                        //Сохранение манифеста ImageSingle отдельным файлом.
                         await storeCollections.activeCollection?.updateImage(activeImage.value! as any);
-                        //Add image to collection array.
+                        //Добавление ImageSingle в массив с изображениями.
                         await storeCollections.activeCollection?.addImage(activeImage.value! as any);
 
                         store.close();

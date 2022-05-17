@@ -1,18 +1,52 @@
 <template>
     <base-card class="card-tag-small">
-        <slot/>
+        {{name()}} ({{count()}})
     </base-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 
 import BaseCard from '@/components/base/BaseCard.vue'
 
 export default defineComponent({
+    props: {
+        tag: {
+            required: true,
+            type: Object as PropType<Tag>
+        }
+    },
     components: {
         BaseCard
     },
+    setup(props) {
+        function name() {
+            if(props.tag) {
+                if(typeof props.tag == 'string') {
+                    return 'Error'
+                } else {
+                    return props.tag.name;
+                }
+            }
+            return null
+        }
+
+        function count() {
+            if(props.tag) {
+                if(typeof props.tag == 'string') {
+                    return 'Error'
+                } else {
+                    return props.tag.count;
+                }
+            }
+            return null
+        }
+
+        return {
+            name,
+            count
+        }
+    }
 })
 </script>
 

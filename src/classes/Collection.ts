@@ -27,7 +27,7 @@ class CollectionOjbect implements Collection {
     loaded = false;
 
     /**
-     * Получить Объект Коллекции через FileSystemDirectoryHandle.
+     * Получить объект Коллекции через FileSystemDirectoryHandle.
      * @param handle FileSystemDirectoryHandle папки Коллекции.
      * @returns Объект Collection.
      */
@@ -60,18 +60,6 @@ class CollectionOjbect implements Collection {
      */
     async initLoadCollection() {
         const imageDataFolderHandler = await this.handle.getDirectoryHandle('imageData');
-        const addTag = (tag: string) => {
-            const t = this.tags.find((t) => t.name == tag);
-
-            if(t) {
-                t.count++;
-            } else {
-                this.tags.push({
-                    name: tag,
-                    count: 1
-                });
-            }
-        }
 
         const buffer: Array<ImageSingle | ImageSet> = [];
         const promises: Promise<ImageSetData | ImageSingleData>[] = [];
@@ -98,9 +86,9 @@ class CollectionOjbect implements Collection {
                     for(const tag of singleImage.tags) {
                         //legacy
                         if(typeof tag == 'object') {
-                            addTag((tag as any).tagName)
+                            this.addTag((tag as any).tagName)
                         } else {
-                            addTag(tag);
+                            this.addTag(tag);
                         }
                     }
                 }
@@ -111,9 +99,9 @@ class CollectionOjbect implements Collection {
                 for(const tag of image.tags) {
                     //legacy
                     if(typeof tag == 'object') {
-                        addTag((tag as any).tagName)
+                        this.addTag((tag as any).tagName)
                     } else {
-                        addTag(tag);
+                        this.addTag(tag);
                     }
                 }
             }
@@ -122,11 +110,53 @@ class CollectionOjbect implements Collection {
         this.addImage(buffer);
         console.timeEnd();
         this.loaded = true;
+
+        this.tags.sort((a, b) => {
+            if(a.count < b.count) return 1;
+            if(a.count > b.count) return -1;
+            return 0;
+        });
     }
 
     /**
-     * Add Image to collection.
-     * @param image Image object.
+     * Добавление тега в Коллекцию.
+     * @param tag Название тега.
+     */
+    addTag(tag: string) {
+        const t = this.tags.find((t) => t.name == tag);
+
+        if(t) {
+            t.count++;
+        } else {
+            this.tags.push({
+                name: tag,
+                count: 1
+            });
+        }
+    }
+
+    /**
+     * Получение тега в Коллекции.
+     * Если такого тега нет, то получение пустой заготовки тега.
+     * @param name Название тега.
+     * @returns Объект тега.
+     */
+    getTag(name: string) {
+        const t = this.tags.find((t) => t.name == name);
+
+        if(t) {
+            return t;
+        } else {
+            return {
+                name: name,
+                count: 0
+            }
+        }
+    }
+
+    /**
+     * Добавление готового Изображения в коллекцию.
+     * @param image Объект Изображения.
      */
     async addImage(image: ImageSingle | ImageSet | Array<ImageSingle | ImageSet>) {
         if(Array.isArray(image)) {
@@ -136,26 +166,17 @@ class CollectionOjbect implements Collection {
         }
     }
 
+    /**
+     * Создание нового Изображения и его добавление в Коллекцию.
+     * @param manifest Метаданные Изображения.
+     * @param image Blob с самим изображением.
+     */
     async createImage(manifest: ImageSingleData, image: Blob) {
         const fs = Fs();
         const imageDataFolderHandle = await this.handle.getDirectoryHandle('imageData');
         const imageFileFolderHandle = await this.handle.getDirectoryHandle('images');
         const imageThumbnailFolderHandle = await this.handle.getDirectoryHandle('thumbnails');
 
-        const addTag = (tag: string) => {
-            const t = this.tags.find((t) => t.name == tag);
-
-            if(t) {
-                t.count++;
-            } else {
-                this.tags.push({
-                    name: tag,
-                    count: 1
-                });
-            }
-        }
-
-        console.info('createImage:single', manifest);
         await fs.writeFile(imageDataFolderHandle, manifest.id + '.json', JSON.stringify(manifest));
         const imageHandle = await fs.writeFile(imageFileFolderHandle, manifest.fileUrl, image);
         const thumbnailHandle = await fs.writeFile(imageThumbnailFolderHandle, manifest.previewFileUrl, await jimp.resize(image));
@@ -164,10 +185,14 @@ class CollectionOjbect implements Collection {
         this.addImage(img);
 
         for(const tag of manifest.tags) {
-            addTag(tag);
+            this.addTag(tag);
         }
     }
 
+    /**
+     * Создание нового сета Изображенийи его добавление в Коллекцию.
+     * @param images Массив с Изображениями.
+     */
     async createSet(images: Array<ImageSingle | ImageSet>) {
         const fs = Fs();
         const imageDataFolderHandle = await this.handle.getDirectoryHandle('imageData');
@@ -203,9 +228,11 @@ class CollectionOjbect implements Collection {
 
     }
  
+
     /**
-     * Delete Image from collection.
-     * @param image Image object.
+     * Удаление Изображения из Коллекции.
+     * Удаляет все данные связанные с данным Изображением.
+     * @param image Объект Изображения.
      */
     async deleteImage(image: ImageSingle | ImageSet): Promise<void> {
         const fs = Fs();
@@ -221,7 +248,6 @@ class CollectionOjbect implements Collection {
             await imageDataFolderHandle.removeEntry(image.manifest.id + '.json');
             this.removeImage(image);
         } else {
-            console.info('single image deletion', image);
             await imageDataFolderHandle.removeEntry(image.manifest.id + '.json');
             await imageFileFolderHandle.removeEntry(image.manifest.fileUrl);
             await imageThumbnailFolderHandle.removeEntry(image.manifest.previewFileUrl);
@@ -229,6 +255,11 @@ class CollectionOjbect implements Collection {
         }
     }
 
+    /**
+     * Убирание Изображения из Коллекции без удаления данных этого Изображения.
+     * При следующем запуске Изображение снова окажется в Коллекции.
+     * @param image Объект Изображения.
+     */
     removeImage(image: ImageSingle | ImageSet | ImageSingleData | string) {
         if(typeof image == 'string') {
             const index = this.arr.findIndex((i) => i.manifest.id == image);
@@ -245,9 +276,10 @@ class CollectionOjbect implements Collection {
         }
     }
 
+
     /**
-     * Update Image in collection.
-     * @param image Image object.
+     * Обновление Изображения в Коллекции.
+     * @param image Объект Изображения.
      */
     async updateImage(image: ImageSingle | ImageSet): Promise<void> {
         const fs = Fs();

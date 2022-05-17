@@ -67,11 +67,11 @@ export default defineComponent({
             return false;
         }
 
-        function input(value: InputEvent) {
+        function input(value: Event) {
             emit('update:modelValue', (value.target as HTMLInputElement).value);
         }
 
-        function enterKeypress(value: InputEvent) {
+        function enterKeypress(value: KeyboardEvent) {
             emit('enterKey');
         }
 

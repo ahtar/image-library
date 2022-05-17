@@ -11,7 +11,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import TransitionFade from '@/components/TransitionFade.vue'
-import CardNotificationBig from '@/components/CardNotificationBig.vue'
 import CardNotificatonSuccess from '@/components/CardNotificationSuccess.vue'
 import CardNotificationError from '@/components/CardNotificationError.vue'
 
