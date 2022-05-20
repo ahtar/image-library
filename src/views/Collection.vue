@@ -10,11 +10,13 @@
         <div class="content-wrapper" ref="container">
             <div class="content" v-if="loaded">
                 <card-new-big @click="storeImageCreate.open()"/>
-                <card-image-small 
-                v-for="(image, i) in filteredImages" 
-                :key="i" :image="image" 
-                @click="imageHandler(image, $event)" 
-                @contextmenu="contextMenuOpen(image, $event)"/>
+                <transition-fade-group :items="displayedImages" v-slot="slotProps">
+                  <card-image-small
+                    :image="slotProps.item" 
+                    @click="imageHandler(slotProps.item, $event)" 
+                    @contextmenu="contextMenuOpen(slotProps.item, $event)"/>
+                </transition-fade-group>
+                <intersection-observer-vue ref="observer" @update="observerHandler"/>
             </div>
             <screen-loading v-else/>
         </div>
@@ -63,12 +65,14 @@ import useClipboard from '@/composables/clipboard'
 
 import Sidebar from '@/components/Sidebar.vue'
 import TransitionFade from '@/components/TransitionFade.vue'
+import TransitionFadeGroup from '@/components/TransitionFadeGroup.vue'
 import CardImageSmall from '@/components/CardImageSmall.vue'
 import CardNewBig from '@/components/CardNewBig.vue'
 import FormImageView from '@/components/FormImageView.vue'
 import FormImageCreate from '@/components/FormImageCreate.vue'
 import FormImageEdit from '@/components/FormImageEdit.vue'
 import InputTag from '@/components/InputTag.vue'
+import IntersectionObserverVue from '@/components/IntersectionObserver.vue'
 import MenuConfirmOverlay from '@/components/MenuConfirmOverlay.vue'
 import MenuContext from '@/components/MenuContext.vue'
 import ScreenLoading from '@/components/ScreenLoading.vue'
@@ -80,12 +84,14 @@ export default defineComponent({
     components: {
         Sidebar,
         TransitionFade,
+        TransitionFadeGroup,
         CardImageSmall,
         CardNewBig,
         FormImageView,
         FormImageCreate,
         FormImageEdit,
         InputTag,
+        IntersectionObserverVue,
         MenuConfirmOverlay,
         MenuContext,
         ScreenLoading,
@@ -100,14 +106,15 @@ export default defineComponent({
         const storeNotification = useNotificationStore();
         const storePrompt = usePromptStore();
 
-        const { images, filteredImages } = useImages();
-        const { tags, definedTags, addTag, removeTag } = UseTags();
+        const { images, filteredImages, displayedImages, displayNextImages, resetDisplayedImages } = useImages();
+        const { tags, definedTags, addTag, removeTag, tagsOnChange } = UseTags();
         const { contextMenuActive, contextMenuEvent, contextMenuOpen, contextMenuClose, contextMenuAction } = useContextMenu();
         const { copyToClipboard } = useClipboard();
 
         const loaded = ref(false);
 
         const container = ref<HTMLElement | null>(null);
+        const observer = ref<InstanceType<typeof IntersectionObserverVue> | null>(null);
 
 
         onMounted(async () => {
@@ -115,6 +122,8 @@ export default defineComponent({
                 await storeCollections.activeCollection?.initLoadCollection();
             }
             loaded.value = true;
+
+            observer.value?.checkIntersection();
         });
 
 
@@ -198,6 +207,19 @@ export default defineComponent({
             });
         }
 
+        function observerHandler(event: boolean) {
+            if(event) {
+                const status = displayNextImages(20);
+                console.info('observer event', status);
+                if(status) observer.value?.checkIntersection();
+            }
+        }
+
+        tagsOnChange(() => {
+            resetDisplayedImages();
+            observer.value?.checkIntersection();
+        });
+
 
 
         return {
@@ -207,10 +229,13 @@ export default defineComponent({
             storeImageEdit,
 
             container,
+            observer,
             scrollToTop,
 
             images,
             filteredImages: filteredImages(tags),
+            displayedImages,
+            observerHandler,
 
             imageHandler,
             imageHandlerState,

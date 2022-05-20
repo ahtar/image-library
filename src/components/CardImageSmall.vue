@@ -34,10 +34,14 @@ export default defineComponent({
             try {
                 if('arr' in props.image) {
                     const file = await props.image.arr[0].getThumbnail();
-                    renderImage(imgRef.value!, file);
+                    await renderImage(imgRef.value!, file);
+                    imgRef.value!.style.width = 'auto';
+                    imgRef.value!.style.height = 'auto';
                 } else {
                     const file = await props.image.getThumbnail();
-                    renderImage(imgRef.value!, file);
+                    await renderImage(imgRef.value!, file);
+                    imgRef.value!.style.width = 'auto';
+                    imgRef.value!.style.height = 'auto';
                 }
             } catch(err) {
                 console.log(err);
@@ -51,9 +55,13 @@ export default defineComponent({
                 if('arr' in props.image) {
                     const file = await props.image.arr[0].getThumbnail();
                     renderImage(imgRef.value!, file);
+                    imgRef.value!.style.width = 'auto';
+                    imgRef.value!.style.height = 'auto';
                 } else {
                     const file = await props.image.getThumbnail();
                     renderImage(imgRef.value!, file);
+                    imgRef.value!.style.width = 'auto';
+                    imgRef.value!.style.height = 'auto';
                 }
             } catch(err) {
                 console.log(err);
@@ -81,6 +89,8 @@ export default defineComponent({
         img {
             max-width: 150px;
             max-height: 250px;
+            height: 190px;
+            width: 140px;
             -webkit-user-drag: none;
             -khtml-user-drag: none;
             -moz-user-drag: none;

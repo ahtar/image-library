@@ -1,4 +1,3 @@
-//import * from '@types/wicg-file-system-access'
 
 
 interface Window {

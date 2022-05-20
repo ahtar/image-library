@@ -1,15 +1,26 @@
 import { useCollections } from '@/store/collections'
-import { computed, Ref, ref } from "vue";
+import { computed, ComputedRef, Ref, ref } from "vue";
 
 
 export default function() {
     const collectionsStore = useCollections();
 
-    const images = ref(collectionsStore.activeCollection!.arr);
+    //Compile error
+    //Types of property 'collectionHandle' are incompatible
+    //Property '[Symbol.asyncIterator]' is missing in type 'FileSystemDirectoryHandle' but required in type 'FileSystemDirectoryHandle'
+    //????????????
+    //Все Изображения в Коллекции.
+    const images: Ref<Array<ImageSingle | ImageSet>> = ref(collectionsStore.activeCollection!.arr as Array<any>);
+
+    //ИЗображения, отображаемые на экране с использованием IntersectionObserver.
+    const displayedImages = ref<Array<ImageSingle | ImageSet>>([]);
+
+    //Фильтрованные изображения.
+    let fImages: ComputedRef<Array<ImageSingle | ImageSet>>;
 
     function filteredImages(tags: Ref<Array<string>>) {
-        return computed(() => {
-            return images.value?.filter((image) => {
+        fImages = computed(() => {
+            return images.value!.filter((image) => {
                 if('set' in image.manifest) {
                     //работает криво
                     //должен вернуть true если хоть в 1 изображении в сете есть нужный тег
@@ -39,11 +50,41 @@ export default function() {
                 return true;
             });
         });
+        return fImages;
     }
+
+
+    //Отобразить следующую партию Изображений.
+    //Если фильтр не задан, то использовать все Изображения.
+    function displayNextImages(count = 15) {
+
+        if(fImages == undefined) {
+            if(displayedImages.value.length >= images.value.length) return false;
+            displayedImages.value.push(...images.value.slice(displayedImages.value.length, displayedImages.value.length + count));
+        } else {
+            if(displayedImages.value.length >= fImages.value.length) return false;
+            const temp = fImages.value.slice(displayedImages.value.length, displayedImages.value.length + count);
+            displayedImages.value.push(...temp);
+        }
+
+        return true;
+    }
+
+    function resetDisplayedImages(filtered = true) {
+        if(filtered) {
+            displayedImages.value = fImages.value.slice(0, 15);
+        } else {
+            displayedImages.value = [];
+        }
+    }
+
 
 
     return {
         images,
         filteredImages,
+        displayedImages,
+        displayNextImages,
+        resetDisplayedImages,
     }
 }
