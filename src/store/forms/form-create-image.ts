@@ -40,7 +40,7 @@ export const useImageCreateStore = defineStore('imageCreate', {
          * Создание тегов.
          * Создание изображения.
          */
-         async submitImage() {
+         submitImage() {
             const storeCollections = useCollections();
 
             const id = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
@@ -67,10 +67,17 @@ export const useImageCreateStore = defineStore('imageCreate', {
 
             console.log('puk puk dummy image creation!');
 
-            storeCollections.activeCollection?.createImage(imageInstance, this.form.blob!);
+            //storeCollections.activeCollection?.createImage(imageInstance, this.form.blob!);
+
+            const obj = {
+                manifest: imageInstance,
+                imageBlob: this.form.blob!
+            };
 
             this.visible = false;
             this.clearForm();
+
+            return obj;
         },
 
         //сброс данных формы

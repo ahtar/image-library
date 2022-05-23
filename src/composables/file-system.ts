@@ -5,6 +5,8 @@ import usePermissions from '@/composables/permissions'
 
 let handler: FileSystemDirectoryHandle;
 
+let callback: Function;
+
 export default function() {
     const { verifyPermission } = usePermissions();
 
@@ -30,6 +32,7 @@ export default function() {
         try {
             handler = await window.showDirectoryPicker();
             await set('entryHandle', handler);
+            if(callback) callback();
         } catch(err) {
             console.log(err);
         }

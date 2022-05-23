@@ -45,7 +45,7 @@ export default defineComponent({
                 }
             } catch(err) {
                 console.log(err);
-                renderImage(imgRef.value!, `${process.env.BASE_URL}/Error.png`);
+                //renderImage(imgRef.value!, `${process.env.BASE_URL}/Error.png`);
             }
         });
 
@@ -65,7 +65,7 @@ export default defineComponent({
                 }
             } catch(err) {
                 console.log(err);
-                renderImage(imgRef.value!, `${process.env.BASE_URL}/Error.png`);
+                //renderImage(imgRef.value!, `${process.env.BASE_URL}/Error.png`);
             }
         });
 

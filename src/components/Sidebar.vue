@@ -8,7 +8,8 @@
 import { defineComponent, onMounted, ref } from 'vue'
 
 export default defineComponent({
-    setup() {
+    emits: ['unfocus'],
+    setup(props, { emit } ) {
         const sidebar = ref<HTMLElement | null>(null);
 
         /**
@@ -54,10 +55,13 @@ export default defineComponent({
                     disable();
                     sidebar.value.style.transform = 'translateX(-100%) translateX(+1.5vw)';
                     sidebar.value.style.transition = '0.35s ease-in';
+
+                    emit('unfocus');
                 }
              },
 
-             sidebar
+             sidebar,
+             blur
         }
     },
 })

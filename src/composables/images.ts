@@ -1,25 +1,58 @@
+import { computed, ComputedRef, Ref, ref, watch } from "vue";
 import { useCollections } from '@/store/collections'
-import { computed, ComputedRef, Ref, ref } from "vue";
 
 
 export default function() {
-    const collectionsStore = useCollections();
+    const storeCollections = useCollections();
 
-    //Compile error
     //Types of property 'collectionHandle' are incompatible
     //Property '[Symbol.asyncIterator]' is missing in type 'FileSystemDirectoryHandle' but required in type 'FileSystemDirectoryHandle'
     //????????????
-    //Все Изображения в Коллекции.
-    const images: Ref<Array<ImageSingle | ImageSet>> = ref(collectionsStore.activeCollection!.arr as Array<any>);
+    /**
+     * Изображения в коллекции.
+     * Изначально берутся из активной коллекции.
+     * Свои изображения можно задать с помощью setImages.
+     */
+    const images = ref<Array<ImageSingle | ImageSet>>([]);
 
-    //ИЗображения, отображаемые на экране с использованием IntersectionObserver.
-    const displayedImages = ref<Array<ImageSingle | ImageSet>>([]);
+    //Ref, определяющий, были ли заданы свои изображения с помозью setImages.
+    const customImages = ref(false);
 
-    //Фильтрованные изображения.
+
+    let tagsRef = ref<Array<string>>([]);
+
+    //Инициализация изображений и реагирование на изменение активной коллекции.
+    if(storeCollections.activeCollection) images.value = storeCollections.activeCollection.arr as any;
+    watch(() => storeCollections.activeCollection, () => {
+        if(!customImages.value && storeCollections.activeCollection) {
+            images.value = storeCollections.activeCollection.arr as any;
+        }
+    });
+
+
+    /**
+     * Изображения, соответствующие заданных тегам.
+     * Теги задаются с помощью filteredImages.
+     */
     let fImages: ComputedRef<Array<ImageSingle | ImageSet>>;
 
+    /**
+     * Установка изображений.
+     * @param imagesArr Массив с изображениями.
+     */
+    function setImages(imagesArr: Array<ImageSingle | ImageSet>) {
+        images.value = imagesArr;
+        customImages.value = true;
+    }
+
+    /**
+     * Задание тегов для фильтрации и получение фильтрованых изображений.
+     * @param tags Массив с тегами.
+     * @returns Фильтрованные изображения.
+     */
     function filteredImages(tags: Ref<Array<string>>) {
-        fImages = computed(() => {
+        tagsRef = tags;
+        fImages = computed<any>(() => {
             return images.value!.filter((image) => {
                 if('set' in image.manifest) {
                     //работает криво
@@ -54,13 +87,28 @@ export default function() {
     }
 
 
-    //Отобразить следующую партию Изображений.
-    //Если фильтр не задан, то использовать все Изображения.
+
+
+    /**
+     * Изображения, отображаемые на экране с использованием IntersectionObserver.
+     * Для добавления изображений используется displayNextImages.
+     * Для сброса изображений используется resetDisplayedImages.
+     * Для реагирования на удаление или создание изображений используются displayAddImage и displayDeleteImage.
+     */
+    const displayedImages = ref<Array<ImageSingle | ImageSet>>([]);
+
+
+    /**
+     * Отобразить следующую партию Изображений.
+     * Если фильтр не задан, то использовать все Изображения.
+     * @param count Количество добавляемых изображений.
+     * @returns статус операции.
+     */
     function displayNextImages(count = 15) {
 
         if(fImages == undefined) {
-            if(displayedImages.value.length >= images.value.length) return false;
-            displayedImages.value.push(...images.value.slice(displayedImages.value.length, displayedImages.value.length + count));
+            if(displayedImages.value.length >= images.value!.length) return false;
+            displayedImages.value.push(...images.value!.slice(displayedImages.value.length, displayedImages.value.length + count));
         } else {
             if(displayedImages.value.length >= fImages.value.length) return false;
             const temp = fImages.value.slice(displayedImages.value.length, displayedImages.value.length + count);
@@ -70,6 +118,7 @@ export default function() {
         return true;
     }
 
+    //Сбросить отображаемые изображения.
     function resetDisplayedImages(filtered = true) {
         if(filtered) {
             displayedImages.value = fImages.value.slice(0, 15);
@@ -78,13 +127,49 @@ export default function() {
         }
     }
 
+    /**
+     * Добавляние нового изображения в массив с отображаемыми изображениями, если оно соответствует фильтру.
+     * @param image Добавляемое изображение.
+     */
+    function displayAddImage(image: ImageSingle | ImageSet) {
+        for(const tag of tagsRef.value) {
+            if('arr' in image) {
+                for(const img of image.manifest.set) {
+                    if(!img.tags.includes(tag)) {
+                        return
+                    }
+                }
+            } else {
+                if(!image.manifest.tags.includes(tag)) {
+                    return;
+                }
+            }
+        }
+
+        displayedImages.value.unshift(image);
+        console.log('composable add image');
+    }
+
+    /**
+     * Удаление изображения из массива с отображаемыми изображениями.
+     * @param image Удалённое изображение.
+     */
+    function displayDeleteImage(image: ImageSingle | ImageSet) {
+        const index = displayedImages.value.findIndex(img => img == image);
+        if(index != -1) displayedImages.value.splice(index, 1);
+        console.log('composalbe delete image');
+    }
+
 
 
     return {
         images,
+        setImages,
         filteredImages,
         displayedImages,
         displayNextImages,
         resetDisplayedImages,
+        displayAddImage,
+        displayDeleteImage
     }
 }

@@ -28,11 +28,11 @@
     </transition-fade>
 
     <transition-fade>
-        <form-image-create v-if="storeImageCreate.visible"/>
+        <form-image-create :definedTags="definedTags" @saveImage="saveImageEvent"  v-if="storeImageCreate.visible"/>
     </transition-fade>
 
     <transition-fade>
-        <form-image-edit v-if="storeImageEdit.visible"/>
+        <form-image-edit @updateImage="editImageEvent" v-if="storeImageEdit.visible"/>
     </transition-fade>
 
     <transition-fade>
@@ -40,7 +40,7 @@
     </transition-fade>
 
     <transition-fade>
-        <menu-context v-if="contextMenuActive" :event="contextMenuEvent" @close="contextMenuClose">
+        <menu-context v-if="contextMenuActive" :event="contextMenuEvent!" @close="contextMenuClose">
             <div @click="editImage">Изменить</div>
             <div @click="copyImage">Копировать</div>
             <div @click="deleteImage">Удалить</div>
@@ -49,7 +49,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import { useCollections } from '@/store/collections'
 import { useImageViewStore } from '@/store/forms/form-image-view'
@@ -62,6 +63,7 @@ import useImages from '@/composables/images'
 import UseTags from '@/composables/tags'
 import useContextMenu from '@/composables/context-menu'
 import useClipboard from '@/composables/clipboard'
+import useQuery from '@/composables/query'
 
 import Sidebar from '@/components/Sidebar.vue'
 import TransitionFade from '@/components/TransitionFade.vue'
@@ -99,6 +101,14 @@ export default defineComponent({
         ScrollBar,
     },
     setup() {
+        //Данные роутера.
+        const route = useRoute();
+        const router = useRouter();
+        //Просматриваемая коллекция.
+        let collection = ref<Collection | null>(null);
+
+        const loaded = ref(false);
+
         const storeCollections = useCollections();
         const storeImageView = useImageViewStore();
         const storeImageCreate = useImageCreateStore();
@@ -106,25 +116,86 @@ export default defineComponent({
         const storeNotification = useNotificationStore();
         const storePrompt = usePromptStore();
 
-        const { images, filteredImages, displayedImages, displayNextImages, resetDisplayedImages } = useImages();
+        const { 
+            images, filteredImages, 
+            displayedImages, displayNextImages, resetDisplayedImages, displayAddImage, displayDeleteImage
+        } = useImages();
         const { tags, definedTags, addTag, removeTag, tagsOnChange } = UseTags();
         const { contextMenuActive, contextMenuEvent, contextMenuOpen, contextMenuClose, contextMenuAction } = useContextMenu();
         const { copyToClipboard } = useClipboard();
+        const { arrayToQuery, setQuery, getQuery } = useQuery();
 
-        const loaded = ref(false);
-
+        //Ref на контейнер с изображениями.
         const container = ref<HTMLElement | null>(null);
+        //Ref на IntersectionObserver.
         const observer = ref<InstanceType<typeof IntersectionObserverVue> | null>(null);
 
-
+        //Инициализация коллекции, полученной из параметров роутера.
+        //Если коллекции ещё не загружены, то сперва дождаться их загрузки.
         onMounted(async () => {
-            if(!storeCollections.activeCollection?.loaded) {
-                await storeCollections.activeCollection?.initLoadCollection();
-            }
-            loaded.value = true;
 
+            const query = getQuery();
+            if(query.tags) {
+                for(const tag of query.tags) {
+                    addTag(tag);
+                }
+            }
+
+            const status = await initCollection();
+            if(!status) {
+                //Ожидание загрузки коллекций и последующая инициализация текущей коллекции.
+                watch(() => [...storeCollections.collections], async () => {
+                    await initCollection();
+                });
+            }
+        });
+
+        //При изменении ссылки инициализировать новую Коллекцию.
+        watch(() => route.params, async () => {
+            await initCollection()
+            resetDisplayedImages();
             observer.value?.checkIntersection();
         });
+
+        //При изменении тегов сбросить отображаемые изображения, проверить пересечение
+        //и обновить query.
+        tagsOnChange(() => {
+            resetDisplayedImages();
+            observer.value?.checkIntersection();
+            setQuery({
+                tags: arrayToQuery(tags.value)
+            });
+        });
+
+        //Если IntersectionObserver пересекается, то отобразить следующую группу изображений
+        //и затем начать проверку на пересечение ещё раз.
+        function observerHandler(event: boolean) {
+            if(event) {
+                const status = displayNextImages(20);
+                if(status) observer.value?.checkIntersection();
+            }
+        }
+
+        //Инициализация коллекции, полученной из параметров роутера.
+        async function initCollection() {
+             const c = storeCollections.getCollection(route.params.name as string);
+            //Property '[Symbol.asyncIterator]' is missing in type 'FileSystemDirectoryHandle'  but required in type 'FileSystemDirectoryHandle'
+            if(c) {
+                //Установка коллекции.
+                collection = ref(c as any);
+                storeCollections.setActiveCollection(c as any);
+                
+                //Инициализация данных коллекции, т. е. загрузка изображений и тегов.
+                if(!collection.value!.loaded) {
+                    await collection.value!.initLoadCollection();
+                    loaded.value = true;
+                    observer.value?.checkIntersection();
+                } else {
+                    loaded.value = true;
+                }
+            } else return false;
+            return true;
+        }
 
 
         const imageHandlerState = ref('view');
@@ -175,7 +246,7 @@ export default defineComponent({
             selectedImages.forEach((item) => {
                 item.ref.classList.toggle('selected');
             });
-            storeCollections.activeCollection?.createSet(selectedImages.map((i: any) => i.image));
+            collection.value!.createSet(selectedImages.map((i: any) => i.image));
             selectedImages = [];
         }
 
@@ -196,7 +267,10 @@ export default defineComponent({
         function deleteImage() {
             contextMenuAction(async (image) => {
                 const answer = await storePrompt.showPrompt('Удалить изображение?', 'confirmation');
-                if(answer) storeCollections.activeCollection?.deleteImage(image);
+                if(answer && collection.value) {
+                    collection.value.deleteImage(image);
+                    displayDeleteImage(image);
+                }
             });
         }
 
@@ -207,23 +281,18 @@ export default defineComponent({
             });
         }
 
-        function observerHandler(event: boolean) {
-            if(event) {
-                const status = displayNextImages(20);
-                console.info('observer event', status);
-                if(status) observer.value?.checkIntersection();
+        async function saveImageEvent(data: any) {
+            if(collection.value) {
+                const image = await collection.value.createImage(data.manifest, data.imageBlob);
+                displayAddImage(image);
             }
         }
 
-        tagsOnChange(() => {
-            resetDisplayedImages();
-            observer.value?.checkIntersection();
-        });
-
-
+        function editImageEvent(data: ImageSingle | ImageSet) {
+            if(collection.value) collection.value.updateImage(data);
+        }
 
         return {
-            storeCollections,
             storeImageView,
             storeImageCreate,
             storeImageEdit,
@@ -258,6 +327,9 @@ export default defineComponent({
             deleteImage,
 
             loaded,
+
+            saveImageEvent,
+            editImageEvent,
         }
     },
 })

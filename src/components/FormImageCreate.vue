@@ -8,7 +8,7 @@
             <input-tags :tags="store.form.tags" :definedTags="definedTags" @add="addTag" @remove="removeTag"/>
             <div class="buttons">
                 <button-small @click="store.clearForm">Отчистить</button-small>
-                <button-small @click="store.submitImage">Сохранить</button-small>
+                <button-small @click="saveImage">Сохранить</button-small>
             </div>
             <div class="similar-images" v-if="haveDoubles">
                 <card-image-small 
@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, PropType, ref } from 'vue'
 import jimp from '@/modules/jimp'
 
 import ModalDark from '@/components/ModalDark.vue'
@@ -51,10 +51,17 @@ export default defineComponent({
         InputImage,
         CardImageSmall
     },
-    setup() {
+    props: {
+        definedTags: {
+            required: true,
+            type: Array as PropType<Array<Tag>>
+        }
+    },
+    emits: ['saveImage'],
+    setup(props, { emit }) {
         const store = useImageCreateStore();
 
-        const { addTag, definedTags, removeTag, setTagRef } = useTagActions();
+        const { addTag, removeTag, setTagRef } = useTagActions();
         const { doublicateImages, setHash, haveDoubles } = useDublicateImages();
 
         setTagRef(ref(store.form.tags));
@@ -66,15 +73,20 @@ export default defineComponent({
             setHash(store.form.hash);
         }
 
+        function saveImage() {
+            const data = store.submitImage();
+            emit('saveImage', data);
+        }
+
 
         return {
             store,
-            definedTags,
             addTag,
             removeTag,
             imagePasteEvent,
             doublicateImages,
-            haveDoubles
+            haveDoubles,
+            saveImage
         }
     },
 })

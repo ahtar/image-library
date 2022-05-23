@@ -187,6 +187,8 @@ class CollectionOjbect implements Collection {
         for(const tag of manifest.tags) {
             this.addTag(tag);
         }
+
+        return img;
     }
 
     /**

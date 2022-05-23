@@ -15,9 +15,14 @@ export const useCollections = defineStore('collections', {
     },
     actions: {
 
-        setActiveCollection(collectionIndex: number) {
-            const collection = this.collections[collectionIndex];
+        setActiveCollection(collection: Collection) {
             this.activeCollection = collection;
+        },
+
+        getCollection(name: string) {
+            const col = this.collections.find((c) => c.manifest.name === name);
+            if(col) return col;
+            return null;
         },
 
         addCollection(collection: Collection | Array<Collection>) {

@@ -2,26 +2,35 @@ interface Callback {
     (value: any, oldValue: any): void
 }
 
-
+import { Ref, ref, watch } from "vue";
 
 import { useCollections } from '@/store/collections'
-import { Ref, ref, watch } from "vue";
 
 
 export default function() {
-
-    const collectionsStore = useCollections();
+    const storeCollections = useCollections();
 
     /**
      * Ref на массив с тегами.
-     * Уникален для каждого вызова Composable.
      */
     let tags = ref<Array<string>>([]);
 
     /**
      * Существующие теги в коллекции.
      */
-    const definedTags = ref(collectionsStore.activeCollection!.tags);
+    const definedTags = ref<Array<Tag>>([]);
+
+    const customDefinedTags = ref(false);
+
+
+
+    //Инициализация тегов коллекции и реагирование на изменение активной коллекции.
+    if(storeCollections.activeCollection) definedTags.value = storeCollections.activeCollection.tags;
+    watch(() => storeCollections.activeCollection, () => {
+        if(!customDefinedTags.value && storeCollections.activeCollection) {
+            definedTags.value = storeCollections.activeCollection.tags;
+        }
+    });
 
 
     /**
@@ -66,6 +75,11 @@ export default function() {
         tags = ref;
     }
 
+    function setDefinedTags(tags: Array<Tag>) {
+        definedTags.value = tags;
+        customDefinedTags.value = true;
+    }
+
     return {
         tags,
         definedTags,
@@ -73,5 +87,6 @@ export default function() {
         removeTag,
         tagsOnChange,
         setTagRef,
+        setDefinedTags,
     }
 }

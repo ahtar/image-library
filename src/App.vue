@@ -8,6 +8,8 @@
     <message-prompt v-if="storePrompt.visible"/>
   </transition-fade>
 
+  <screen-init v-if="storeInit.visible" @data="addCollections"/>
+
 </template>
 
 
@@ -17,24 +19,52 @@ import { defineComponent, onMounted } from 'vue'
 import MessagePrompt from '@/components/MessagePrompt.vue'
 import MessageNotification from '@/components/MessageNotification.vue'
 import TransitionFade from '@/components/TransitionFade.vue'
+import ScreenInit from '@/components/ScreenInit.vue'
 
 import { usePromptStore } from '@/store/modals/modal-prompt'
+import { useInitStore } from '@/store/modals/modal-init'
+import { useCollections } from '@/store/collections'
+
+import useFileSystem from '@/composables/file-system'
+
+
 
 export default defineComponent({
   components: {
     MessageNotification,
     MessagePrompt,
     TransitionFade,
+    ScreenInit,
   },
   setup() {
     const storePrompt = usePromptStore();
+    const storeInit = useInitStore();
+    const storeCollections = useCollections();
+    const { checkMainFolderAccess, initLoadCollections } = useFileSystem();
 
-    onMounted(() => {
+    onMounted(async () => {
       console.clear();
+
+      if(!storeCollections.collectionsInitialized) {
+          const status = await checkMainFolderAccess();
+        if(!status) {
+          storeInit.show();
+        } else {
+          const data = await initLoadCollections();
+          storeCollections.addCollection(data);
+        }
+      }
     });
+
+    function addCollections(data: Collection[]) {
+      storeCollections.addCollection(data);
+      storeInit.hide();
+    }
 
     return {
       storePrompt,
+      storeInit,
+      addCollections,
     }
   }
 })

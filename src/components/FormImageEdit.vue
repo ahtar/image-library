@@ -39,7 +39,8 @@ export default defineComponent({
         ButtonSmall,
         ModalDark,
     },
-    setup() {
+    emits: ['updateImage'],
+    setup(props, { emit }) {
         const store = useImageEditStore();
         const storeCollections = useCollections();
 
@@ -143,7 +144,8 @@ export default defineComponent({
         return {
             close() {
                 store.close();
-                store.updateImage();
+                //store.updateImage();
+                emit('updateImage', store.image);
             },
             img,
             image,
