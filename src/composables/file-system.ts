@@ -5,7 +5,7 @@ import usePermissions from '@/composables/permissions'
 
 let handler: FileSystemDirectoryHandle;
 
-let callback: Function;
+let callback: any;
 
 export default function() {
     const { verifyPermission } = usePermissions();

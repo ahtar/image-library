@@ -3,4 +3,7 @@ module.exports = {
   transform: {
     "^.+\\.vue$": "vue-jest",
   },
+  verbose: false,
+  //verbose: true,
+  "testEnvironment": "jest-environment-jsdom-sixteen",
 };

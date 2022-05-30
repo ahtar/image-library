@@ -1,14 +1,14 @@
 <template>
-    <modal-dark @close="store.visible = false">
-        <div class="form-image-create-wraper wraper">
+    <modal-dark @close="store.close" data-test="modal">
+        <div class="form-image-create-wraper wraper" data-test="form-wrapper">
             <div class="form-image-create">
             <div class="section">
                 <input-text v-model="store.form.fileUrl" label="Id" :important="true" :active="store.urlInputActive" placeholder="Идентификатор изображения"/>
             </div>
-            <input-tags :tags="store.form.tags" :definedTags="definedTags" @add="addTag" @remove="removeTag"/>
+            <input-tags :tags="store.form.tags" :definedTags="definedTags" @add="addTag" @remove="removeTag" data-test="input-tags"/>
             <div class="buttons">
-                <button-small @click="store.clearForm">Отчистить</button-small>
-                <button-small @click="saveImage">Сохранить</button-small>
+                <button-small @click="store.clearForm" data-test="form-clear">Отчистить</button-small>
+                <button-small @click="saveImage" :blocked="saveButtonBlocked" data-test="form-save">Сохранить</button-small>
             </div>
             <div class="similar-images" v-if="haveDoubles">
                 <card-image-small 
@@ -21,7 +21,7 @@
         </div>
         </div>
         <div class="image-wrapper wrapper">
-            <input-image :active="true" :blob="store.form.blob" @paste="imagePasteEvent"/>
+            <input-image :active="true" :blob="store.form.blob" @paste="imagePasteEvent" data-test="input-image"/>
         </div>
     </modal-dark>
 </template>
@@ -41,6 +41,7 @@ import { useImageCreateStore } from '@/store/forms/form-create-image'
 
 import useTagActions from '@/composables/tags'
 import useDublicateImages from '@/composables/dublicate-images'
+import { computed } from '@vue/reactivity'
 
 export default defineComponent({
     components: {
@@ -64,6 +65,11 @@ export default defineComponent({
         const { addTag, removeTag, setTagRef } = useTagActions();
         const { doublicateImages, setHash, haveDoubles } = useDublicateImages();
 
+        const saveButtonBlocked = computed(() => {
+            if(store.form.blob == null) return true;
+            return false;
+        });
+
         setTagRef(ref(store.form.tags));
 
         async function imagePasteEvent(data: Blob) {
@@ -86,7 +92,8 @@ export default defineComponent({
             imagePasteEvent,
             doublicateImages,
             haveDoubles,
-            saveImage
+            saveImage,
+            saveButtonBlocked,
         }
     },
 })

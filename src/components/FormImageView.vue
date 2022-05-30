@@ -1,10 +1,10 @@
 <template>
-    <modal-dark @close="close">
+    <modal-dark @close="close" data-test="form-view-close">
         <div class="select-wrapper wrapper" v-if="isSet()">
-            <select-image :set="(image as ImageSet).arr" @change="changeImage"/>
+            <select-image :set="(image as ImageSet).arr" @change="changeImage" data-test="form-view-select"/>
         </div>
         <div class="image-wrapper wrapper">
-           <viewer-image :image="renderedImage!"/>
+           <viewer-image :image="renderedImage!" data-test="form-view-viewer"/>
         </div>
     </modal-dark>
 </template>

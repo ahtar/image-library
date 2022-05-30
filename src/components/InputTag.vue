@@ -12,7 +12,7 @@
         />
         <div class="tag-container">
             <div class="container">
-                <card-tag-small v-for="(tag, i) in tags" :key="i" :tag="getTagObject(tag)" @click="removeTag(tag, i)"/>
+                <card-tag-small v-for="(tag, i) in tags" :key="i" :tag="getTagObject(tag)" @click="removeTag(tag, i)" data-test="tag-container"/>
             </div>
         </div>
         <div class="suggestions" v-if="suggestionsVisible">

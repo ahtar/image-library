@@ -19,7 +19,6 @@ export default function() {
      * При изменении хэша получает все схожие изображения.
      */
     watch(() => hash.value, (newHash) => {
-        console.log('hash changed!');
         if(newHash == null || newHash == '') {
             doublicateImages.value = [];
         } else {

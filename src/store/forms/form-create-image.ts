@@ -84,7 +84,7 @@ export const useImageCreateStore = defineStore('imageCreate', {
         clearForm() {
             this.urlInputActive = true;
             this.imageInputActive = true;
-            this.form.tags = [];
+            this.form.tags.length = 0;
             this.form.blob = undefined;
             this.form.source = '';
             this.form.fileUrl = '';

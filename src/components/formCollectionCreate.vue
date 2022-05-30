@@ -1,12 +1,12 @@
 <template>
     <modal-dark @close="store.close">
         <div class="content-wrapper">
-            <input-text v-model="store.form.name" label="Name" placeholder="Input collection name" :important="true"/>
-            <input-text v-model="store.form.theme" label="Theme" placeholder="Input collection theme"/>
-            <input-text class="input-description" v-model="store.form.description" label="Description" placeholder="Input collection description" :textarea="true"/>
+            <input-text id="input-name" v-model="store.form.name" label="Name" placeholder="Input collection name" :important="true"/>
+            <input-text id="input-theme" v-model="store.form.theme" label="Theme" placeholder="Input collection theme"/>
+            <input-text id="input-desc" class="input-description" v-model="store.form.description" label="Description" placeholder="Input collection description" :textarea="true"/>
             <div class="button-wrapper">
-                <button-small @click="save">Save</button-small>
-                <button-small @click="clear">Clear</button-small>
+                <button-small id="form-save" @click="save" :blocked="saveButtonActive == false">Save</button-small>
+                <button-small id="form-clear" @click="clear">Clear</button-small>
             </div>
         </div>
         <div class="image-wrapper wrapper">
@@ -24,6 +24,7 @@ import InputImage from '@/components/InputImage.vue'
 import ButtonSmall from '@/components/ButtonSmall.vue'
 
 import { useCollectionCreateStore } from '@/store/forms/form-collection-create'
+import { computed } from '@vue/reactivity'
 
 export default defineComponent({
     components: {
@@ -34,6 +35,11 @@ export default defineComponent({
     },
     setup() {
         const store = useCollectionCreateStore();
+
+        const saveButtonActive = computed(() => {
+            if(store.form.name == '' || store.form.name == undefined) return false;
+            return true;
+        });
 
         async function imagePasteEvent(data: Blob) {
             store.form.blob = data;
@@ -47,11 +53,13 @@ export default defineComponent({
             store.clearForm();
         }
 
+
         return {
             store,
             imagePasteEvent,
             save,
             clear,
+            saveButtonActive,
         }
     },
 })

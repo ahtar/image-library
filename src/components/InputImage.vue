@@ -1,5 +1,5 @@
 <template>
-    <div class="input-image" ref="imageField" :tabindex="tabindex">
+    <div class="input-image" ref="imageField" :tabindex="tabindex" @paste="pasteEvent">
         <img ref="image">
         <div class="message" v-if="imageActive == false">Вставь картинку</div>
     </div>
@@ -7,6 +7,8 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue'
+
+import useClipboard from '@/composables/clipboard'
 
 export default defineComponent({
     props: {
@@ -31,18 +33,21 @@ export default defineComponent({
         const image = ref<HTMLImageElement | null>(null);
         const imageActive = ref(false);
 
+        const { readFromClipboard } = useClipboard();
+
         let blobObjectUrl: string;
 
         //Чтение первого изображения из буфера обмена
-        const pasteEvent = async () => {
+        async function pasteEvent() {
             if(props.active) {
-                const item = await (navigator.clipboard as any).read();
+                const item: any = await readFromClipboard();
                 const type = item[0].types.find((t: any) => t.includes('image'));
                 if(type) {
                     const b = await item[0].getType(type);
                     emit('paste', b);
                 }
             }
+            //emit('paste');
         };
 
         //Реагирование на изменение blob
@@ -61,8 +66,6 @@ export default defineComponent({
 
         //Инициализация.
         onMounted(() => {
-            imageField.value?.addEventListener('paste', pasteEvent);
-
             if(props.blob) {
                 URL.revokeObjectURL(blobObjectUrl);
                 blobObjectUrl = URL.createObjectURL(props.blob);
@@ -72,13 +75,13 @@ export default defineComponent({
         });
 
         onUnmounted(() => {
-            imageField.value?.removeEventListener('paste', pasteEvent);
             URL.revokeObjectURL(blobObjectUrl);
         });
         return {
             imageField,
             image,
-            imageActive
+            imageActive,
+            pasteEvent
         }
     },
 })

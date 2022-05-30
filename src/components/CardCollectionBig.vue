@@ -15,7 +15,7 @@ export default defineComponent({
     props: {
         fileHandle: {
             required: true,
-            type: Object as PropType<FileSystemFileHandle>
+            type: Object as PropType<FileSystemFileHandle | string>
         },
     },
     components: {

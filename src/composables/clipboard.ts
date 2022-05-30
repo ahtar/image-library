@@ -13,11 +13,17 @@ async function copyToClipboard(data: ImageSingle | ImageSet) {
     if(item != null) await navigator.clipboard.write([item]);
 }
 
+async function readFromClipboard() {
+    const data: any = await navigator.clipboard.read();
+    return data;
+}
+
 
 
 
 export default function() {
     return {
-        copyToClipboard
+        copyToClipboard,
+        readFromClipboard
     }
 }

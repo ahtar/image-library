@@ -1,15 +1,15 @@
 <template>
-    <modal-dark @close="close">
+    <modal-dark @close="close" data-test="form-edit-close">
         <div class="section-wrapper wrapper">
-            <select-image :set="image.arr" @change="changeActiveImage" v-if="isSet()" :draggable="true" @dragSort="dragSort"/>
+            <select-image :set="image.arr" @change="changeActiveImage" v-if="isSet()" :draggable="true" @dragSort="dragSort" data-test="form-edit-select"/>
             <div class="form-image-edit-wrapper">
                 <input-text v-model="fileUrl" label="Ссылка" :important="true" :active="false"/>
-                <input-tags :tags="computedTags" :definedTags="definedTags" @add="addTag" @remove="removeTag"/>
-                <button-small v-if="isSet()" class="button" @click="separateImage">Remove image from set</button-small>
+                <input-tags :tags="computedTags" :definedTags="definedTags" @add="addTag" @remove="removeTag" data-test="input-tags"/>
+                <button-small v-if="isSet()" class="button" @click="separateImage" data-test="form-edit-remove-image">Remove image from set</button-small>
             </div>
         </div>
         <div class="image-wrapper wrapper">
-            <img  class="image-edit" ref="img"/>
+            <img  class="image-edit" ref="img" data-test="form-edit-image"/>
         </div>
     </modal-dark>
 </template>
@@ -53,7 +53,7 @@ export default defineComponent({
 
         //Текущее активное изображение.
         //Все изменения происходят на нем.
-        //Если основное изображение это ImageSet, то активным изображением будет 1 из элементов этого сета
+        //Если основное изображение это ImageSet, то активным  будет 1 из элементов этого сета
         //Если основное изображение это ImageSingle, то оно и будет активным.
         const activeImage = ref<ImageSingle | null>(null);
 
@@ -111,12 +111,12 @@ export default defineComponent({
         //Отделение изображения из сета.
         async function separateImage() {
             if(image.value != null) {
-                console.log(activeImage.value);
+                //console.log(activeImage.value);
                 if('arr' in image.value) {
                     const img: ImageSet = image.value;
                     //Удаление ImageSingle из сета.
                     image.value.removeImage(activeImage.value!);
-                    //Сохранение манифеста ImageSingle отдельным файлом.
+                    //Сохранение данных ImageSingle отдельным файлом.
                     storeCollections.activeCollection?.updateImage(activeImage.value! as any);
                     //Добавление ImageSingle в массив с изображениями.
                     storeCollections.activeCollection?.addImage(activeImage.value! as any);
