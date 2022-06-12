@@ -51,7 +51,9 @@ export default defineComponent({
         }
         
         return {
-            close: store.close,
+            close() {
+                store.close();
+            },
             image: store.image,
             renderedImage,
             img,

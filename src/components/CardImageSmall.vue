@@ -1,13 +1,13 @@
 <template>
     <base-card class="card-image-small">
         <img ref="imgRef">
-        <div class="set-symbol" v-if="isSet()"/>
+        <div class="set-symbol" v-if="isSet()" data-test="card-image-small-set"/>
     </base-card>
 </template>
 
 
 <script lang="ts">
-import { defineComponent, onMounted, onUpdated, PropType, ref } from 'vue'
+import { defineComponent, onMounted, onUnmounted, onUpdated, PropType, ref } from 'vue'
 
 import BaseCard from '@/components/base/BaseCard.vue'
 
@@ -68,6 +68,11 @@ export default defineComponent({
                 //renderImage(imgRef.value!, `${process.env.BASE_URL}/Error.png`);
             }
         });
+
+        //TODO
+        //onUnmounted(() => {
+        //    URL.revokeObjectURL(imgRef.value!.src);
+        //})
 
         function isSet() {
            return 'arr' in props.image

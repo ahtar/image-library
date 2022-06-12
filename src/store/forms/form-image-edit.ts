@@ -28,8 +28,7 @@ export const useImageEditStore = defineStore('imageEdit', {
 
         updateImage() {
             if(this.image != undefined) {
-                //const img: ImageSet | ImageSingle = this.image;
-                //какая то странная ошибка
+                console.info('update image store', this.image);
                 this.collectionsStore.activeCollection?.updateImage(this.image as any);
             }
         },

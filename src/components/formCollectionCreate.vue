@@ -1,16 +1,16 @@
 <template>
     <modal-dark @close="store.close">
-        <div class="content-wrapper">
-            <input-text id="input-name" v-model="store.form.name" label="Name" placeholder="Input collection name" :important="true"/>
-            <input-text id="input-theme" v-model="store.form.theme" label="Theme" placeholder="Input collection theme"/>
-            <input-text id="input-desc" class="input-description" v-model="store.form.description" label="Description" placeholder="Input collection description" :textarea="true"/>
+        <div class="content-wrapper" data-test="collection-create-wrapper">
+            <input-text id="input-name" v-model="store.form.name" label="Name" placeholder="Input collection name" :important="true" data-test="collection-create-name"/>
+            <input-text id="input-theme" v-model="store.form.theme" label="Theme" placeholder="Input collection theme" data-test="collection-create-theme"/>
+            <input-text id="input-desc" class="input-description" v-model="store.form.description" label="Description" placeholder="Input collection description" :textarea="true" data-test="collection-create-description"/>
             <div class="button-wrapper">
-                <button-small id="form-save" @click="save" :blocked="saveButtonActive == false">Save</button-small>
-                <button-small id="form-clear" @click="clear">Clear</button-small>
+                <button-small id="form-save" @click="save" :blocked="saveButtonActive == false" data-test="collection-create-save">Save</button-small>
+                <button-small id="form-clear" @click="clear" data-test="collection-create-clear">Clear</button-small>
             </div>
         </div>
         <div class="image-wrapper wrapper">
-            <input-image :active="true" :blob="store.form.blob" @paste="imagePasteEvent"/>
+            <input-image :active="true" :blob="store.form.blob" @paste="imagePasteEvent" data-test="collection-create-image"/>
         </div>
     </modal-dark>
 </template>

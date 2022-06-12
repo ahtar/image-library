@@ -30,6 +30,10 @@ export const usePromptStore = defineStore('prompt', {
                     }
                 }
             });
+        },
+
+        callAction(status = true) {
+            if(this.action) this.action(status);
         }
     },
 });

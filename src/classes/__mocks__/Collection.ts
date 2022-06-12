@@ -9,7 +9,7 @@ const mockedClass =  jest.fn(() => {
             theme: 'mocked theme',
             lastModified: 'mocked lastModified date'
         },
-        arr: [],
+        arr: [] as Array<ImageSet | ImageSingle>,
         tags: [],
         handle: {
             kind: 'directory',
@@ -42,11 +42,29 @@ const mockedClass =  jest.fn(() => {
         initLoadCollection: jest.fn(),
         addTag: jest.fn(),
         getTag: jest.fn(),
-        addImage: jest.fn(),
+        addImage(img: ImageSingle | ImageSet) {
+            this.arr.push(img);
+        },
         createImage: jest.fn(),
         createSet: jest.fn(),
-        deleteImage: jest.fn(),
-        removeImage: jest.fn(),
+        async deleteImage(image: ImageSingle | ImageSet): Promise<void> {
+            this.removeImage(image);
+        },
+        removeImage(image: ImageSingle | ImageSet | ImageSingleData | string) {
+            if(typeof image == 'string') {
+                const index = this.arr.findIndex((i) => i.manifest.id == image);
+                if(index != -1) this.arr.splice(index, 1);
+            } else if('imageHandle' in image) {
+                const index = this.arr.findIndex((i) => i.manifest.id == image.manifest.id);
+                if(index != -1) this.arr.splice(index, 1);
+            } else if('arr' in image) {
+                const index = this.arr.findIndex((i) => i.manifest.id == image.manifest.id);
+                if(index != -1) this.arr.splice(index, 1);
+            } else {
+                const index = this.arr.findIndex((i) => i.manifest.id == image.id);
+                if(index != -1) this.arr.splice(index, 1);
+            }
+        },
         updateImage: jest.fn(),
         log: jest.fn(),
     }

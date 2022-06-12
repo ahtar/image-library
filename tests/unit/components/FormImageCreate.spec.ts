@@ -3,18 +3,19 @@ import userEvent from '@testing-library/user-event';
 import { createTestingPinia } from '@pinia/testing';
 
 import FormImageCreate from '@/components/FormImageCreate.vue'
-import ModalDark from '@/components/ModalDark.vue'
 import InputImage from '@/components/InputImage.vue'
 
 import { useImageCreateStore } from '@/store/forms/form-create-image'
 import Collection from '@/classes/Collection';
-import { VueNode } from "@vue/test-utils/dist/types";
 
 jest.mock('@/classes/Collection');
 jest.mock('@/composables/clipboard');
 jest.mock('@/modules/jimp.ts');
-jest.mock('@/composables/image-rendering')
+jest.mock('@/composables/image-rendering');
 
+
+globalThis.URL.createObjectURL = jest.fn();
+globalThis.URL.revokeObjectURL = jest.fn();
 
 
 describe('FormImageCreate.vue', () => {
@@ -36,15 +37,12 @@ describe('FormImageCreate.vue', () => {
         });
         const storeImages = useImageCreateStore();
 
-        await wrapper.find('[data-test="input-tags"] input').setValue('test');
-        (wrapper.find('[data-test="input-tags"] input').element as VueNode<HTMLElement>).focus();
-
-        expect(wrapper.find('[data-test="input-tags"] input').element).toBe(document.activeElement);
-        expect((wrapper.find('[data-test="input-tags"] input').element as VueNode<HTMLInputElement>).value).toBe('test');
+        await wrapper.find<HTMLInputElement>('[data-test="input-tags"] input').setValue('test');
+        wrapper.find<HTMLInputElement>('[data-test="input-tags"] input').element.focus();
+        expect(wrapper.find<HTMLInputElement>('[data-test="input-tags"] input').element.value).toBe('test');
 
         await userEvent.keyboard('{Enter}');
-
-        expect((wrapper.find('[data-test="input-tags"] input').element as VueNode<HTMLInputElement>).value).toBe('');
+        expect(wrapper.find<HTMLInputElement>('[data-test="input-tags"] input').element.value).toBe('');
         expect(storeImages.form.tags.length).toBe(1);
     });
 
@@ -115,17 +113,14 @@ describe('FormImageCreate.vue', () => {
         const user = userEvent.setup();
         const storeImages = useImageCreateStore();
 
-        globalThis.URL.createObjectURL = jest.fn();
-        globalThis.URL.revokeObjectURL = jest.fn();
-
         expect(storeImages.form.blob).not.toBeDefined();
 
-        wrapper.find<HTMLElement>('[data-test="input-image"]').element.focus();
+        //пользователь жмет на элемент и вставляет изображение из буфера обмена
+        await userEvent.click(wrapper.find<HTMLElement>('[data-test="input-image"]').element);
         await user.paste();
 
         expect(wrapper.findComponent(InputImage).emitted().paste).toBeDefined();
         expect(storeImages.form.blob).toBeDefined();
-
     });
 
     it('изображение рендерится, если оно вставлено', async () => {
@@ -174,12 +169,14 @@ describe('FormImageCreate.vue', () => {
             attachTo: document.body
         });
         const storeImages = useImageCreateStore();
-        jest.spyOn(wrapper.vm, 'saveImage');
+        jest.spyOn(storeImages, 'submitImage');
 
         storeImages.form.blob = new Blob();
 
         await userEvent.click(wrapper.find('[data-test="form-save"]').element);
-        expect(wrapper.vm.saveImage).toBeCalledTimes(1);
+
+        expect(storeImages.submitImage).toBeCalledTimes(1);
+        expect(wrapper.emitted().saveImage).toBeDefined();
     });
 
     it('форма не сохраняется, если изображение не вставлено', async () => {
@@ -198,10 +195,12 @@ describe('FormImageCreate.vue', () => {
             },
             attachTo: document.body
         });
-        jest.spyOn(wrapper.vm, 'saveImage');
+        const storeImages = useImageCreateStore();
+        jest.spyOn(storeImages, 'submitImage');
 
         await userEvent.click(wrapper.find('[data-test="form-save"]').element);
-        expect(wrapper.vm.saveImage).toBeCalledTimes(0);
-    });
 
+        expect(storeImages.submitImage).toBeCalledTimes(0);
+        expect(wrapper.emitted().saveImage).not.toBeDefined();
+    });
 });

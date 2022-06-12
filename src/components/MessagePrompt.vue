@@ -1,10 +1,10 @@
 <template>
-    <modal-dark @close="close">
+    <modal-dark @close="close()">
         <div class="prompt-wrapper">
             {{store.message}}
             <div class="button-box">
-                <button-small @click="close">Нет</button-small>
-                <button-small @click="confirm">Да</button-small>
+                <button-small @click="close()">Нет</button-small>
+                <button-small @click="confirm()">Да</button-small>
             </div>
         </div>
     </modal-dark>
@@ -29,11 +29,11 @@ export default defineComponent({
         return {
             store,
             close() {
-                store.action?.(false);
+                store.callAction(false);
                 store.visible = false;
             },
             confirm() {
-                store.action?.(true);
+                store.callAction(true);
                 store.visible = false;
             }
         }

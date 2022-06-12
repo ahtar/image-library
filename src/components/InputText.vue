@@ -1,6 +1,6 @@
 <template>
     <div class="input-wrapper" :class="{'input-wrapper-textarea': textarea}">
-        <div class="label" :class="{'important': important, 'label-textarea': textarea}" v-if="labelActive()">{{label}}</div>
+        <div class="label" :class="{'important': important, 'label-textarea': textarea}" v-if="labelActive()" data-test="input-text-label">{{label}}</div>
         <div class="input-textarea" v-if="textarea">
             <textarea :placeholder="placeholder" :value="modelValue" @input="input"/>
         </div>
@@ -14,7 +14,7 @@
                 :tabindex="tabIndex"
                 @keypress.enter="enterKeypress"/>
         </div>
-        <div class="wrapper-disabled" v-if="!active"/>
+        <div class="wrapper-disabled" v-if="!active" data-test="input-test-disabled"/>
     </div>
 </template>
 
@@ -33,7 +33,7 @@ export default defineComponent({
         },
         placeholder: {
             type: String,
-            default: 'placeholder'
+            default: ''
         },
         modelValue: String,
         active: {

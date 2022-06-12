@@ -3,7 +3,7 @@
         <div class="init-wrapper">
             <p class="message">Due to a restriction of the File System Access API and Permissions API, 
                 the user must grant access to the folder every time he visits the site.</p>
-            <button-small @click="requestFolder">Pick folder</button-small>
+            <button-small @click="requestFolder()">Pick folder</button-small>
         </div>
     </modal-dark>
 </template>

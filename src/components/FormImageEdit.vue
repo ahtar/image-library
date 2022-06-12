@@ -120,7 +120,7 @@ export default defineComponent({
                     storeCollections.activeCollection?.updateImage(activeImage.value! as any);
                     //Добавление ImageSingle в массив с изображениями.
                     storeCollections.activeCollection?.addImage(activeImage.value! as any);
-                    //Изменение активного изображения на персове изображение в сете.
+                    //Изменение активного изображения на первое изображение в сете.
                     changeActiveImage(image.value.arr[0]);
                     //Если после удаления изображения из сета в сете останется лишь 1 изображение,
                     //то сохранить его как отдельное изображение и удалить сет.
@@ -144,7 +144,6 @@ export default defineComponent({
         return {
             close() {
                 store.close();
-                //store.updateImage();
                 emit('updateImage', store.image);
             },
             img,

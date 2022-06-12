@@ -37,13 +37,15 @@ export default defineComponent({
     },
     emits: ['change', 'dragSort'],
     setup(props, { emit }) {
-        let selectedImage: any = null;
+        let selectedImage: HTMLElement | null = null;
         let dragOverId = '';
 
         //Инициализация.
         onMounted(async () => {
-            selectedImage = document.getElementById(`${0}`)?.children[0];
-            selectedImage.classList.toggle('selected');
+            selectedImage = document.getElementById(`${0}`)?.children[0] as HTMLElement;
+            if(selectedImage != undefined) {
+                selectedImage.classList.toggle('selected');
+            }
         });
 
         //Начало Drag.
@@ -77,11 +79,11 @@ export default defineComponent({
 
         //Изменение активного изображения.
         function change(card: ImageSingle, event: any) {
-            if(event.target != selectedImage) {
+            if(selectedImage && event.target != selectedImage) {
+                emit('change', card);
                 selectedImage.classList.toggle('selected');
                 event.target.classList.toggle('selected');
                 selectedImage = event.target;
-                emit('change', card);
             }
         }
 

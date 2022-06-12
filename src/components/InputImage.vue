@@ -9,6 +9,7 @@
 import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import useClipboard from '@/composables/clipboard'
+import useImageRendering from '@/composables/image-rendering'
 
 export default defineComponent({
     props: {
@@ -34,6 +35,7 @@ export default defineComponent({
         const imageActive = ref(false);
 
         const { readFromClipboard } = useClipboard();
+        const { renderImage } = useImageRendering();
 
         let blobObjectUrl: string;
 
@@ -47,19 +49,16 @@ export default defineComponent({
                     emit('paste', b);
                 }
             }
-            //emit('paste');
         };
 
         //Реагирование на изменение blob
         //Перерисовка изображения.
-            watch(() => props.blob, (newData) => {
+        watch(() => props.blob, (newData) => {
             URL.revokeObjectURL(blobObjectUrl);
+            renderImage(image.value!, props.blob);
             if(props.blob != undefined) {
-                blobObjectUrl = URL.createObjectURL(props.blob);
-                image.value!.src = blobObjectUrl;
                 imageActive.value = true;
             } else {
-                image.value!.src = '';
                 imageActive.value = false;
             }
         });
@@ -67,15 +66,13 @@ export default defineComponent({
         //Инициализация.
         onMounted(() => {
             if(props.blob) {
-                URL.revokeObjectURL(blobObjectUrl);
-                blobObjectUrl = URL.createObjectURL(props.blob);
-                image.value!.src = blobObjectUrl;
+                renderImage(image.value!, props.blob);
                 imageActive.value = true;
             }
         });
 
         onUnmounted(() => {
-            URL.revokeObjectURL(blobObjectUrl);
+            URL.revokeObjectURL(image.value!.src);
         });
         return {
             imageField,

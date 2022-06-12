@@ -8,6 +8,12 @@ import ModalDark from '@/components/ModalDark.vue'
 
 import { useCollectionCreateStore } from '@/store/forms/form-collection-create'
 
+jest.mock('@/composables/clipboard');
+jest.mock('@/composables/image-rendering');
+
+globalThis.URL.createObjectURL = jest.fn();
+globalThis.URL.revokeObjectURL = jest.fn();
+
 
 describe('FormCollectionCreate.vue', () => {
     it('название коллекции вводится', () => {
@@ -20,11 +26,9 @@ describe('FormCollectionCreate.vue', () => {
 
         expect(store.form.name).toBe('');
 
-        wrapper.find('#input-name').find('input').setValue('collection name');
-        wrapper.find('#input-name').find('input').trigger('input');
+        wrapper.find('[data-test="collection-create-name"] input').setValue('collection name');
 
         expect(store.form.name).toBe('collection name');
-
     });
 
     it('тема коллекции вводится', () => {
@@ -37,8 +41,7 @@ describe('FormCollectionCreate.vue', () => {
 
         expect(store.form.theme).toBe('');
 
-        wrapper.find('#input-theme').find('input').setValue('collection theme');
-        wrapper.find('#input-theme').find('input').trigger('input');
+        wrapper.find('[data-test="collection-create-theme"] input').setValue('collection theme');
 
         expect(store.form.theme).toBe('collection theme');
 
@@ -54,8 +57,7 @@ describe('FormCollectionCreate.vue', () => {
 
         expect(store.form.description).toBe('');
 
-        wrapper.find('#input-desc').find('textarea').setValue('collection description');
-        wrapper.find('#input-desc').find('textarea').trigger('input');
+        wrapper.find('[data-test="collection-create-description"] textarea').setValue('collection description');
 
         expect(store.form.description).toBe('collection description');
 
@@ -70,7 +72,7 @@ describe('FormCollectionCreate.vue', () => {
         const store = useCollectionCreateStore();
         jest.spyOn(store, 'clearForm');
 
-        await userEvent.click(wrapper.find('#form-clear').element);
+        await userEvent.click(wrapper.find('[data-test="collection-create-clear"]').element);
 
         expect(store.clearForm).toBeCalledTimes(1);
 
@@ -85,10 +87,9 @@ describe('FormCollectionCreate.vue', () => {
         const store = useCollectionCreateStore();
         jest.spyOn(store, 'createCollection');
 
-        expect(store.form.name).not.toBeTruthy();
-        expect(wrapper.vm.saveButtonActive).not.toBeTruthy();
+        expect(store.form.name).toBeFalsy();
 
-        await userEvent.click(wrapper.find('#form-save').element);
+        await userEvent.click(wrapper.find('[data-test="collection-create-save"]').element);
 
         expect(store.createCollection).toBeCalledTimes(0);
 
@@ -104,12 +105,8 @@ describe('FormCollectionCreate.vue', () => {
         jest.spyOn(store, 'createCollection');
 
 
-        wrapper.find('#input-name').find('input').setValue('collection name');
-
-        expect(wrapper.vm.saveButtonActive).toBeTruthy();
-        expect(store.form.name).toBeTruthy();
-
-        await userEvent.click(wrapper.find('#form-save').element);
+        wrapper.find('[data-test="collection-create-name"] input').setValue('collection name');
+        await userEvent.click(wrapper.find('[data-test="collection-create-save"]').element);
 
         expect(store.createCollection).toBeCalledTimes(1);
 
@@ -124,15 +121,34 @@ describe('FormCollectionCreate.vue', () => {
         const store = useCollectionCreateStore();
         jest.spyOn(store, 'close');
 
-        await userEvent.click(wrapper.find('.content-wrapper').element);
+        //при нажании в границе окна, окно не закрывается
+        await userEvent.click(wrapper.find('[data-test="collection-create-wrapper"]').element);
         await userEvent.click(wrapper.findComponent(InputImage).element);
-
         expect(store.close).not.toBeCalled();
 
+        //при нажатии за границу окна, окно закроется
         await userEvent.click(wrapper.findComponent(ModalDark).element);
-
-
         expect(store.close).toBeCalledTimes(1);
+    });
+
+    it('Изображение вставляется', async () => {
+        const wrapper = mount(FormCollectionCreate, {
+            global: {
+                plugins: [createTestingPinia()],
+            },
+            attachTo: document.body
+        });
+        const user = userEvent.setup();
+
+        //src изображения это пустая строка, следовательно изображение не отрисовано
+        expect(wrapper.find<HTMLImageElement>('img').element.src).toBe('');
+
+        //пользователь жмет на элемент и вставляет изображение из буфера обмена
+        await userEvent.click(wrapper.find<HTMLElement>('[data-test="collection-create-image"]').element);
+        await user.paste();
+
+        //src изображения меняется с пустой строки, следовательно это изображение отрисовано
+        expect(wrapper.find<HTMLImageElement>('img').element.src).not.toBe('');
     });
 
 });

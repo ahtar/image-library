@@ -5,26 +5,24 @@ import CardNotificationSuccess from '@/components/CardNotificationSuccess.vue'
 
 describe('CardNotificationSuccess.vue', () => {
     it('рендерит текст, полученный из  props.message', () => {
-        const msg = 'Hello World';
         const wrapper = mount(CardNotificationSuccess, {
             props: {
-                message: msg
+                message: 'Hello World'
             }
         });
 
-        expect(wrapper.find('.message').text()).toMatch(msg);
+        expect(wrapper.html()).toContain('Hello World');
     });
 
-    it('emit Close при нажатии', async () => {
-        const msg = 'Hello World';
+    it('событие Close при нажатии', async () => {
         const wrapper = mount(CardNotificationSuccess, {
             props: {
-                message: msg
+                message: 'Hello World'
             }
         });
 
         await wrapper.trigger('click');
 
-        expect(wrapper.emitted().close).toBeTruthy();
+        expect(wrapper.emitted().close).toBeDefined();
     });
 });

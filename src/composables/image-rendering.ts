@@ -1,12 +1,21 @@
 
 
-async function renderImage(image: HTMLImageElement, file: FileSystemFileHandle | string) {
+async function renderImage(image: HTMLImageElement, file: FileSystemFileHandle | string | Blob | undefined): Promise<string> {
     let data: string | null = null;
 
-    if(typeof file == 'string') {
-        data = file;
-    } else {
-        data = URL.createObjectURL(await file.getFile());
+    if(file) {
+        //file == string
+        if(typeof file == 'string') {
+            data = file;
+        } else {
+            if('getFile' in file) {
+                //file == FileSystemFileHandle
+                data = URL.createObjectURL(await file.getFile());
+            } else {
+                //file == Blob
+                data = URL.createObjectURL(file);
+            }
+        }
     }
 
     return new Promise((resolve) => {
@@ -17,12 +26,14 @@ async function renderImage(image: HTMLImageElement, file: FileSystemFileHandle |
         }
 
         if(data) {
+            //ожидание прогрузки изображения
             image.onload = function() {
-                resolve(null);
+                resolve(data!);
             };
             image.src = data;
         } else {
-            resolve(null);
+            image.src = '';
+            resolve('');
         }
     });
 }

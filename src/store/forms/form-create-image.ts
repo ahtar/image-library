@@ -62,13 +62,6 @@ export const useImageCreateStore = defineStore('imageCreate', {
                 imageInstance.tags.push(tag);
             }
 
-            //сохранить изображение в коллекцию
-            //const status = await storeCollections.activeCollection?.addImage(imageInstance);
-
-            console.log('puk puk dummy image creation!');
-
-            //storeCollections.activeCollection?.createImage(imageInstance, this.form.blob!);
-
             const obj = {
                 manifest: imageInstance,
                 imageBlob: this.form.blob!

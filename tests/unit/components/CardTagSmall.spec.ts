@@ -4,7 +4,7 @@ import CardTagSmall from '@/components/CardTagSmall.vue'
 
 
 describe('CardTagSmall.vue', () => {
-    it('рендерит текст, полученный из  props.tag', () => {
+    it('рендерит полученный props.tag', () => {
         const tag: Tag = {
             name: 'test',
             count: 50
@@ -15,7 +15,6 @@ describe('CardTagSmall.vue', () => {
             }
         });
 
-        expect(wrapper.text()).toMatch('test (50)');
+        expect(wrapper.html()).toContain('test (50)');
     });
-
 });

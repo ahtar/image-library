@@ -1,4 +1,4 @@
-import { shallowMount, mount } from "@vue/test-utils";
+import { mount } from "@vue/test-utils";
 
 import CardNewBig from '@/components/CardNewBig.vue'
 

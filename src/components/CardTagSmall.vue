@@ -34,7 +34,7 @@ export default defineComponent({
         function count() {
             if(props.tag) {
                 if(typeof props.tag == 'string') {
-                    return 'Error'
+                    return '0'
                 } else {
                     return props.tag.count;
                 }

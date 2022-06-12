@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="suggestions" v-if="suggestionsVisible">
-            <card-tag-small v-for="(tag, i) in suggestedTags" :key="i" :tag="tag" @click="getTag(tag)"/>
+            <card-tag-small v-for="(tag, i) in suggestedTags" :key="i" :tag="tag" @click="getTag(tag)" data-test="input-tag-suggestion"/>
         </div>
     </div>
 </template>
