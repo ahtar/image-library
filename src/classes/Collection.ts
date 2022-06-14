@@ -292,6 +292,14 @@ class CollectionOjbect implements Collection {
     log() {
         console.log(this);
     }
+
+    /**
+     * Удаление коллекции.
+     */
+    async deleteCollection() {
+        const handle = Fs().getHandle();
+        await handle.removeEntry(this.manifest.name, { recursive: true });
+    }
 }
 
 

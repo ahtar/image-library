@@ -54,7 +54,7 @@ export const useCollectionCreateStore = defineStore('collectionCreate', {
             const handle = getHandle();
 
             /**
-             * Проверка, существует ли Коллекция с заданых пользователем именем,
+             * Проверка, существует ли Коллекция с заданым пользователем именем,
              * если не существует, то приступить к созданию.
              */
             try {
@@ -81,6 +81,9 @@ export const useCollectionCreateStore = defineStore('collectionCreate', {
 
                     const collection = new Collection(manifest, thumbnailHandle, collectionHandle);
                     store.addCollection(collection);
+
+                    this.clearForm();
+                    this.close();
                 } else {
                     console.log(error);
                 }

@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import useClipboard from '@/composables/clipboard'
 import useImageRendering from '@/composables/image-rendering'
@@ -71,9 +71,10 @@ export default defineComponent({
             }
         });
 
-        onUnmounted(() => {
+        onBeforeUnmount(() => {
             URL.revokeObjectURL(image.value!.src);
-        });
+        })
+
         return {
             imageField,
             image,

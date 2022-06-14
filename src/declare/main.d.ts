@@ -16,6 +16,7 @@ interface Collection {
     deleteImage(image: ImageSingle | ImageSet): Promise<void>,
     updateImage(image: ImageSingle | ImageSet): Promise<void>,
     initLoadCollection(): Promise<void>,
+    deleteCollection(): Promise<void>
 }
 
 interface CollectionManifest {

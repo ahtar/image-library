@@ -251,21 +251,21 @@ export default defineComponent({
         }
 
         function editImage() {
-            contextMenuAction((image) => {
+            contextMenuAction<ImageSingle | ImageSet>((image) => {
                 storeImageEdit.setImage(image);
                 storeImageEdit.open();
             });
         }
 
         function copyImage() {
-            contextMenuAction(async (image) => {
+            contextMenuAction<ImageSingle | ImageSet>(async (image) => {
                 await copyToClipboard(image);
                 storeNotification.notify('Изображение скопировано!');
             });
         }
 
         function deleteImage() {
-            contextMenuAction(async (image) => {
+            contextMenuAction<ImageSingle | ImageSet>(async (image) => {
                 const answer = await storePrompt.showPrompt('Удалить изображение?', 'confirmation');
                 if(answer && collection.value) {
                     collection.value.deleteImage(image);

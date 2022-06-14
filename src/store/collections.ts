@@ -34,6 +34,15 @@ export const useCollections = defineStore('collections', {
             } else {
                 this.collections.push(collection);
             }
+        },
+
+        deleteCollection(collection: Collection) {
+            const index = this.collections.findIndex((c) => c.manifest.name == collection.manifest.name);
+
+            if(index != -1) {
+                this.collections.splice(index, 1);
+                collection.deleteCollection();
+            }
         }
     }
 });

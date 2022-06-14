@@ -35,7 +35,9 @@ const mockClass = jest.fn(() => {
             isSameEntry: jest.fn(),
             queryPermission: jest.fn(),
             requestPermission: jest.fn(),
-            getFile: jest.fn(),
+            getFile: jest.fn(() => {
+                return { type: 'testType' }
+            }),
             createWritable: jest.fn(),
             isFile: true,
             isDirectory: false,
@@ -53,7 +55,9 @@ const mockClass = jest.fn(() => {
         },
         loadImage: jest.fn(),
         loadThumbnail: jest.fn(),
-        getImage: jest.fn(),
+        getImage() {
+            return this.imageHandle;
+        },
         getThumbnail: jest.fn(),
     }
 });

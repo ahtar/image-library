@@ -67,6 +67,7 @@ const mockedClass =  jest.fn(() => {
         },
         updateImage: jest.fn(),
         log: jest.fn(),
+        deleteCollection: jest.fn(),
     }
 });
 
