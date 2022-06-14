@@ -13,6 +13,10 @@
   </transition-fade>
 
   <transition-fade>
+    <form-collection-edit v-if="storeCollectionEdit.visible"/>
+  </transition-fade>
+
+  <transition-fade>
     <menu-context :event="contextMenuEvent!" v-if="contextMenuActive" @close="contextMenuClose">
       <div @click="editCollection">Изменить</div>
       <div @click="deleteCollection">Удалить</div>
@@ -27,11 +31,13 @@ import CardCollectionBig from '@/components/CardCollectionBig.vue'
 import CardNewBig from '@/components/CardNewBig.vue'
 import TransitionFade from '@/components/TransitionFade.vue'
 import FormCollectionCreate from '@/components/formCollectionCreate.vue'
+import FormCollectionEdit from '@/components/FormCollectionEdit.vue'
 import MenuContext from '@/components/MenuContext.vue'
 
 import { useCollections } from '@/store/collections'
 import { useCollectionCreateStore } from '@/store/forms/form-collection-create'
 import { usePromptStore } from '@/store/modals/modal-prompt'
+import { useCollectionEditStore } from '@/store/forms/form-collection-edit'
 import useContextMenu from '@/composables/context-menu'
 
 
@@ -42,12 +48,14 @@ export default defineComponent({
     CardNewBig,
     TransitionFade,
     FormCollectionCreate,
+    FormCollectionEdit,
     MenuContext
   },
 
   setup() {
     const store = useCollections();
     const storeCollectionCreate = useCollectionCreateStore();
+    const storeCollectionEdit = useCollectionEditStore();
     const storePrompt = usePromptStore();
     const { contextMenuActive, contextMenuEvent, contextMenuOpen, contextMenuClose, contextMenuAction } = useContextMenu();
 
@@ -57,7 +65,7 @@ export default defineComponent({
 
     function editCollection() {
       contextMenuAction<Collection>((item) => {
-        console.info('edit', item);
+        storeCollectionEdit.open(item);
       });
     }
 
@@ -73,6 +81,7 @@ export default defineComponent({
     return {
       store,
       storeCollectionCreate,
+      storeCollectionEdit,
       editCollection,
       deleteCollection,
       link,

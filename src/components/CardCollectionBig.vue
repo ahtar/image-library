@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, PropType, ref } from 'vue'
+import { defineComponent, onMounted, onUpdated, PropType, ref } from 'vue'
 
 import BaseCard from '@/components/base/BaseCard.vue'
 
@@ -30,6 +30,10 @@ export default defineComponent({
         onMounted(() => {
             renderImage(imgRef.value!, props.fileHandle);
         });
+
+        onUpdated(() => {
+            renderImage(imgRef.value!, props.fileHandle);
+        })
 
         return {
             imgRef,

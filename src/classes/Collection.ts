@@ -9,7 +9,7 @@ import Fs from '@/composables/file-system'
 interface CollectionOptions {
     name: string,
     created?: string,
-    deription?: string,
+    description?: string,
     theme?: string,
     lastModified?: string,
     count?: number
@@ -44,7 +44,7 @@ class CollectionOjbect implements Collection {
         this.manifest = {
             name: options.name,
             created: options.created || Date(),
-            description: options.deription,
+            description: options.description,
             theme: options.theme,
             lastModified: options.lastModified
         };
@@ -299,6 +299,21 @@ class CollectionOjbect implements Collection {
     async deleteCollection() {
         const handle = Fs().getHandle();
         await handle.removeEntry(this.manifest.name, { recursive: true });
+    }
+
+    /**
+     * Обновление данных коллекции.
+     * @param manifest данные коллекции.
+     * @param thumbnail опциональный thumbnail файл.
+     */
+    async updateCollectionManifest(manifest: CollectionManifest, thumbnail?: Blob) {
+        Fs().writeFile(this.handle, 'manifest.json', JSON.stringify(manifest));
+        this.manifest = manifest;
+
+        if(thumbnail) {
+            const handle = await Fs().writeFile(this.handle, 'thumbnail.png', await jimp.resize(thumbnail));
+            this.thumbnail = handle;
+        }
     }
 }
 
