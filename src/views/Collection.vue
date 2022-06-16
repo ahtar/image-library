@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 import { useCollections } from '@/store/collections'
 import { useImageViewStore } from '@/store/forms/form-image-view'
@@ -64,6 +64,7 @@ import UseTags from '@/composables/tags'
 import useContextMenu from '@/composables/context-menu'
 import useClipboard from '@/composables/clipboard'
 import useQuery from '@/composables/query'
+import useImageDisplay from '@/composables/imagesDisplay'
 
 import Sidebar from '@/components/Sidebar.vue'
 import TransitionFade from '@/components/TransitionFade.vue'
@@ -101,12 +102,8 @@ export default defineComponent({
         ScrollBar,
     },
     setup() {
-        //Данные роутера.
         const route = useRoute();
-        const router = useRouter();
-        //Просматриваемая коллекция.
         let collection = ref<Collection | null>(null);
-
         const loaded = ref(false);
 
         const storeCollections = useCollections();
@@ -116,70 +113,68 @@ export default defineComponent({
         const storeNotification = useNotificationStore();
         const storePrompt = usePromptStore();
 
-        const { 
-            images, filteredImages, 
-            displayedImages, displayNextImages, resetDisplayedImages, displayAddImage, displayDeleteImage
-        } = useImages();
+        const { images, filteredImages, setImages, setTagRef } = useImages();
+        const { setDisplayableImages, displayedImages, displayNextImages, resetDisplayedImages } = useImageDisplay();
         const { tags, definedTags, addTag, removeTag, tagsOnChange } = UseTags();
         const { contextMenuActive, contextMenuEvent, contextMenuOpen, contextMenuClose, contextMenuAction } = useContextMenu();
         const { copyToClipboard } = useClipboard();
         const { arrayToQuery, setQuery, getQuery } = useQuery();
 
-        //Ref на контейнер с изображениями.
         const container = ref<HTMLElement | null>(null);
-        //Ref на IntersectionObserver.
         const observer = ref<InstanceType<typeof IntersectionObserverVue> | null>(null);
 
-        //Инициализация коллекции, полученной из параметров роутера.
-        //Если коллекции ещё не загружены, то сперва дождаться их загрузки.
-        onMounted(async () => {
 
+
+
+    
+        setTagRef(tags);
+        setDisplayableImages(filteredImages as any);
+
+
+
+        /**
+        * Работа с коллекцией и параметрами роутера.
+        */
+
+        //Инициализация.
+        onMounted(async () => {
+            //Получение тегов из query параметров
             const query = getQuery();
             if(query.tags) {
                 for(const tag of query.tags) {
                     addTag(tag);
                 }
             }
-
+            //Инициализация коллекции, если она ещё не инициализирована и сами коллекции уже получены.
+            //Название коллекции берется из параметра роутера.
             const status = await initCollection();
+
+            //Если коллекции ещё не получены (приложение было открыто сразу на какой-либо коллекции, например */collections/CollectionName)
+            //то дождаться получения коллекций, и после этого инициализировать коллекцию.
             if(!status) {
-                //Ожидание загрузки коллекций и последующая инициализация текущей коллекции.
                 watch(() => [...storeCollections.collections], async () => {
                     await initCollection();
+                    setImages(ref(collection.value!.arr) as any);
                 });
+            } else {
+                //Если коллекция уже инициализирована
+                setImages(ref(collection.value!.arr) as any);
             }
         });
 
-        //При изменении ссылки инициализировать новую Коллекцию.
+        //Если коллекция в параметре роутера каким-либо образом изменилась 
+        //(например, пользователь сам изменил ссылку */collections/CollectionName => */collections/NewName)
+        //то сделать активной эту коллекцию.
         watch(() => route.params, async () => {
-            await initCollection()
+            await initCollection();
+            setImages(ref(collection.value!.arr) as any);
             resetDisplayedImages();
             observer.value?.checkIntersection();
         });
-
-        //При изменении тегов сбросить отображаемые изображения, проверить пересечение
-        //и обновить query.
-        tagsOnChange(() => {
-            resetDisplayedImages();
-            observer.value?.checkIntersection();
-            setQuery({
-                tags: arrayToQuery(tags.value)
-            });
-        });
-
-        //Если IntersectionObserver пересекается, то отобразить следующую группу изображений
-        //и затем начать проверку на пересечение ещё раз.
-        function observerHandler(event: boolean) {
-            if(event) {
-                const status = displayNextImages(20);
-                if(status) observer.value?.checkIntersection();
-            }
-        }
 
         //Инициализация коллекции, полученной из параметров роутера.
         async function initCollection() {
              const c = storeCollections.getCollection(route.params.name as string);
-            //Property '[Symbol.asyncIterator]' is missing in type 'FileSystemDirectoryHandle'  but required in type 'FileSystemDirectoryHandle'
             if(c) {
                 //Установка коллекции.
                 collection = ref(c as any);
@@ -197,7 +192,35 @@ export default defineComponent({
             return true;
         }
 
+        //Обновление query параметров в соответствии с введеными тегами.
+        tagsOnChange(() => {
+            //resetDisplayedImages();
+            //observer.value?.checkIntersection();
+            setQuery({
+                tags: arrayToQuery(tags.value)
+            });
+        });
 
+
+
+
+        //Если IntersectionObserver пересекается, то отобразить следующую группу изображений
+        //и затем начать проверку на пересечение ещё раз.
+        function observerHandler(event: boolean) {
+            if(event) {
+                const status = displayNextImages(20);
+                if(status) observer.value?.checkIntersection();
+            }
+        }
+
+
+
+
+
+
+        /**
+         * Работа с изображениями
+         */
         const imageHandlerState = ref('view');
         let selectedImages: Array<any> = [];
 
@@ -250,6 +273,14 @@ export default defineComponent({
             selectedImages = [];
         }
 
+
+
+
+
+
+        /**
+         * контект меню
+         */
         function editImage() {
             contextMenuAction<ImageSingle | ImageSet>((image) => {
                 storeImageEdit.setImage(image);
@@ -269,7 +300,7 @@ export default defineComponent({
                 const answer = await storePrompt.showPrompt('Удалить изображение?', 'confirmation');
                 if(answer && collection.value) {
                     collection.value.deleteImage(image);
-                    displayDeleteImage(image);
+                    //displayDeleteImage(image);
                 }
             });
         }
@@ -281,10 +312,13 @@ export default defineComponent({
             });
         }
 
+
+
+
         async function saveImageEvent(data: any) {
             if(collection.value) {
                 const image = await collection.value.createImage(data.manifest, data.imageBlob);
-                displayAddImage(image);
+                //displayAddImage(image);
             }
         }
 
@@ -302,7 +336,7 @@ export default defineComponent({
             scrollToTop,
 
             images,
-            filteredImages: filteredImages(tags),
+            filteredImages,//: filteredImages(tags),
             displayedImages,
             observerHandler,
 

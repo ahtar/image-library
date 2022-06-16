@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent } from 'vue'
+    import { defineComponent, watch } from 'vue'
 
     export default defineComponent({
 
@@ -18,6 +18,10 @@
             },
         },
         setup(props) {
+
+            /*watch(props.items, () => {
+
+            });*/
 
             return {
                 
