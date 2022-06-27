@@ -5,5 +5,7 @@ export default jest.fn(() => {
             const str = (Math.random().toString(36)+'00000000000000000').slice(2, 8);
             image.src = str;
         }),
+
+        releaseImage: jest.fn(),
     }
 });
