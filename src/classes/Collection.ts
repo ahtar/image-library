@@ -32,12 +32,15 @@ class CollectionOjbect implements Collection {
      * @returns Объект Collection.
      */
     static async fromFolderHandle(handle: FileSystemDirectoryHandle) {
-        const manifest = JSON.parse(await (await (await handle.getFileHandle('manifest.json')).getFile()).text());
-        const thumbnail = await handle.getFileHandle('thumbnail.png');
-        const collectionClass = new this(manifest, thumbnail, handle);
-
-        return collectionClass;
-
+        try {
+            const manifest = JSON.parse(await (await (await handle.getFileHandle('manifest.json')).getFile()).text());
+            const thumbnail = await handle.getFileHandle('thumbnail.png');
+            const collectionClass = new this(manifest, thumbnail, handle);
+            return collectionClass;
+        } catch(err) {
+            console.info(err, `entry name: ${handle.name}`, `entry kind: ${handle.kind}`);
+            return null;
+        }
     }
 
     constructor(options: CollectionOptions, thumbnail: FileSystemFileHandle, handle: FileSystemDirectoryHandle) {
@@ -160,9 +163,9 @@ class CollectionOjbect implements Collection {
      */
     async addImage(image: ImageSingle | ImageSet | Array<ImageSingle | ImageSet>) {
         if(Array.isArray(image)) {
-            this.arr.push(...image);
+            this.arr.unshift(...image);
         } else {
-            this.arr.push(image);
+            this.arr.unshift(image);
         }
     }
 
@@ -173,9 +176,9 @@ class CollectionOjbect implements Collection {
      */
     async createImage(manifest: ImageSingleData, image: Blob) {
         const fs = Fs();
-        const imageDataFolderHandle = await this.handle.getDirectoryHandle('imageData');
-        const imageFileFolderHandle = await this.handle.getDirectoryHandle('images');
-        const imageThumbnailFolderHandle = await this.handle.getDirectoryHandle('thumbnails');
+        const imageDataFolderHandle = await this.handle.getDirectoryHandle('imageData', { create: true });
+        const imageFileFolderHandle = await this.handle.getDirectoryHandle('images', { create: true });
+        const imageThumbnailFolderHandle = await this.handle.getDirectoryHandle('thumbnails', { create: true });
 
         await fs.writeFile(imageDataFolderHandle, manifest.id + '.json', JSON.stringify(manifest));
         const imageHandle = await fs.writeFile(imageFileFolderHandle, manifest.fileUrl, image);
@@ -237,23 +240,32 @@ class CollectionOjbect implements Collection {
      * @param image Объект Изображения.
      */
     async deleteImage(image: ImageSingle | ImageSet): Promise<void> {
-        const fs = Fs();
-        const imageDataFolderHandle = await this.handle.getDirectoryHandle('imageData');
-        const imageFileFolderHandle = await this.handle.getDirectoryHandle('images');
-        const imageThumbnailFolderHandle = await this.handle.getDirectoryHandle('thumbnails');
+        try {
+            const fs = Fs();
+            const imageDataFolderHandle = await this.handle.getDirectoryHandle('imageData', { create: true });
+            const imageFileFolderHandle = await this.handle.getDirectoryHandle('images', { create: true });
+            const imageThumbnailFolderHandle = await this.handle.getDirectoryHandle('thumbnails', { create: true });
+            //let status = false;
+            const promises: Promise<void>[] = [];
 
-        if('arr' in image) {
-            for(const imageSingle of image.arr) {
-                await imageFileFolderHandle.removeEntry(imageSingle.manifest.fileUrl);
-                await imageThumbnailFolderHandle.removeEntry(imageSingle.manifest.previewFileUrl);
+            if('arr' in image) {
+                for(const imageSingle of image.arr) {
+                    promises.push(imageFileFolderHandle.removeEntry(imageSingle.manifest.fileUrl));
+                    promises.push(imageThumbnailFolderHandle.removeEntry(imageSingle.manifest.previewFileUrl));
+                }
+                promises.push(imageDataFolderHandle.removeEntry(image.manifest.id + '.json'));
+            } else {
+                promises.push(imageDataFolderHandle.removeEntry(image.manifest.id + '.json'));
+                promises.push(imageFileFolderHandle.removeEntry(image.manifest.fileUrl));
+                promises.push(imageThumbnailFolderHandle.removeEntry(image.manifest.previewFileUrl));
             }
-            await imageDataFolderHandle.removeEntry(image.manifest.id + '.json');
+
+            const temp = await Promise.allSettled(promises);
             this.removeImage(image);
-        } else {
-            await imageDataFolderHandle.removeEntry(image.manifest.id + '.json');
-            await imageFileFolderHandle.removeEntry(image.manifest.fileUrl);
-            await imageThumbnailFolderHandle.removeEntry(image.manifest.previewFileUrl);
-            this.removeImage(image);
+            console.info('File deleted?', temp);
+        } catch(err) {
+            console.log(err);
+            throw(err);
         }
     }
 

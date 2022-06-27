@@ -2,11 +2,12 @@ const fs = require('fs');
 const webpack = require('webpack')
 
 module.exports = {
+    assetsDir: 'assets',
     configureWebpack: {
         plugins: [
             new webpack.DefinePlugin({
                 'process.browser': 'true'
-            }),
+            })
         ]
     },
     devServer: {

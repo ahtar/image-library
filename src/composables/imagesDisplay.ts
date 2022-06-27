@@ -10,10 +10,11 @@ export default function() {
     function setDisplayableImages(data: Ref<Array<ImageSet | ImageSingle>>) {
         displayableImages = data;
 
+        //Слежение за добавлением или удалением изображений в сете.
         watch(() => [...displayableImages.value], (n, o) => {
             if(n.length > o.length) {
                 const newImages = n.filter(i => !o.includes(i));
-               displayedImages.value.unshift(...newImages);
+                if(newImages.length == 1) displayedImages.value.unshift(...newImages);
             } else if(n.length < o.length) {
                 const removedImages = o.filter(i => !n.includes(i));
                 for(const image of removedImages) {

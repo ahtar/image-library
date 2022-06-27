@@ -45,6 +45,7 @@ export default defineComponent({
     onMounted(async () => {
       console.clear();
 
+      //Проверка, загруженны ли коллекции, если не загружены, то запросить доступ к коллекциям.
       if(!storeCollections.collectionsInitialized) {
           const status = await checkMainFolderAccess();
         if(!status) {

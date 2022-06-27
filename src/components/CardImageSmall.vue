@@ -1,13 +1,13 @@
 <template>
     <base-card class="card-image-small">
-        <img ref="imgRef">
+        <img ref="imgRef" src="@/assets/Error.png">
         <div class="set-symbol" v-if="isSet()" data-test="card-image-small-set"/>
     </base-card>
 </template>
 
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, onUpdated, PropType, ref } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, onUnmounted, onUpdated, PropType, ref } from 'vue'
 
 import BaseCard from '@/components/base/BaseCard.vue'
 
@@ -24,55 +24,62 @@ export default defineComponent({
         BaseCard,
     },
     setup(props) {
-        const { renderImage } = useImageRendering();
+        const { renderImage, releaseImage } = useImageRendering();
 
         const imgRef = ref<null | HTMLImageElement>(null);
+
+        let cachedId = '';
 
 
         //Прорисовка изображения при mounted.
         onMounted(async () => {
             try {
+                let file: any;
                 if('arr' in props.image) {
-                    const file = await props.image.arr[0].getThumbnail();
-                    await renderImage(imgRef.value!, file);
-                    imgRef.value!.style.width = 'auto';
-                    imgRef.value!.style.height = 'auto';
+                    cachedId = props.image.arr[0].manifest.id;
+                    file = await props.image.arr[0].getThumbnail();
                 } else {
-                    const file = await props.image.getThumbnail();
-                    await renderImage(imgRef.value!, file);
-                    imgRef.value!.style.width = 'auto';
-                    imgRef.value!.style.height = 'auto';
+                    cachedId = props.image.manifest.id;
+                    file = await props.image.getThumbnail();
                 }
+                imgRef.value!.style.width = 'auto';
+                imgRef.value!.style.height = 'auto';
+                releaseImage(imgRef.value!);
+                await renderImage(imgRef.value!, file);
             } catch(err) {
                 console.log(err);
-                //renderImage(imgRef.value!, `${process.env.BASE_URL}/Error.png`);
             }
         });
 
         //Прорисовка изображения при updated.
         onUpdated(async () => {
             try {
+                let id = '';
+                let file: any;
+
                 if('arr' in props.image) {
-                    const file = await props.image.arr[0].getThumbnail();
-                    renderImage(imgRef.value!, file);
-                    imgRef.value!.style.width = 'auto';
-                    imgRef.value!.style.height = 'auto';
+                    id = props.image.arr[0].manifest.id;
+                    file = await props.image.arr[0].getThumbnail();
                 } else {
-                    const file = await props.image.getThumbnail();
+                    id = props.image.manifest.id;
+                    file = await props.image.getThumbnail();
+                }
+
+                if(cachedId != id) {
+                    releaseImage(imgRef.value!);
                     renderImage(imgRef.value!, file);
                     imgRef.value!.style.width = 'auto';
                     imgRef.value!.style.height = 'auto';
+                    cachedId = id;
                 }
             } catch(err) {
                 console.log(err);
-                //renderImage(imgRef.value!, `${process.env.BASE_URL}/Error.png`);
             }
         });
 
-        //TODO
-        //onUnmounted(() => {
-        //    URL.revokeObjectURL(imgRef.value!.src);
-        //})
+        onBeforeUnmount(() => {
+            releaseImage(imgRef.value!);
+        })
 
         function isSet() {
            return 'arr' in props.image

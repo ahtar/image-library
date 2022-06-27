@@ -38,13 +38,13 @@ interface ImageSingle {
     async loadImage(): Promise<void>,
     async loadThumbnail(): Promise<void>,
     async getImage(): Promise<FileSystemFileHandle>,
-    async getThumbnail(): Promise<FileSystemFileHandle>,
+    async getThumbnail(): Promise<FileSystemFileHandle>
 }
 
 interface ImageSet {
     manifest: ImageSetData,
     arr: Array<ImageSingle>
-    removeImage(image: ImageSingle): void,
+    removeImage(image: ImageSingle): void
 }
 
 
@@ -80,6 +80,6 @@ interface TagGype {
     colorCode?: string
 }
 
-declare module 'vue-virtual-scroll-list' {
+declare module 'vue-virtual-scroller' {
 
 }

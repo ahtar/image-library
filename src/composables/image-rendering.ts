@@ -38,10 +38,18 @@ async function renderImage(image: HTMLImageElement, file: FileSystemFileHandle |
     });
 }
 
+function releaseImage(image: HTMLImageElement) {
+    if(image.src != '') {
+        //console.log('releasing image!');
+        URL.revokeObjectURL(image.src);
+    }
+}
+
 
 
 export default function() {
     return {
         renderImage,
+        releaseImage,
     }
 }

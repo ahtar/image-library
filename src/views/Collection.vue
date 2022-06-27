@@ -174,28 +174,31 @@ export default defineComponent({
 
         //Инициализация коллекции, полученной из параметров роутера.
         async function initCollection() {
-             const c = storeCollections.getCollection(route.params.name as string);
-            if(c) {
-                //Установка коллекции.
-                collection = ref(c as any);
-                storeCollections.setActiveCollection(c as any);
+            try {
+                const c = storeCollections.getCollection(route.params.name as string);
+                if(c) {
+                    //Установка коллекции.
+                    collection = ref(c as any);
+                    storeCollections.setActiveCollection(c as any);
                 
-                //Инициализация данных коллекции, т. е. загрузка изображений и тегов.
-                if(!collection.value!.loaded) {
-                    await collection.value!.initLoadCollection();
-                    loaded.value = true;
-                    observer.value?.checkIntersection();
-                } else {
-                    loaded.value = true;
-                }
-            } else return false;
-            return true;
+                    //Инициализация данных коллекции, т. е. загрузка изображений и тегов.
+                    if(!collection.value!.loaded) {
+                        await collection.value!.initLoadCollection();
+                        loaded.value = true;
+                        //observer.value?.checkIntersection();
+                    } else {
+                        loaded.value = true;
+                    }
+                } else return false;
+                return true;
+            } catch(err) {
+                storeNotification.notify('При загрузке коллекции что то пошло не так', false);
+                console.log(err);
+            }
         }
 
         //Обновление query параметров в соответствии с введеными тегами.
         tagsOnChange(() => {
-            //resetDisplayedImages();
-            //observer.value?.checkIntersection();
             setQuery({
                 tags: arrayToQuery(tags.value)
             });
@@ -297,10 +300,15 @@ export default defineComponent({
 
         function deleteImage() {
             contextMenuAction<ImageSingle | ImageSet>(async (image) => {
-                const answer = await storePrompt.showPrompt('Удалить изображение?', 'confirmation');
-                if(answer && collection.value) {
-                    collection.value.deleteImage(image);
-                    //displayDeleteImage(image);
+                try {
+                    const answer = await storePrompt.showPrompt('Удалить изображение?', 'confirmation');
+                    if(answer && collection.value) {
+                        await collection.value.deleteImage(image);
+                        storeNotification.notify('Изображение удалено!');
+                    }
+                } catch(err) {
+                    storeNotification.notify('Изображение не было удалено', false);
+                    console.log(err);
                 }
             });
         }
@@ -317,13 +325,26 @@ export default defineComponent({
 
         async function saveImageEvent(data: any) {
             if(collection.value) {
-                const image = await collection.value.createImage(data.manifest, data.imageBlob);
-                //displayAddImage(image);
+                try {
+                    await collection.value.createImage(data.manifest, data.imageBlob);
+                    storeNotification.notify('Изображение создано!');
+                } catch(err) {
+                    storeNotification.notify('Изображение не было создано', false);
+                    console.log(err);
+                }
             }
         }
 
-        function editImageEvent(data: ImageSingle | ImageSet) {
-            if(collection.value) collection.value.updateImage(data);
+        async function editImageEvent(data: ImageSingle | ImageSet) {
+            try {
+                if(collection.value) {
+                    await collection.value.updateImage(data);
+                    storeNotification.notify('Изображение измененно!');
+                } else storeNotification.notify('Что-то пошло не так');
+            } catch(err) {
+                console.log(err);
+                storeNotification.notify('Изображение не измененно!', false);
+            }
         }
 
         return {

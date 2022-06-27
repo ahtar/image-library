@@ -77,7 +77,8 @@ export default function() {
         if(handler != undefined) {
             for await (const [key, h] of handler.entries()) {
                 if(h.kind == 'directory') {
-                    arr.push(await Collection.fromFolderHandle(h));
+                    const collection = await Collection.fromFolderHandle(h);
+                    if( collection) arr.push(collection);
                 }
             }
         }

@@ -35,14 +35,22 @@ export default defineComponent({
         }
 
         onMounted(async () => {
-            if(img.value != null) {
-                await renderImage(img.value, await props.image.getImage());
+            try {
+                if(img.value != null) {
+                    await renderImage(img.value, await props.image.getImage());
+                }
+            } catch(err) {
+                console.log(err);
             }
         });
 
         onUpdated(async () => {
-            if(img.value != null) {
-                await renderImage(img.value, await props.image.getImage());
+            try {
+                if(img.value != null) {
+                    await renderImage(img.value, await props.image.getImage());
+                }
+            } catch(err) {
+                console.log(err);
             }
         });
 
