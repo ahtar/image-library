@@ -1,24 +1,27 @@
 <template>
     <modal-dark @close="store.close" data-test="modal">
-        <div class="form-image-create-wraper wraper" data-test="form-wrapper">
+        <div class="form-image-create-wraper wraper" :class="{ 'margin-big': oldTagsCopy.length == 0 }" data-test="form-wrapper">
+            <div class="prior-tag-wrapper" v-if="oldTagsCopy.length > 0" data-test="old-tags">
+                <card-tag-small v-for="(tag, i) in oldTagsCopy" :key="i" :tag="tag" @click="reuseOldTag(i)"/>
+            </div>
             <div class="form-image-create">
-            <div class="section">
-                <input-text v-model="store.form.fileUrl" label="Id" :important="true" :active="store.urlInputActive" placeholder="Идентификатор изображения"/>
-            </div>
-            <input-tags :tags="store.form.tags" :definedTags="definedTags" @add="addTag" @remove="removeTag" data-test="input-tags"/>
-            <div class="buttons">
-                <button-small @click="store.clearForm" data-test="form-clear">Отчистить</button-small>
-                <button-small @click="saveImage" :blocked="saveButtonBlocked" data-test="form-save">Сохранить</button-small>
-            </div>
-            <div class="similar-images" v-if="haveDoubles">
-                <card-image-small 
+                <div class="section">
+                    <input-text v-model="store.form.fileUrl" label="Id" :important="true" :active="store.urlInputActive" placeholder="Идентификатор изображения"/>
+                </div>
+                <input-tags :tags="store.form.tags" :definedTags="definedTags" @add="addTag" @remove="removeTagHandler" data-test="input-tags"/>
+                <div class="buttons">
+                    <button-small @click="store.clearForm" data-test="form-clear">Отчистить</button-small>
+                    <button-small @click="saveImage" :blocked="saveButtonBlocked" data-test="form-save">Сохранить</button-small>
+                </div>
+                <div class="similar-images" v-if="haveDoubles">
+                    <card-image-small 
                         v-for="(image) in doublicateImages"
                         :image="image" 
                         :key="image.manifest.id"
                         class="image-card"
-                />
+                    />
+                </div>
             </div>
-        </div>
         </div>
         <div class="image-wrapper wrapper">
             <input-image :active="true" :blob="store.form.blob" @paste="imagePasteEvent" data-test="input-image"/>
@@ -27,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue'
+import { defineComponent, PropType, ref, Ref } from 'vue'
 import jimp from '@/modules/jimp'
 
 import ModalDark from '@/components/ModalDark.vue'
@@ -35,6 +38,7 @@ import InputText from '@/components/InputText.vue'
 import InputTags from '@/components/InputTag.vue'
 import InputImage from '@/components/InputImage.vue'
 import CardImageSmall from '@/components/CardImageSmall.vue'
+import CardTagSmall from '@/components/CardTagSmall.vue'
 import ButtonSmall from '@/components/ButtonSmall.vue'
 
 import { useImageCreateStore } from '@/store/forms/form-create-image'
@@ -50,11 +54,16 @@ export default defineComponent({
         InputText,
         InputTags,
         InputImage,
-        CardImageSmall
+        CardImageSmall,
+        CardTagSmall,
     },
     props: {
         definedTags: {
             required: true,
+            type: Array as PropType<Array<Tag>>
+        },
+        priorTags: {
+            default: () => [],
             type: Array as PropType<Array<Tag>>
         }
     },
@@ -62,13 +71,18 @@ export default defineComponent({
     setup(props, { emit }) {
         const store = useImageCreateStore();
 
+        //Действия над тегами формы.
         const { addTag, removeTag, setTagRef } = useTagActions();
+        //Дубликаты создаваемого изображения.
         const { doublicateImages, setHash, haveDoubles } = useDublicateImages();
 
         const saveButtonBlocked = computed(() => {
             if(store.form.blob == null) return true;
             return false;
         });
+
+        //Теги прошлого созданного изображения.
+        const oldTagsCopy: Ref<Tag[]> = ref(props.priorTags.filter(t => !store.form.tags.includes(t.name)));
 
         setTagRef(ref(store.form.tags));
 
@@ -84,16 +98,34 @@ export default defineComponent({
             emit('saveImage', data);
         }
 
+        function reuseOldTag(i: number) {
+            addTag(oldTagsCopy.value[i]);
+            oldTagsCopy.value.splice(i, 1);
+        }
+
+        function removeTagHandler(tag: Tag | string, index: number) {
+            removeTag(tag, index);
+
+            if(typeof tag == 'string') {
+                const t = props.priorTags.find((t) => t.name == tag);
+                if(t && !oldTagsCopy.value.includes(t)) {
+                    oldTagsCopy.value.push(t);
+                }
+            }
+        }
+
 
         return {
             store,
             addTag,
-            removeTag,
+            removeTagHandler,
             imagePasteEvent,
             doublicateImages,
             haveDoubles,
             saveImage,
             saveButtonBlocked,
+            oldTagsCopy,
+            reuseOldTag,
         }
     },
 })
@@ -101,6 +133,33 @@ export default defineComponent({
 
 
 <style lang="scss" scoped>
+
+    .form-image-create-wraper {
+        margin-left: 5vw;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .margin-big {
+        margin-left: calc(12vw + 26px);
+    }
+
+    .prior-tag-wrapper {
+        width: 7vw;
+        max-height: 60vh;
+        background-color: $color-dark-1;
+        border: thin solid $color-border-dark-1;
+        border-radius: $radius-big;
+        padding: 12px;
+        overflow-y: auto;
+        @include z-depth();
+        @include scroll();
+        
+        .card-tag-small {
+            margin-bottom: 12px;
+        }
+    }
     .form-image-create {
         background-color: $color-dark-1;
         border: thin solid $color-border-dark-1;
@@ -110,6 +169,7 @@ export default defineComponent({
         align-items: flex-start;
         flex-direction: column;
         padding: 20px;
+        margin-left: 1vw;
         width: 30vw;
 
         .section {
@@ -151,13 +211,6 @@ export default defineComponent({
 
     .input-image {
         margin-left: 10vw;
-    }
-
-    .form-image-create-wraper {
-        margin-left: 10vw;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
     }
 
     .image-wrapper {

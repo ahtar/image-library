@@ -203,4 +203,102 @@ describe('FormImageCreate.vue', () => {
         expect(storeImages.submitImage).toBeCalledTimes(0);
         expect(wrapper.emitted().saveImage).not.toBeDefined();
     });
+
+    it('Окно с тегами предыдущего изображения не активно, если ни 1 изображение ещё не было создано в этой сессии', () => {
+        const collection = new Collection(jest.fn(), {} as any, {} as any);
+        const wrapper = mount(FormImageCreate, {
+            global: {
+                plugins: [createTestingPinia({
+                    initialState: {
+                        collections: {
+                            activeCollection: collection
+                        }
+                    }
+                })],
+            },
+            props: {
+                definedTags: [],
+            },
+            attachTo: document.body
+        });
+
+        expect(wrapper.find('[data-test="old-tags"]').exists()).not.toBeTruthy();
+    });
+
+    it('Окно с тегами предыдущего изображения активно, если в сессии уже было создано новое изображение', () => {
+        const collection = new Collection(jest.fn(), {} as any, {} as any);
+        collection.lastTags.push(...[{ name: 'test tag 1', count: 1 }, { name: 'test tag 2', count: 1 }, { name: 'test tag 3', count: 1 }]);
+        const wrapper = mount(FormImageCreate, {
+            global: {
+                plugins: [createTestingPinia({
+                    initialState: {
+                        collections: {
+                            activeCollection: collection
+                        }
+                    }
+                })],
+            },
+            props: {
+                definedTags: [],
+                priorTags: collection.lastTags
+            },
+            attachTo: document.body
+        });
+
+        expect(wrapper.find('[data-test="old-tags"]').exists()).toBeTruthy();
+    });
+
+    it('Старые теги можно добавить', async () => {
+        const collection = new Collection(jest.fn(), {} as any, {} as any);
+        collection.lastTags.push(...[{ name: 'test tag 1', count: 1 }, { name: 'test tag 2', count: 1 }, { name: 'test tag 3', count: 1 }]);
+        const wrapper = mount(FormImageCreate, {
+            global: {
+                plugins: [createTestingPinia({
+                    initialState: {
+                        collections: {
+                            activeCollection: collection
+                        }
+                    }
+                })],
+            },
+            props: {
+                definedTags: [],
+                priorTags: collection.lastTags
+            },
+            attachTo: document.body
+        });
+        const storeImages = useImageCreateStore();
+
+        expect(storeImages.form.tags.length).toBe(0);
+
+        await userEvent.click(wrapper.find('[data-test="old-tags"]').element.children[0]);
+
+        expect(storeImages.form.tags.length).toBe(1);
+    });
+
+    it('Окно со старыми тегами пропадает, если использованы все старые теги', async () => {
+        const collection = new Collection(jest.fn(), {} as any, {} as any);
+        collection.lastTags.push(...[{ name: 'test tag 1', count: 1 }]);
+        const wrapper = mount(FormImageCreate, {
+            global: {
+                plugins: [createTestingPinia({
+                    initialState: {
+                        collections: {
+                            activeCollection: collection
+                        }
+                    }
+                })],
+            },
+            props: {
+                definedTags: [],
+                priorTags: collection.lastTags
+            },
+            attachTo: document.body
+        });
+        expect(wrapper.find('[data-test="old-tags"]').exists()).toBeTruthy();
+
+        await userEvent.click(wrapper.find('[data-test="old-tags"]').element.children[0]);
+
+        expect(wrapper.find('[data-test="old-tags"]').exists()).not.toBeTruthy();
+    });
 });

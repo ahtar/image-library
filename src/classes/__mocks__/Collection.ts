@@ -11,6 +11,7 @@ const mockedClass =  jest.fn(() => {
         },
         arr: [] as Array<ImageSet | ImageSingle>,
         tags: [],
+        lastTags: [],
         handle: {
             kind: 'directory',
             name: 'mocked name',

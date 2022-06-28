@@ -28,7 +28,7 @@
     </transition-fade>
 
     <transition-fade>
-        <form-image-create :definedTags="definedTags" @saveImage="saveImageEvent"  v-if="storeImageCreate.visible"/>
+        <form-image-create :definedTags="definedTags" :priorTags="lastTags" @saveImage="saveImageEvent"  v-if="storeImageCreate.visible"/>
     </transition-fade>
 
     <transition-fade>
@@ -81,6 +81,7 @@ import MenuContext from '@/components/MenuContext.vue'
 import ScreenLoading from '@/components/ScreenLoading.vue'
 import ButtonSmall from '@/components/ButtonSmall.vue'
 import ScrollBar from '@/components/ScrollBar.vue'
+import { computed } from '@vue/reactivity'
 
 
 export default defineComponent({
@@ -124,7 +125,12 @@ export default defineComponent({
         const observer = ref<InstanceType<typeof IntersectionObserverVue> | null>(null);
 
 
-
+        const lastTags = computed(() => {
+            if(collection.value) {
+                return collection.value.lastTags;
+            }
+            return [];
+        });
 
     
         setTagRef(tags);
@@ -327,6 +333,14 @@ export default defineComponent({
             if(collection.value) {
                 try {
                     await collection.value.createImage(data.manifest, data.imageBlob);
+
+                    //Запоминание тегов нового изображения.
+                    collection.value.lastTags = [];
+                    for(const tag of data.manifest.tags) {
+                        collection.value.lastTags.push(collection.value.getTag(tag));
+                    }
+                    console.log(collection.value.lastTags);
+
                     storeNotification.notify('Изображение создано!');
                 } catch(err) {
                     storeNotification.notify('Изображение не было создано', false);
@@ -371,6 +385,7 @@ export default defineComponent({
             definedTags,
             addTag, 
             removeTag,
+            lastTags,
 
             contextMenuActive,
             contextMenuOpen,

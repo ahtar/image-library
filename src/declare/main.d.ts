@@ -8,6 +8,7 @@ interface Collection {
     manifest: CollectionManifest,
     loaded: boolean,
     arr: Array<ImageSingle | ImageSet>,
+    lastTags: Array<Tag>,
     tags: Array<Tag>,
     thumbnail: FileSystemFileHandle,
     addImage(image: ImageSingle | ImageSet | Array<ImageSingle | ImageSet>): Promise<void>,
@@ -15,6 +16,8 @@ interface Collection {
     createSet(images: Array<ImageSingle>): Promise<void>,
     deleteImage(image: ImageSingle | ImageSet): Promise<void>,
     updateImage(image: ImageSingle | ImageSet): Promise<void>,
+    addTag(tag: string): void,
+    getTag(name: string): Tag,
     initLoadCollection(): Promise<void>,
     deleteCollection(): Promise<void>,
     updateCollectionManifest(manifest: CollectionManifest, thumbnail?: Blob): Promise<void>

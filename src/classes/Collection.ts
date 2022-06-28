@@ -19,11 +19,19 @@ interface CollectionOptions {
 
 class CollectionOjbect implements Collection {
 
+    //Данные коллекции.
     manifest: CollectionManifest;
+    //Массив с изобажениями.
     arr: (ImageSingle | ImageSet)[];
+    //Массив с тегами.
     tags: Array<Tag>;
+    //Массив с тегами последнего созданного изображения.
+    lastTags: Array<Tag> = [];
+    //DirectoryHandle папки с коллекцией.
     private handle: FileSystemDirectoryHandle;
+    //FileHandle превью коллекции.
     thumbnail: FileSystemFileHandle;
+    //Инициализирована ли коллекция.
     loaded = false;
 
     /**
@@ -195,7 +203,7 @@ class CollectionOjbect implements Collection {
     }
 
     /**
-     * Создание нового сета Изображенийи его добавление в Коллекцию.
+     * Создание нового сета Изображений и его добавление в Коллекцию.
      * @param images Массив с Изображениями.
      */
     async createSet(images: Array<ImageSingle | ImageSet>) {
