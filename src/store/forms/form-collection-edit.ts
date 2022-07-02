@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useNotificationStore } from '@/store/modals/modal-notification'
 
 export const useCollectionEditStore = defineStore('collectionEdit', {
     state: () => {
@@ -26,16 +27,24 @@ export const useCollectionEditStore = defineStore('collectionEdit', {
             this.form.blob = await collection.thumbnail.getFile();
         },
 
-        //Отправление запроса на обновление данных коллекции.
-        save() {
-            const manifest = {
-                name: this.form.name,
-                theme: this.form.theme,
-                description: this.form.description,
-                created: this.collection!.manifest.created,
-                lastModified: Date()
-            };
-            this.collection?.updateCollectionManifest(manifest, this.form.blob!);
+        //Обновление данных коллекции.
+        async save() {
+            const storeNotification = useNotificationStore();
+            try {
+                const manifest = {
+                    name: this.form.name,
+                    theme: this.form.theme,
+                    description: this.form.description,
+                    created: this.collection!.manifest.created,
+                    lastModified: Date()
+                };
+                await this.collection!.updateCollectionManifest(manifest, this.form.blob!);
+                this.close();
+                storeNotification.notify('Информация о коллекции обновлена.');
+            } catch(err) {
+                console.log(err);
+                storeNotification.notify('Что-то пошло не так.', false);
+            }
         }
     }
 });

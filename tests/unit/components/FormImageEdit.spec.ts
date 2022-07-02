@@ -33,12 +33,12 @@ describe('FormImageEdit.vue', () => {
         });
         const store = useImageEditStore();
         jest.spyOn(store, 'close');
+        jest.spyOn(store, 'updateImage');
 
         await userEvent.click(wrapper.find('[data-test="form-edit-close"]').element);
 
         expect(store.close).toBeCalledTimes(1);
-        expect(wrapper.emitted().updateImage).toBeDefined();
-
+        expect(store.updateImage).toBeCalledTimes(1);
     });
 
     it('новый тег добавляется', async () => {
@@ -246,7 +246,8 @@ describe('FormImageEdit.vue', () => {
                         imageEdit: {
                             image
                         }
-                    }
+                    },
+                    stubActions: false
                 })],
             }
         });
@@ -285,7 +286,8 @@ describe('FormImageEdit.vue', () => {
                         imageEdit: {
                             image
                         }
-                    }
+                    },
+                    stubActions: false
                 })],
             }
         });

@@ -1,5 +1,5 @@
 <template>
-    <div class="scroll-component" @click="up"></div>
+    <div class="scroll-component" @click="click"></div>
 </template>
 
 <script lang="ts">
@@ -8,7 +8,7 @@ export default defineComponent({
     emits: ['scroll'],
     setup(props, { emit }) {
         return {
-            up() {
+            click() {
                 emit('scroll');
             }
         }

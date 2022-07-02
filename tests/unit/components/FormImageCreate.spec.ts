@@ -87,7 +87,7 @@ describe('FormImageCreate.vue', () => {
         const storeImages = useImageCreateStore();
         jest.spyOn(storeImages, 'close');
 
-        await userEvent.click(wrapper.find('[data-test="form-wrapper"]').element);
+        await userEvent.click(wrapper.find('[data-test="form-create-wrapper"]').element);
         expect(storeImages.close).toBeCalledTimes(0);
 
         await userEvent.click(wrapper.find('[data-test="modal"]').element);
@@ -176,7 +176,6 @@ describe('FormImageCreate.vue', () => {
         await userEvent.click(wrapper.find('[data-test="form-save"]').element);
 
         expect(storeImages.submitImage).toBeCalledTimes(1);
-        expect(wrapper.emitted().saveImage).toBeDefined();
     });
 
     it('форма не сохраняется, если изображение не вставлено', async () => {

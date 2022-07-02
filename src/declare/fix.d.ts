@@ -17,3 +17,7 @@ declare var ClipboardItem: {
     prototype: ClipboardItem;
     new (itemData: ClipboardItemData): ClipboardItem;
 };
+
+declare module 'vue-virtual-scroller' {
+
+}

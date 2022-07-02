@@ -1,5 +1,8 @@
 
-
+/**
+ * Копирование изображения в буфер обмена.
+ * @param data Объект изображения.
+ */
 async function copyToClipboard(data: ImageSingle | ImageSet) {
     let item: null | ClipboardItem = null;
     if('arr' in data) {
@@ -13,6 +16,10 @@ async function copyToClipboard(data: ImageSingle | ImageSet) {
     if(item != null) await navigator.clipboard.write([item]);
 }
 
+/**
+ * Чтение данных из буфера обмена.
+ * @returns Данные из обмена обмена.
+ */
 async function readFromClipboard() {
     const data: any = await navigator.clipboard.read();
     return data;

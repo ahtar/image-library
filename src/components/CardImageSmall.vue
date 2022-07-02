@@ -1,13 +1,13 @@
 <template>
     <base-card class="card-image-small">
         <img ref="imgRef" src="@/assets/Error.png">
-        <div class="set-symbol" v-if="isSet()" data-test="card-image-small-set"/>
+        <div class="set-symbol" v-if="isSet" data-test="card-image-small-set"/>
     </base-card>
 </template>
 
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted, onUnmounted, onUpdated, PropType, ref } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, onUpdated, PropType, ref, computed } from 'vue'
 
 import BaseCard from '@/components/base/BaseCard.vue'
 
@@ -28,13 +28,17 @@ export default defineComponent({
 
         const imgRef = ref<null | HTMLImageElement>(null);
 
+        const isSet = computed(() => {
+            return 'arr' in props.image;
+        });
+
         let cachedId = '';
 
 
         //Прорисовка изображения при mounted.
         onMounted(async () => {
             try {
-                let file: any;
+                let file: FileSystemFileHandle;
                 if('arr' in props.image) {
                     cachedId = props.image.arr[0].manifest.id;
                     file = await props.image.arr[0].getThumbnail();
@@ -55,7 +59,7 @@ export default defineComponent({
         onUpdated(async () => {
             try {
                 let id = '';
-                let file: any;
+                let file: FileSystemFileHandle;
 
                 if('arr' in props.image) {
                     id = props.image.arr[0].manifest.id;
@@ -80,10 +84,6 @@ export default defineComponent({
         onBeforeUnmount(() => {
             releaseImage(imgRef.value!);
         })
-
-        function isSet() {
-           return 'arr' in props.image
-        }
         
         return {
             imgRef,

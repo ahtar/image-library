@@ -39,9 +39,9 @@ export default function() {
     }
 
     /**
-     * Load file from provided file handle.
-     * @param handle File handle for requested file.
-     * @returns Requested file object.
+     * Загрузка файла из полученного FileHandle.
+     * @param handle FileHandle требуемого файла.
+     * @returns Файл.
      */
     async function loadFile(handle: FileSystemFileHandle) {
         const data = await handle.getFile();
@@ -49,10 +49,11 @@ export default function() {
     }
 
     /**
-     * Write file to the provided folder.
-     * @param handle Folder handle.
-     * @param name File name.
-     * @param content File content.
+     * Запись файла в предоставленную папку.
+     * @param handle DirectoryHandle папки.
+     * @param name Название файла.
+     * @param content Содержимое файла.
+     * @returns FileHandle созданного файла.
      */
     async function writeFile(handle: FileSystemDirectoryHandle, name: string, content: FileSystemWriteChunkType) {
         try {
@@ -68,8 +69,8 @@ export default function() {
     }
 
     /**
-     * Initialize user collections.
-     * @returns Array with user collections.
+     * Получение всех коллекций пользователя.
+     * @returns Массив с коллекциями.
      */
     async function initLoadCollections() {
         const arr: Array<Collection> = [];
@@ -86,14 +87,13 @@ export default function() {
         return arr;
     }
 
-
-
+    /**
+     * Получение DirectoryHandle папки приложения.
+     * @returns DirectoryHandle папки приложения.
+     */
     function getHandle() {
         return handler;
     }
-
-
-
 
     return {
         checkMainFolderAccess,

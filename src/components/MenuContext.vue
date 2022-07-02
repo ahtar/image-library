@@ -16,7 +16,6 @@
     export default defineComponent({
 
         props: {
-            //MouseEvent
             event: {
                 type: MouseEvent,
                 required: true
@@ -54,7 +53,6 @@
 
             return {
                 menu,
-                //закрыть меню при потере фокуса
                 closeContext() {
                     emit('close');
                 },

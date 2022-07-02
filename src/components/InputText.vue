@@ -1,18 +1,11 @@
 <template>
     <div class="input-wrapper" :class="{'input-wrapper-textarea': textarea}">
-        <div class="label" :class="{'important': important, 'label-textarea': textarea}" v-if="labelActive()" data-test="input-text-label">{{label}}</div>
+        <div class="label" :class="{'important': important, 'label-textarea': textarea}" v-if="labelActive" data-test="input-text-label">{{label}}</div>
         <div class="input-textarea" v-if="textarea">
             <textarea :placeholder="placeholder" :value="modelValue" @input="input"/>
         </div>
         <div class="input-text" v-else>
-            <input type="text" 
-                class="focusable"
-                :placeholder="placeholder" 
-                :value="modelValue" @input="input" 
-                @keydown.down="quickSuggestion" 
-                :disabled="active != true" 
-                :tabindex="tabIndex"
-                @keypress.enter="enterKeypress"/>
+            <input type="text" class="focusable" :placeholder="placeholder" :value="modelValue" @input="input" @keydown.down="quickSuggestion" :disabled="active != true" :tabindex="tabIndex" @keypress.enter="enterKeypress"/>
         </div>
         <div class="wrapper-disabled" v-if="!active" data-test="input-test-disabled"/>
     </div>
@@ -62,10 +55,10 @@ export default defineComponent({
             }
         });
 
-        function labelActive() {
+        const labelActive = computed(() => {
             if(props.label) return true;
             return false;
-        }
+        })
 
         function input(value: Event) {
             emit('update:modelValue', (value.target as HTMLInputElement).value);

@@ -1,25 +1,20 @@
 <template>
     <modal-dark @close="store.close" data-test="modal">
-        <div class="form-image-create-wraper wraper" :class="{ 'margin-big': oldTagsCopy.length == 0 }" data-test="form-wrapper">
+        <div class="form-image-create-wrapper wrapper" :class="{ 'margin-big': oldTagsCopy.length == 0 }" data-test="form-wrapper">
             <div class="prior-tag-wrapper" v-if="oldTagsCopy.length > 0" data-test="old-tags">
                 <card-tag-small v-for="(tag, i) in oldTagsCopy" :key="i" :tag="tag" @click="reuseOldTag(i)"/>
             </div>
-            <div class="form-image-create">
+            <div class="form-image-create" data-test="form-create-wrapper">
                 <div class="section">
                     <input-text v-model="store.form.fileUrl" label="Id" :important="true" :active="store.urlInputActive" placeholder="Идентификатор изображения"/>
                 </div>
                 <input-tags :tags="store.form.tags" :definedTags="definedTags" @add="addTag" @remove="removeTagHandler" data-test="input-tags"/>
                 <div class="buttons">
                     <button-small @click="store.clearForm" data-test="form-clear">Отчистить</button-small>
-                    <button-small @click="saveImage" :blocked="saveButtonBlocked" data-test="form-save">Сохранить</button-small>
+                    <button-small @click="store.submitImage" :blocked="saveButtonBlocked" data-test="form-save">Сохранить</button-small>
                 </div>
                 <div class="similar-images" v-if="haveDoubles">
-                    <card-image-small 
-                        v-for="(image) in doublicateImages"
-                        :image="image" 
-                        :key="image.manifest.id"
-                        class="image-card"
-                    />
+                    <card-image-small v-for="(image) in doublicateImages" :image="image" :key="image.manifest.id" class="image-card"/>
                 </div>
             </div>
         </div>
@@ -67,13 +62,10 @@ export default defineComponent({
             type: Array as PropType<Array<Tag>>
         }
     },
-    emits: ['saveImage'],
-    setup(props, { emit }) {
+    setup(props) {
         const store = useImageCreateStore();
 
-        //Действия над тегами формы.
         const { addTag, removeTag, setTagRef } = useTagActions();
-        //Дубликаты создаваемого изображения.
         const { doublicateImages, setHash, haveDoubles } = useDublicateImages();
 
         const saveButtonBlocked = computed(() => {
@@ -93,11 +85,6 @@ export default defineComponent({
             setHash(store.form.hash);
         }
 
-        function saveImage() {
-            const data = store.submitImage();
-            emit('saveImage', data);
-        }
-
         function reuseOldTag(i: number) {
             addTag(oldTagsCopy.value[i]);
             oldTagsCopy.value.splice(i, 1);
@@ -106,6 +93,7 @@ export default defineComponent({
         function removeTagHandler(tag: Tag | string, index: number) {
             removeTag(tag, index);
 
+            //Возвращает удаленный тег в массив с тегами из прошлого изображения.
             if(typeof tag == 'string') {
                 const t = props.priorTags.find((t) => t.name == tag);
                 if(t && !oldTagsCopy.value.includes(t)) {
@@ -122,7 +110,6 @@ export default defineComponent({
             imagePasteEvent,
             doublicateImages,
             haveDoubles,
-            saveImage,
             saveButtonBlocked,
             oldTagsCopy,
             reuseOldTag,
@@ -134,7 +121,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 
-    .form-image-create-wraper {
+    .form-image-create-wrapper {
         margin-left: 5vw;
         display: flex;
         flex-direction: row;

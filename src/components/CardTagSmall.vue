@@ -1,11 +1,11 @@
 <template>
     <base-card class="card-tag-small">
-        {{name()}} ({{count()}})
+        {{content}}
     </base-card>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, computed } from 'vue'
 
 import BaseCard from '@/components/base/BaseCard.vue'
 
@@ -20,7 +20,8 @@ export default defineComponent({
         BaseCard
     },
     setup(props) {
-        function name() {
+
+        const name = computed(() => {
             if(props.tag) {
                 if(typeof props.tag == 'string') {
                     return 'Error'
@@ -28,10 +29,9 @@ export default defineComponent({
                     return props.tag.name;
                 }
             }
-            return null
-        }
-
-        function count() {
+            return 'Error';
+        });
+        const count = computed(() => {
             if(props.tag) {
                 if(typeof props.tag == 'string') {
                     return '0'
@@ -39,12 +39,15 @@ export default defineComponent({
                     return props.tag.count;
                 }
             }
-            return null
-        }
+            return '0';
+        });
+
+        const content = computed(() => {
+            return `${name.value} (${count.value})`;
+        });
 
         return {
-            name,
-            count
+            content
         }
     }
 })

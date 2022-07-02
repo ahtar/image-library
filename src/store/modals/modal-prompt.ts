@@ -11,6 +11,14 @@ export const usePromptStore = defineStore('prompt', {
     },
 
     actions: {
+        confirm() {
+            this.visible = false;
+            this.callAction(true);
+        },
+        close() {
+            this.visible = false;
+            this.callAction(false);
+        },
         /**
          * Показывает диалоговое окно, возвращает Promise с подтверждением, отрицанием
          * @param text Текст диалогового окна

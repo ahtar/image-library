@@ -5,8 +5,8 @@
             <input-text id="input-theme" v-model="store.form.theme" label="Theme" placeholder="Input collection theme" data-test="collection-create-theme"/>
             <input-text id="input-desc" class="input-description" v-model="store.form.description" label="Description" placeholder="Input collection description" :textarea="true" data-test="collection-create-description"/>
             <div class="button-wrapper">
-                <button-small id="form-save" @click="save" :blocked="saveButtonActive == false" data-test="collection-create-save">Save</button-small>
-                <button-small id="form-clear" @click="clear" data-test="collection-create-clear">Clear</button-small>
+                <button-small id="form-save" @click="store.createCollection" :blocked="saveButtonActive == false" data-test="collection-create-save">Save</button-small>
+                <button-small id="form-clear" @click="store.clearForm" data-test="collection-create-clear">Clear</button-small>
             </div>
         </div>
         <div class="image-wrapper wrapper">
@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed } from 'vue'
 
 import ModalDark from '@/components/ModalDark.vue'
 import InputText from '@/components/InputText.vue'
@@ -24,7 +24,6 @@ import InputImage from '@/components/InputImage.vue'
 import ButtonSmall from '@/components/ButtonSmall.vue'
 
 import { useCollectionCreateStore } from '@/store/forms/form-collection-create'
-import { computed } from '@vue/reactivity'
 
 export default defineComponent({
     components: {
@@ -45,20 +44,9 @@ export default defineComponent({
             store.form.blob = data;
         }
 
-        function save() {
-            store.createCollection();
-        }
-
-        function clear() {
-            store.clearForm();
-        }
-
-
         return {
             store,
             imagePasteEvent,
-            save,
-            clear,
             saveButtonActive,
         }
     },

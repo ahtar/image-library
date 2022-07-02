@@ -16,13 +16,13 @@ export const useImageViewStore = defineStore('imageView', {
             this.image = image;
         },
         /**
-         * Открытие формы просмотра.
+         * Открытие окна просмотра.
          */
         open() {
             this.visible = true;
         },
         /**
-         * Закрытие формы просмотра.
+         * Закрытие окна просмотра.
          */
         close() {
             this.visible = false;

@@ -3,13 +3,15 @@
         <div class="init-wrapper">
             <p class="message">Due to a restriction of the File System Access API and Permissions API, 
                 the user must grant access to the folder every time he visits the site.</p>
-            <button-small @click="requestFolder()">Pick folder</button-small>
+            <button-small @click="requestFolderAccess()">Pick folder</button-small>
         </div>
     </modal-dark>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+
+import { useInitStore } from '@/store/modals/modal-init'
 
 import ModalDark from '@/components/ModalDark.vue'
 import ButtonSmall from '@/components/ButtonSmall.vue'
@@ -23,16 +25,14 @@ export default defineComponent({
     },
     emits: ['data'],
     setup(props, { emit }) {
-        const { requestMainFolderAccess, initLoadCollections } = useFileSystem();
+        const store = useInitStore();
 
-        async function requestFolder() {
-            await requestMainFolderAccess();
-            const data = await initLoadCollections();
-            emit('data', data);
+        async function requestFolderAccess() {
+            emit('data', await store.requestFolderAccess());
         }
 
         return {
-            requestFolder,
+            requestFolderAccess,
         }
     },
 })

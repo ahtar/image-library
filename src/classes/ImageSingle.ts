@@ -31,21 +31,35 @@ class ImageSingleObject implements ImageSingle {
         this.collectionHandle = handle;
     }
 
+    /**
+     * Инициализация FileHandle на файл изображения из DirectoryHandle коллекции.
+     */
     async loadImage(): Promise<void> {
         const folderHandle = await this.collectionHandle.getDirectoryHandle('images');
         this.imageHandle = await folderHandle.getFileHandle(this.manifest.fileUrl);
     }
 
+    /**
+     * Инициализация FileHandle на превью из DirectoryHandle коллекции.
+     */
     async loadThumbnail(): Promise<void> {
         const folderHandle = await this.collectionHandle.getDirectoryHandle('thumbnails');
         this.thumbnailHandle = await folderHandle.getFileHandle(this.manifest.previewFileUrl);
     }
 
+    /**
+     * Получение файла изображения.
+     * @returns FileHandle на файл изображения.
+     */
     async getImage(): Promise<FileSystemFileHandle> {
         if(this.imageHandle == null) await this.loadImage();
         return this.imageHandle!;
     }
 
+    /**
+     * Получение превью изображения.
+     * @returns FileHandle на превью.
+     */
     async getThumbnail(): Promise<FileSystemFileHandle> {
         if(this.thumbnailHandle == null) await this.loadThumbnail();
         return this.thumbnailHandle!;

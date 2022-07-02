@@ -1,4 +1,5 @@
 import { useCollections } from '@/store/collections';
+import { useNotificationStore } from '@/store/modals/modal-notification'
 import { defineStore } from 'pinia'
 
 /**
@@ -21,28 +22,24 @@ export const useImageCreateStore = defineStore('imageCreate', {
     },
     actions: {
         /**
-         * Открытие формы.
+         * Открытие окна.
          */
         open() {
             this.visible = true;
         },
         /**
-         * Закрытие формы.
+         * Закрытие закрытие окна.
          */
         close() {
             this.visible = false;
         },
 
         /**
-         * Обработка формы.
-         * Получение ArrayBuffer.
-         * Валидация объекта изображения.
-         * Создание тегов.
-         * Создание изображения.
+         * Сохранение нового изображения.
          */
-         submitImage() {
-            const storeCollections = useCollections();
-
+         async submitImage() {
+            const store = useCollections();
+            const storeNotifications = useNotificationStore();
             const id = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
 
             const imageInstance: ImageSingleData = {
@@ -58,22 +55,33 @@ export const useImageCreateStore = defineStore('imageCreate', {
             imageInstance.fileUrl = imageInstance.id + '.' + this.form.blob?.type.split('/')[1];
             imageInstance.previewFileUrl = imageInstance.id + '.' + this.form.blob?.type.split('/')[1];
 
+            //Создание тегов
             for(const tag of this.form.tags) {
                 imageInstance.tags.push(tag);
             }
 
-            const obj = {
-                manifest: imageInstance,
-                imageBlob: this.form.blob!
-            };
+            //Запоминание тегов нового изображения.
+            store.activeCollection!.lastTags = [];
+            for(const tag of imageInstance.tags) {
+                store.activeCollection!.lastTags.push(store.activeCollection!.getTag(tag));
+            }
+
+            try {
+                //сохранение изображения.
+                await store.activeCollection!.createImage(imageInstance, this.form.blob!);
+                this.clearForm();
+                storeNotifications.notify('Изображение создано!');
+            } catch(err) {
+                console.log(err);
+                storeNotifications.notify('Изображение не было создано, что-то пошло не так.', false);
+            }
 
             this.visible = false;
-            this.clearForm();
-
-            return obj;
         },
 
-        //сброс данных формы
+        /**
+         * Сброс данных окна.
+         */
         clearForm() {
             this.urlInputActive = true;
             this.imageInputActive = true;

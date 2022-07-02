@@ -42,11 +42,8 @@ export default function() {
         for(const item of arr) {
             string += '+' + item
         }
-        //Удаление первого символа +.
         return string.replace('+', '');
     }
-
-    //function 
 
 
     return {

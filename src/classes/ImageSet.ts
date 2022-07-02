@@ -20,20 +20,22 @@ class ImageSetObject implements ImageSet {
         this.arr = arr;
     }
 
+    /**
+     * Добавление изображения в сет.
+     * @param image Объект изображения.
+     */
     addImage(image: ImageSingle) {
         this.arr.push(image);
     }
 
     /**
-     * Remove image from image set.
-     * @param image 
+     * Удаление зображения из сета.
+     * @param image Объект изображения.
      */
     removeImage(image: ImageSingle) {
-        //Remove image from physical array.
         let index = this.arr.findIndex((img) => img.manifest.id == image.manifest.id);
         if(index != -1) this.arr.splice(index, 1);
 
-        //Remove image from manifest array.
         index = this.manifest.set.findIndex((img) => img.id == image.manifest.id);
         if(index != -1) this.manifest.set.splice(index, 1);
     }

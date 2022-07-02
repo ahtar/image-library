@@ -1,15 +1,6 @@
 <template>
     <div class="tag-input-wrapper" ref="input">
-        <input-text :important="true" 
-                    label="Теги" 
-                    placeholder="Тег"
-                    :active="true" 
-                    class="input-tag" 
-                    v-model="item" 
-                    @enterKey="createTag"
-                    @quickSuggestion="quickSuggestion"
-                    :tabindex="tabindex"
-        />
+        <input-text :important="true" label="Теги" placeholder="Тег" :active="true" class="input-tag" v-model="item" @enterKey="createTag" @quickSuggestion="quickSuggestion" :tabindex="tabindex"/>
         <div class="tag-container">
             <div class="container">
                 <card-tag-small v-for="(tag, i) in tags" :key="i" :tag="getTagObject(tag)" @click="removeTag(tag, i)" data-test="tag-container"/>
@@ -133,7 +124,7 @@ export default defineComponent({
         /**
          * Событие на добавление предложенного тега.
          */
-        function getTag(tag: any) {
+        function getTag(tag: Tag) {
             if(!props.tags?.includes(tag.name)) {
                 emit('add', tag);
             }

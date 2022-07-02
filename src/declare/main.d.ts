@@ -82,7 +82,3 @@ interface TagGype {
     description?: string,
     colorCode?: string
 }
-
-declare module 'vue-virtual-scroller' {
-
-}

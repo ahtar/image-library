@@ -35,7 +35,7 @@ class CollectionOjbect implements Collection {
     loaded = false;
 
     /**
-     * Получить объект Коллекции через FileSystemDirectoryHandle.
+     * Получение экземпляра коллекции через FileSystemDirectoryHandle.
      * @param handle FileSystemDirectoryHandle папки Коллекции.
      * @returns Объект Collection.
      */
@@ -51,6 +51,11 @@ class CollectionOjbect implements Collection {
         }
     }
 
+    /**
+     * @param options Параметры коллекции.
+     * @param thumbnail FileHandle на превью коллекции.
+     * @param handle DirectoryHandle на папку коллекции.
+     */
     constructor(options: CollectionOptions, thumbnail: FileSystemFileHandle, handle: FileSystemDirectoryHandle) {
         this.manifest = {
             name: options.name,
@@ -122,6 +127,7 @@ class CollectionOjbect implements Collection {
         console.timeEnd();
         this.loaded = true;
 
+        //Первоначальная сортировка тегов по убыванию.
         this.tags.sort((a, b) => {
             if(a.count < b.count) return 1;
             if(a.count > b.count) return -1;
@@ -130,7 +136,7 @@ class CollectionOjbect implements Collection {
     }
 
     /**
-     * Добавление тега в Коллекцию.
+     * Добавление тега в Коллекцию. Если такой тег уже есть, то увеличение счетчика тега.
      * @param tag Название тега.
      */
     addTag(tag: string) {
@@ -179,8 +185,8 @@ class CollectionOjbect implements Collection {
 
     /**
      * Создание нового Изображения и его добавление в Коллекцию.
-     * @param manifest Метаданные Изображения.
-     * @param image Blob с самим изображением.
+     * @param manifest данные Изображения.
+     * @param image Blob с изображением.
      */
     async createImage(manifest: ImageSingleData, image: Blob) {
         const fs = Fs();
@@ -278,9 +284,9 @@ class CollectionOjbect implements Collection {
     }
 
     /**
-     * Убирание Изображения из Коллекции без удаления данных этого Изображения.
-     * При следующем запуске Изображение снова окажется в Коллекции.
-     * @param image Объект Изображения.
+     * Удаление изображения из коллекции без удаления файлов этого изображения.
+     * При следующем запуске изображение снова окажется в коллекции.
+     * @param image Объект изображения.
      */
     removeImage(image: ImageSingle | ImageSet | ImageSingleData | string) {
         if(typeof image == 'string') {
@@ -300,8 +306,8 @@ class CollectionOjbect implements Collection {
 
 
     /**
-     * Обновление Изображения в Коллекции.
-     * @param image Объект Изображения.
+     * Обновление изображения в коллекции.
+     * @param image Объект изображения.
      */
     async updateImage(image: ImageSingle | ImageSet): Promise<void> {
         const fs = Fs();
@@ -314,7 +320,7 @@ class CollectionOjbect implements Collection {
     }
 
     /**
-     * Удаление коллекции.
+     * Удаление папки с коллекцией.
      */
     async deleteCollection() {
         const handle = Fs().getHandle();
@@ -322,8 +328,8 @@ class CollectionOjbect implements Collection {
     }
 
     /**
-     * Обновление данных коллекции.
-     * @param manifest данные коллекции.
+     * Обновление информации об коллекции.
+     * @param manifest информация о коллекции.
      * @param thumbnail опциональный thumbnail файл.
      */
     async updateCollectionManifest(manifest: CollectionManifest, thumbnail?: Blob) {

@@ -1,4 +1,5 @@
 import { useCollections } from '@/store/collections';
+import { useNotificationStore } from '@/store/modals/modal-notification'
 import { defineStore } from 'pinia'
 import Collection from '@/classes/Collection'
 import jimp from '@/modules/jimp'
@@ -50,16 +51,13 @@ export const useCollectionCreateStore = defineStore('collectionCreate', {
         async createCollection() {
             const { getHandle, writeFile } = useFileSystem();
             const store = useCollections();
+            const storeNotifications = useNotificationStore();
 
             const handle = getHandle();
 
-            /**
-             * Проверка, существует ли Коллекция с заданым пользователем именем,
-             * если не существует, то приступить к созданию.
-             */
             try {
                 await handle.getDirectoryHandle(this.form.name);
-                console.log('Коллекция уже существует!');
+                storeNotifications.notify('Коллекция с таким именем уже существует', false);
             } catch(err) {
                 const error = err as DOMException;
                 if(error.NOT_FOUND_ERR == 8) {
@@ -84,7 +82,10 @@ export const useCollectionCreateStore = defineStore('collectionCreate', {
 
                     this.clearForm();
                     this.close();
+
+                    storeNotifications.notify('Коллекция создана');
                 } else {
+                    storeNotifications.notify('Что-то пошло не так', false);
                     console.log(error);
                 }
             }

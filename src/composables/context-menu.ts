@@ -20,6 +20,7 @@ export default function() {
         contextMenuItem.value = item;
         contextMenuActive.value = true;
     }
+    
     /**
      * Закрывает открытое контекст меню.
      */
@@ -28,8 +29,8 @@ export default function() {
     }
 
     /**
-     * Do something on context menu button click.
-     * @param callback Callback function, with object on which the action was called.
+     * Действие над элементом.
+     * @param callback Функция.
      */
     function contextMenuAction<T>(callback: Action<T>) {
         callback(contextMenuItem.value!);

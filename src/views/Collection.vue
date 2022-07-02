@@ -11,10 +11,7 @@
             <div class="content" v-if="loaded">
                 <card-new-big @click="storeImageCreate.open()"/>
                 <transition-fade-group :items="displayedImages" v-slot="slotProps">
-                  <card-image-small
-                    :image="slotProps.item" 
-                    @click="imageHandler(slotProps.item, $event)" 
-                    @contextmenu="contextMenuOpen(slotProps.item, $event)"/>
+                  <card-image-small :image="slotProps.item" @click="imageHandler(slotProps.item, $event)" @contextmenu="contextMenuOpen(slotProps.item, $event)"/>
                 </transition-fade-group>
                 <intersection-observer-vue ref="observer" @update="observerHandler"/>
             </div>
@@ -28,11 +25,11 @@
     </transition-fade>
 
     <transition-fade>
-        <form-image-create :definedTags="definedTags" :priorTags="lastTags" @saveImage="saveImageEvent"  v-if="storeImageCreate.visible"/>
+        <form-image-create :definedTags="definedTags" :priorTags="lastTags" v-if="storeImageCreate.visible"/>
     </transition-fade>
 
     <transition-fade>
-        <form-image-edit @updateImage="editImageEvent" v-if="storeImageEdit.visible"/>
+        <form-image-edit v-if="storeImageEdit.visible"/>
     </transition-fade>
 
     <transition-fade>
@@ -152,7 +149,6 @@ export default defineComponent({
                 }
             }
             //Инициализация коллекции, если она ещё не инициализирована и сами коллекции уже получены.
-            //Название коллекции берется из параметра роутера.
             const status = await initCollection();
 
             //Если коллекции ещё не получены (приложение было открыто сразу на какой-либо коллекции, например */collections/CollectionName)
@@ -288,7 +284,7 @@ export default defineComponent({
 
 
         /**
-         * контект меню
+         * контекст меню
          */
         function editImage() {
             contextMenuAction<ImageSingle | ImageSet>((image) => {
@@ -319,46 +315,13 @@ export default defineComponent({
             });
         }
 
+
+
         function scrollToTop() {
             container.value?.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
-        }
-
-
-
-
-        async function saveImageEvent(data: any) {
-            if(collection.value) {
-                try {
-                    await collection.value.createImage(data.manifest, data.imageBlob);
-
-                    //Запоминание тегов нового изображения.
-                    collection.value.lastTags = [];
-                    for(const tag of data.manifest.tags) {
-                        collection.value.lastTags.push(collection.value.getTag(tag));
-                    }
-                    console.log(collection.value.lastTags);
-
-                    storeNotification.notify('Изображение создано!');
-                } catch(err) {
-                    storeNotification.notify('Изображение не было создано', false);
-                    console.log(err);
-                }
-            }
-        }
-
-        async function editImageEvent(data: ImageSingle | ImageSet) {
-            try {
-                if(collection.value) {
-                    await collection.value.updateImage(data);
-                    storeNotification.notify('Изображение измененно!');
-                } else storeNotification.notify('Что-то пошло не так');
-            } catch(err) {
-                console.log(err);
-                storeNotification.notify('Изображение не измененно!', false);
-            }
         }
 
         return {
@@ -371,7 +334,7 @@ export default defineComponent({
             scrollToTop,
 
             images,
-            filteredImages,//: filteredImages(tags),
+            filteredImages,
             displayedImages,
             observerHandler,
 
@@ -396,10 +359,7 @@ export default defineComponent({
             copyImage,
             deleteImage,
 
-            loaded,
-
-            saveImageEvent,
-            editImageEvent,
+            loaded
         }
     },
 })

@@ -16,7 +16,7 @@ export default function() {
         return doublicateImages.value.length != 0;
     });
     /**
-     * При изменении хэша получает все схожие изображения.
+     * При изменении хэша получение схожих изображений.
      */
     watch(() => hash.value, (newHash) => {
         if(newHash == null || newHash == '') {

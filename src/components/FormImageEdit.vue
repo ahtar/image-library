@@ -1,11 +1,11 @@
 <template>
     <modal-dark @close="close" data-test="form-edit-close">
         <div class="section-wrapper wrapper">
-            <select-image :set="image.arr" @change="changeActiveImage" v-if="isSet()" :draggable="true" @dragSort="dragSort" data-test="form-edit-select"/>
+            <select-image :set="image.arr" @change="changeActiveImage" v-if="store.isSet" :draggable="true" @dragSort="dragSort" data-test="form-edit-select"/>
             <div class="form-image-edit-wrapper">
                 <input-text v-model="fileUrl" label="Ссылка" :important="true" :active="false"/>
                 <input-tags :tags="computedTags" :definedTags="definedTags" @add="addTag" @remove="removeTag" data-test="input-tags"/>
-                <button-small v-if="isSet()" class="button" @click="separateImage" data-test="form-edit-remove-image">Remove image from set</button-small>
+                <button-small v-if="store.isSet" class="button" @click="separateImage" data-test="form-edit-remove-image">Remove image from set</button-small>
             </div>
         </div>
         <div class="image-wrapper wrapper">
@@ -24,7 +24,6 @@ import ButtonSmall from '@/components/ButtonSmall.vue'
 import ModalDark from '@/components/ModalDark.vue'
 
 import { useImageEditStore } from '@/store/forms/form-image-edit'
-import { useCollections } from '@/store/collections'
 
 import useTagActions from '@/composables/tags'
 import useRerenderImage from '@/composables/image-rendering'
@@ -39,10 +38,8 @@ export default defineComponent({
         ButtonSmall,
         ModalDark,
     },
-    emits: ['updateImage'],
-    setup(props, { emit }) {
+    setup(props) {
         const store = useImageEditStore();
-        const storeCollections = useCollections();
 
         const { addTag, removeTag, setTagRef, definedTags } = useTagActions();
         const { renderImage } = useRerenderImage();
@@ -82,19 +79,11 @@ export default defineComponent({
 
         //Смена активного изображения.
         async function changeActiveImage(image: ImageSingle) {
-            activeImage.value = image;
-            setTagRef(ref(activeImage.value.manifest.tags));
-            renderImage(img.value!, await activeImage.value.getImage());
-        }
-
-        //Является ли основное изображение ImageSet.
-        function isSet() {
-            if(image.value != null) {
-                if('arr' in image.value) {
-                    return true;
-                }
+            if(image) {
+                activeImage.value = image;
+                setTagRef(ref(activeImage.value.manifest.tags));
+                renderImage(img.value!, await activeImage.value.getImage());
             }
-            return false;
         }
 
         //Изменение порядка изображений в сете.
@@ -111,40 +100,16 @@ export default defineComponent({
         //Отделение изображения из сета.
         async function separateImage() {
             if(image.value != null) {
-                //console.log(activeImage.value);
-                if('arr' in image.value) {
-                    const img: ImageSet = image.value;
-                    //Удаление ImageSingle из сета.
-                    image.value.removeImage(activeImage.value!);
-                    //Сохранение данных ImageSingle отдельным файлом.
-                    storeCollections.activeCollection?.updateImage(activeImage.value! as any);
-                    //Добавление ImageSingle в массив с изображениями.
-                    storeCollections.activeCollection?.addImage(activeImage.value! as any);
-                    //Изменение активного изображения на первое изображение в сете.
-                    changeActiveImage(image.value.arr[0]);
-                    //Если после удаления изображения из сета в сете останется лишь 1 изображение,
-                    //то сохранить его как отдельное изображение и удалить сет.
-                    if(image.value.arr.length == 1) {
-                        //Удалить ImageSingle из сета.
-                        image.value.removeImage(activeImage.value!);
-                        //Удалить пустой сет.
-                        await storeCollections.activeCollection?.deleteImage(image.value);
-                        //Сохранение манифеста ImageSingle отдельным файлом.
-                        await storeCollections.activeCollection?.updateImage(activeImage.value! as any);
-                        //Добавление ImageSingle в массив с изображениями.
-                        await storeCollections.activeCollection?.addImage(activeImage.value! as any);
-
-                        store.close();
-
-                    }
-                }
+                store.separateImage(activeImage.value! as any);
+                changeActiveImage(image.value.arr[0]);
             }
         }
 
         return {
+            store,
             close() {
                 store.close();
-                emit('updateImage', store.image);
+                store.updateImage();
             },
             img,
             image,
@@ -154,7 +119,6 @@ export default defineComponent({
             definedTags,
             addTag,
             removeTag,
-            isSet,
             computedTags,
             dragSort,
             separateImage,

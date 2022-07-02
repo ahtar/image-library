@@ -1,19 +1,9 @@
 <template>
     <div class="select-images" @drop="drop($event)" @dragenter.prevent @dragover.prevent v-if="draggable">
-        <card-image-small v-for="(card, i) in set" draggable="true" data-test="select-image-card"
-        @dragstart="drag($event, card)"
-        @dragover="dragOver($event, card)"
-        :key="card.manifest.id" 
-        :image="card"
-        @click="change(card, $event)" 
-        :id="i"/>
+        <card-image-small v-for="(card, i) in set" draggable="true" data-test="select-image-card" @dragstart="drag($event, card)" @dragover="dragOver($event, card)" :key="card.manifest.id" :image="card" @click="change(card, $event)" :id="i"/>
     </div>
     <div class="select-images" v-else>
-        <card-image-small v-for="(card, i) in set" data-test="select-image-card"
-        :key="card.manifest.id" 
-        :image="card"
-        @click="change(card, $event)" 
-        :id="i"/>
+        <card-image-small v-for="(card, i) in set" data-test="select-image-card" :key="card.manifest.id" :image="card" @click="change(card, $event)" :id="i"/>
     </div>
 </template>
 

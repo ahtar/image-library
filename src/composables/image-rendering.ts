@@ -1,18 +1,21 @@
 
 
+/**
+ * Изменение src изображения.
+ * @param image DOM элемент.
+ * @param file src изображения.
+ * @returns новый ObjectURL изображения.
+ */
 async function renderImage(image: HTMLImageElement, file: FileSystemFileHandle | string | Blob | undefined): Promise<string> {
     let data: string | null = null;
 
     if(file) {
-        //file == string
         if(typeof file == 'string') {
             data = file;
         } else {
             if('getFile' in file) {
-                //file == FileSystemFileHandle
                 data = URL.createObjectURL(await file.getFile());
             } else {
-                //file == Blob
                 data = URL.createObjectURL(file);
             }
         }
@@ -38,9 +41,9 @@ async function renderImage(image: HTMLImageElement, file: FileSystemFileHandle |
     });
 }
 
+
 function releaseImage(image: HTMLImageElement) {
     if(image.src != '') {
-        //console.log('releasing image!');
         URL.revokeObjectURL(image.src);
     }
 }

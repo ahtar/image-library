@@ -1,10 +1,10 @@
 <template>
-    <modal-dark @close="close" data-test="modal">
+    <modal-dark @close="store.close" data-test="modal">
         <div class="content-wrapper" data-test="collection-edit-wrapper">
             <input-text label="Name" placeholder="Collection name" :important="true" v-model="data.name" data-test="collection-edit-name"/>
             <input-text label="Theme" placeholder="Collection theme" v-model="data.theme" data-test="collection-edit-theme"/>
             <input-text label="Description" class="input-description" placeholder="Collection description" v-model="data.description" :textarea="true" data-test="collection-edit-description"/>
-            <button-small @click="save" :blocked="!buttonSaveActive">Save</button-small>
+            <button-small @click="store.save" :blocked="!buttonSaveActive">Save</button-small>
         </div>
 
         <div class="image-wrapper wrapper">
@@ -43,13 +43,8 @@
             }
 
             return {
+                store,
                 data: store.form,
-                close() {
-                    store.close();
-                },
-                save() {
-                    store.save();
-                },
                 imagePasteEvent,
                 buttonSaveActive,
             }

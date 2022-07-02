@@ -31,11 +31,11 @@ describe('MessagePrompt.vue', () => {
             }
         });
         const store = usePromptStore();
-        jest.spyOn(store, 'callAction');
+        jest.spyOn(store, 'confirm');
 
         await userEvent.click(wrapper.findAll('button')[1].element);
 
-        expect(store.callAction).toHaveBeenCalledWith(true);
+        expect(store.confirm).toBeCalledTimes(1);
     });
 
     it('оповещение можно отклонить', async () => {
@@ -46,11 +46,11 @@ describe('MessagePrompt.vue', () => {
             }
         });
         const store = usePromptStore();
-        jest.spyOn(store, 'callAction');
+        jest.spyOn(store, 'close');
 
         await userEvent.click(wrapper.findAll('button')[0].element);
 
-        expect(store.callAction).toHaveBeenCalledWith(false);
+        expect(store.close).toBeCalledTimes(1);
     });
 
     it('окно закрывается', async () => {
@@ -61,10 +61,10 @@ describe('MessagePrompt.vue', () => {
             }
         });
         const store = usePromptStore();
-        jest.spyOn(store, 'callAction');
+        jest.spyOn(store, 'close');
 
         await userEvent.click(wrapper.findComponent(ModalDark).element);
 
-        expect(store.callAction).toHaveBeenCalledWith(false);
+        expect(store.close).toBeCalledTimes(1);
     });
 });

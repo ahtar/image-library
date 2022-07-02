@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import BaseButton from '@/components/base/BaseButton.vue'
 
 export default defineComponent({
