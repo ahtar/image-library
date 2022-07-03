@@ -1,22 +1,23 @@
 <template>
     <modal-dark>
-        <div class="init-wrapper">
+        <div class="init-wrapper" v-if="compatibility">
             <p class="message">Due to a restriction of the File System Access API and Permissions API, 
                 the user must grant access to the folder every time he visits the site.</p>
             <button-small @click="requestFolderAccess()">Pick folder</button-small>
+        </div>
+        <div class="init-wrapper" v-else>
+            <p class="message">Данный браузер не поддерживает функционал этого сайта.</p>
         </div>
     </modal-dark>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, onBeforeMount, ref } from 'vue'
 
 import { useInitStore } from '@/store/modals/modal-init'
 
 import ModalDark from '@/components/ModalDark.vue'
 import ButtonSmall from '@/components/ButtonSmall.vue'
-
-import useFileSystem from '@/composables/file-system'
 
 export default defineComponent({
     components: {
@@ -26,13 +27,53 @@ export default defineComponent({
     emits: ['data'],
     setup(props, { emit }) {
         const store = useInitStore();
+        const compatibility = ref(true);
 
         async function requestFolderAccess() {
             emit('data', await store.requestFolderAccess());
         }
 
+
+        onBeforeMount(() => {
+            compatibility.value = check();
+        })
+
+
+        function check() {
+            const options = [
+                {
+                    text: 'window.showDirectoryPicker',
+                    data: window.showDirectoryPicker
+                },
+                {
+                    text: 'navigator.clipboard',
+                    data: navigator.clipboard
+                },
+                {
+                    text: 'FileSystemFileHandle',
+                    data: globalThis.FileSystemFileHandle.prototype
+                },
+                {
+                    text: 'FileSystemDirectoryHandle',
+                    data: globalThis.FileSystemDirectoryHandle.prototype
+                },
+                {
+                    text: 'FileSystemWritableFileStream',
+                    data:  globalThis.FileSystemFileHandle?.prototype.createWritable
+                }
+            ];
+            for(const opt of options) {
+                if(opt.data == undefined) {
+                    console.info('no compatibility', opt.text);
+                    return false;
+                }
+            }
+            return true;
+        }
+
         return {
             requestFolderAccess,
+            compatibility,
         }
     },
 })
