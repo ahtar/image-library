@@ -35,41 +35,9 @@ export default defineComponent({
 
 
         onBeforeMount(() => {
-            compatibility.value = check();
+            compatibility.value = store.checkCompatibility;
         })
 
-
-        function check() {
-            const options = [
-                {
-                    text: 'window.showDirectoryPicker',
-                    data: window.showDirectoryPicker
-                },
-                {
-                    text: 'navigator.clipboard',
-                    data: navigator.clipboard
-                },
-                {
-                    text: 'FileSystemFileHandle',
-                    data: globalThis.FileSystemFileHandle.prototype
-                },
-                {
-                    text: 'FileSystemDirectoryHandle',
-                    data: globalThis.FileSystemDirectoryHandle.prototype
-                },
-                {
-                    text: 'FileSystemWritableFileStream',
-                    data:  globalThis.FileSystemFileHandle?.prototype.createWritable
-                }
-            ];
-            for(const opt of options) {
-                if(opt.data == undefined) {
-                    console.info('no compatibility', opt.text);
-                    return false;
-                }
-            }
-            return true;
-        }
 
         return {
             requestFolderAccess,

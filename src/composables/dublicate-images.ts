@@ -24,8 +24,8 @@ export default function() {
         } else {
             const t: ImageSingle[] = [];
             const temp = images.value.filter((img) => {
-                if('set' in img.manifest) {
-                    for(const t of (img as ImageSet).arr) {
+                if('arr' in img) {
+                    for(const t of img.arr) {
                         if(hammingDistance(newHash, t.manifest.hash) < 0.25) {
                             return true;
                         }

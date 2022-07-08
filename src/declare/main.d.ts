@@ -4,6 +4,14 @@ interface Window {
     showDirectoryPicker: FileSystemDirectoryReader
 }
 
+interface ImageUpdateData {
+    manifest?: ImageSingleData | ImageSetData,
+    imageData?: {
+        [key: string]: Blob
+    },
+    separate?: ImageSingle[]
+}
+
 interface Collection {
     manifest: CollectionManifest,
     loaded: boolean,
@@ -15,7 +23,7 @@ interface Collection {
     createImage(manifest: ImageSingleData, image: Blob): Promise<Void>,
     createSet(images: Array<ImageSingle>): Promise<void>,
     deleteImage(image: ImageSingle | ImageSet): Promise<void>,
-    updateImage(image: ImageSingle | ImageSet): Promise<void>,
+    updateImage(image: ImageSingle | ImageSet, data?: ImageUpdateData): Promise<void>,
     addTag(tag: string): void,
     getTag(name: string): Tag,
     initLoadCollection(): Promise<void>,
@@ -42,12 +50,18 @@ interface ImageSingle {
     async loadThumbnail(): Promise<void>,
     async getImage(): Promise<FileSystemFileHandle>,
     async getThumbnail(): Promise<FileSystemFileHandle>
+    saveState(): void,
+    restoreState(): void,
+    checkChanges(): boolean
 }
 
 interface ImageSet {
     manifest: ImageSetData,
     arr: Array<ImageSingle>
-    removeImage(image: ImageSingle): void
+    removeImage(image: ImageSingle): void,
+    saveState(): void,
+    restoreState(): void,
+    checkChanges(): boolean
 }
 
 
@@ -66,6 +80,10 @@ interface ImageSingleData extends ImageManifest {
 }
 
 interface ImageSetData extends ImageManifest {
+
+}
+
+interface ImageSetSavedData extends ImageSetData {
     set: Array<ImageSingleData>
 }
 

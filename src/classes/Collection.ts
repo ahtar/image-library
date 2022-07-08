@@ -78,7 +78,7 @@ class CollectionOjbect implements Collection {
         const imageDataFolderHandler = await this.handle.getDirectoryHandle('imageData');
 
         const buffer: Array<ImageSingle | ImageSet> = [];
-        const promises: Promise<ImageSetData | ImageSingleData>[] = [];
+        const promises: Promise<ImageSetSavedData | ImageSingleData>[] = [];
 
         console.time();
 
@@ -86,7 +86,7 @@ class CollectionOjbect implements Collection {
         for await (const [key, h] of imageDataFolderHandler.entries()) {
             promises.push((async () => {
                 const imageDataHandler = await imageDataFolderHandler.getFileHandle(key);
-                const imageData: ImageSetData | ImageSingleData = JSON.parse(await (await imageDataHandler.getFile()).text());
+                const imageData = JSON.parse(await (await imageDataHandler.getFile()).text()) as ImageSetSavedData | ImageSingleData;
                 return(imageData);
             })());
         }
@@ -99,6 +99,8 @@ class CollectionOjbect implements Collection {
                 const temp = new ImageSet(image);
                 for(const singleImage of image.set) {
                     temp.addImage(new ImageSingle(singleImage, this.handle));
+
+                    //теги
                     for(const tag of singleImage.tags) {
                         //legacy
                         if(typeof tag == 'object') {
@@ -112,6 +114,8 @@ class CollectionOjbect implements Collection {
             } else {
                 const temp = new ImageSingle(image, this.handle);
                 buffer.push(temp);
+
+                //теги
                 for(const tag of image.tags) {
                     //legacy
                     if(typeof tag == 'object') {
@@ -209,32 +213,19 @@ class CollectionOjbect implements Collection {
     }
 
     /**
-     * Создание нового сета Изображений и его добавление в Коллекцию.
+     * Создание нового сета Изображений.
      * @param images Массив с Изображениями.
      */
     async createSet(images: Array<ImageSingle | ImageSet>) {
+        console.log('createSet');
         const fs = Fs();
         const imageDataFolderHandle = await this.handle.getDirectoryHandle('imageData');
         
+        //Данные для создания сета.
         const manifest: ImageSetData = {
-            set: [],
             dateCreated: Date(),
             id: Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2)
         };
-
-        for(const image of images) {
-            if('arr' in image) {
-                manifest.set.push(...image.manifest.set);
-                await imageDataFolderHandle.removeEntry(image.manifest.id + '.json');
-                this.removeImage(image);
-            } else {
-                manifest.set.push(image.manifest);
-                await imageDataFolderHandle.removeEntry(image.manifest.id + '.json');
-                this.removeImage(image);
-            }
-        }
-
-        await fs.writeFile(imageDataFolderHandle, manifest.id + '.json', JSON.stringify(manifest));
 
         const image = new ImageSet(manifest, images.map((image) => {
             if('arr' in image) {
@@ -245,6 +236,26 @@ class CollectionOjbect implements Collection {
         }).flat());
         this.addImage(image);
 
+
+        //Данные для сохранения сета.
+        const savedManifest: ImageSetSavedData = {
+            dateCreated: manifest.dateCreated,
+            id: manifest.id,
+            set: []
+        }
+
+        for(const image of images) {
+            if('arr' in image) {
+                savedManifest.set.push(...image.arr.map((i) => i.manifest))
+            } else {
+                savedManifest.set.push(image.manifest);
+            }
+
+            await imageDataFolderHandle.removeEntry(image.manifest.id + '.json');
+            this.removeImage(image);
+        }
+        
+        await fs.writeFile(imageDataFolderHandle, manifest.id + '.json', JSON.stringify(savedManifest));
     }
  
 
@@ -306,13 +317,81 @@ class CollectionOjbect implements Collection {
 
 
     /**
-     * Обновление изображения в коллекции.
+     * Обновление изображения.
      * @param image Объект изображения.
+     * @param data Обновляемые данные.
      */
-    async updateImage(image: ImageSingle | ImageSet): Promise<void> {
+    async updateImage(image: ImageSingle | ImageSet, data?: ImageUpdateData): Promise<void> {
         const fs = Fs();
         const manifestFolderHandle = await this.handle.getDirectoryHandle('imageData');
-        await fs.writeFile(manifestFolderHandle, image.manifest.id + '.json', JSON.stringify(image.manifest));
+        const imageFolderHandle = await this.handle.getDirectoryHandle('images');
+        const thumbnailFolderHandle = await this.handle.getDirectoryHandle('thumbnails');
+        let manifest: ImageSingleData | ImageSetSavedData | null = null;
+
+        //Замена изображения.
+        if(data?.imageData) {
+            for(const keyId in data.imageData) {
+                const imageHandle = await fs.writeFile(imageFolderHandle, keyId + '.png', data.imageData[keyId]);
+                const thumbnailHandle = await fs.writeFile(thumbnailFolderHandle, keyId + '.png', await jimp.resize(data.imageData[keyId]));
+
+                if('arr' in image) {
+                    const imageSingle = image.arr.find((i) => i.manifest.id == keyId);
+                    if(imageSingle) {
+                        imageSingle.imageHandle = imageHandle;
+                        imageSingle.thumbnailHandle = thumbnailHandle;
+                    }
+                } else {
+                    image.imageHandle = imageHandle;
+                    image.thumbnailHandle = thumbnailHandle;
+                }
+            }
+        }
+
+        //Обновление данных об изображении.
+        if(data?.manifest) {
+            if('arr' in image) {
+                const manifestData = data.manifest as ImageSetSavedData;
+                manifest = manifestData;
+                manifest.set = [];
+
+                manifest.set.push(...image.arr.map((i) => i.manifest));
+            } else {
+                const manifestData = data.manifest as ImageSingleData;
+                manifest = manifestData;
+            }
+
+            await fs.writeFile(manifestFolderHandle, manifest.id + '.json', JSON.stringify(manifest));
+        }
+
+        //Отделение изображений от сета.
+        if(data?.separate) {
+            //Подготовка manifest изображения.
+            if(!manifest) {
+                manifest = image.manifest as ImageSetSavedData;
+                manifest.set = [];
+                manifest.set.push(...(image as ImageSet).arr.map((i) => i.manifest));
+            } else {
+                (manifest as ImageSetSavedData).set = [];
+                (manifest as ImageSetSavedData).set.push(...(image as ImageSet).arr.map((i) => i.manifest));
+            }
+
+            //Удаление каждого изображения из сета и сохранение как одиночное изображение.
+            for(const imageSingle of data.separate) {
+                const index = (manifest as ImageSetSavedData).set.findIndex((i) => i.id == imageSingle.manifest.id);
+                if(index != -1) (manifest as ImageSetSavedData).set.splice(index, 1);
+                (image as ImageSet).removeImage(imageSingle);
+                this.addImage(imageSingle);
+                await this.updateImage(imageSingle, { manifest: imageSingle.manifest });
+            }
+
+            //Удаление пустого сета.
+            if((image as ImageSet).arr.length == 0) {
+                this.removeImage(image);
+                await this.deleteImage(image);
+            } else {
+                await this.updateImage(image, { manifest: image.manifest });
+            }
+        }
     }
 
     log() {

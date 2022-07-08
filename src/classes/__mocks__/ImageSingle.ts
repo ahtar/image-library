@@ -59,6 +59,9 @@ const mockClass = jest.fn(() => {
             return this.imageHandle;
         },
         getThumbnail: jest.fn(),
+        saveState: jest.fn(),
+        restoreState: jest.fn(),
+        checkChanges: jest.fn()
     }
 });
 

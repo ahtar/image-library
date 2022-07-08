@@ -85,7 +85,7 @@
         border-bottom: none;
         }
         &:hover {
-            background-color: $color-dark-5;
+            background-color: $color-dark-6;
         }
     }
 </style>

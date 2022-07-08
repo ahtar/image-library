@@ -10,7 +10,7 @@
         <div class="content-wrapper" ref="container">
             <div class="content" v-if="loaded">
                 <card-new-big @click="storeImageCreate.open()"/>
-                <transition-fade-group :items="displayedImages" v-slot="slotProps">
+                <transition-fade-group :items="filteredImages" v-slot="slotProps">
                   <card-image-small :image="slotProps.item" @click="imageHandler(slotProps.item, $event)" @contextmenu="contextMenuOpen(slotProps.item, $event)"/>
                 </transition-fade-group>
                 <intersection-observer-vue ref="observer" @update="observerHandler"/>

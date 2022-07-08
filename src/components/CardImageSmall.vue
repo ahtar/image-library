@@ -122,5 +122,10 @@ export default defineComponent({
         .selected {
             outline: 3px solid rgb(95, 168, 228);
         }
+
+        .removed {
+            outline: 3px solid rgb(221, 48, 48);
+            outline-offset: -3px;
+        }
     }
 </style>

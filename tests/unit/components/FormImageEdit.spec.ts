@@ -9,22 +9,28 @@ import ImageSingle from '@/classes/ImageSingle'
 import SelectImage from '@/components/SelectImage.vue'
 
 import { useImageEditStore } from '@/store/forms/form-image-edit'
-import { useCollections } from '@/store/collections'
 
 
 jest.mock('@/classes/Collection');
 jest.mock('@/classes/ImageSet');
 jest.mock('@/classes/ImageSingle');
 jest.mock('@/composables/image-rendering');
+jest.mock('@/composables/clipboard');
+
+globalThis.URL.createObjectURL = jest.fn();
+globalThis.URL.revokeObjectURL = jest.fn();
 
 describe('FormImageEdit.vue', () => {
-    it('форма закрывается при нажатии за границу формы', async () => {
+    it('изменение изображения отменяется при нажатии за границу формы', async () => {
         const wrapper = mount(FormImageEdit, {
             global: {
                 plugins: [createTestingPinia({
                     initialState: {
                         collections: {
                             activeCollection: new Collection(jest.fn(), {} as any, {} as any)
+                        },
+                        imageEdit: {
+                            image: new ImageSingle({} as any, [] as any),
                         }
                     }
                 })],
@@ -32,12 +38,34 @@ describe('FormImageEdit.vue', () => {
             attachTo: document.body
         });
         const store = useImageEditStore();
-        jest.spyOn(store, 'close');
-        jest.spyOn(store, 'updateImage');
+        jest.spyOn(store, 'cancelUpdate');
 
         await userEvent.click(wrapper.find('[data-test="form-edit-close"]').element);
 
-        expect(store.close).toBeCalledTimes(1);
+        expect(store.cancelUpdate).toBeCalledTimes(1);
+    });
+
+    it('Изменения в изображении сохраняются', async () => {
+        const wrapper = mount(FormImageEdit, {
+            global: {
+                plugins: [createTestingPinia({
+                    initialState: {
+                        collections: {
+                            activeCollection: new Collection(jest.fn(), {} as any, {} as any)
+                        },
+                        imageEdit: {
+                            image: new ImageSingle({} as any, [] as any),
+                        }
+                    }
+                })],
+            }
+        });
+
+        const store = useImageEditStore();
+        jest.spyOn(store, 'updateImage');
+
+        await userEvent.click(wrapper.find('[data-test="form-edit-save"]').element);
+
         expect(store.updateImage).toBeCalledTimes(1);
     });
 
@@ -153,21 +181,22 @@ describe('FormImageEdit.vue', () => {
             attachTo: document.body
         });
         await wrapper.vm.$nextTick();
+        await wrapper.vm.$forceUpdate();
 
-        let imgSrc = wrapper.find<HTMLImageElement>('[data-test="form-edit-image"]').element.src;
+        let imgSrc = wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img').element.src;
         let firstTag = wrapper.find<HTMLElement>('[data-test="tag-container"]').text();
 
         //пользователь выбирает 2 изображение в списке изображений
         await userEvent.click(wrapper.findAll('[data-test="select-image-card"]')[1].element);
         //src нового изображения не должен быть равен src предыдущего изображения
-        expect(wrapper.find<HTMLImageElement>('[data-test="form-edit-image"]').element.src).not.toBe(imgSrc);
+        expect(wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img').element.src).not.toBe(imgSrc);
         //теги нового изображения не должны быть равны тегам предыдущего изображения
         expect(wrapper.find<HTMLElement>('[data-test="tag-container"]').text()).not.toBe(firstTag);
-        imgSrc = wrapper.find<HTMLImageElement>('[data-test="form-edit-image"]').element.src;
+        imgSrc = wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img').element.src;
         firstTag = wrapper.find<HTMLElement>('[data-test="tag-container"]').text();
 
         await userEvent.click(wrapper.findAll('[data-test="select-image-card"]')[0].element);
-        expect(wrapper.find<HTMLImageElement>('[data-test="form-edit-image"]').element.src).not.toBe(imgSrc);
+        expect(wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img').element.src).not.toBe(imgSrc);
         expect(wrapper.find<HTMLElement>('[data-test="tag-container"]').text()).not.toBe(firstTag);
     });
     
@@ -246,74 +275,18 @@ describe('FormImageEdit.vue', () => {
                         imageEdit: {
                             image
                         }
-                    },
-                    stubActions: false
+                    }
                 })],
             }
         });
         const store = useImageEditStore();
-        const collectionStore = useCollections();
         await wrapper.vm.$nextTick();
+        jest.spyOn(store, 'separateImage');
 
-        //в активной коллекции должно быть 1 изображение.
-        expect(collectionStore.activeCollection?.arr.length).toBe(1);
-
-        //добавляем 3 изображение в сет, чтобы сет не разделился
-        (store.image as ImageSet).addImage(new ImageSingle({} as any, {} as any));
-        expect((store.image as ImageSet).arr.length).toBe(3);
 
         //жмем кнопку удаления изображения в сете
         await userEvent.click(wrapper.find('[data-test="form-edit-remove-image"]').element);
-
-        //из сета удаляется 1 изображение, теперь в сете 2 изображения
-        expect((store.image as ImageSet).arr.length).toBe(2);
-        //в активной коллекции теперь 2 изображения
-        expect(collectionStore.activeCollection?.arr.length).toBe(2);
-    });
-
-    it('сет разделяется на отдельные изображения', async () => {
-        const collection = new Collection(jest.fn(), {} as any, {} as any);
-        const image = new ImageSet({} as any, [] as any);
-        image.addImage(new ImageSingle({} as any, {} as any));
-        collection.addImage(image);
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [createTestingPinia({
-                    initialState: {
-                        collections: {
-                            activeCollection: collection
-                        },
-                        imageEdit: {
-                            image
-                        }
-                    },
-                    stubActions: false
-                })],
-            }
-        });
-        const store = useImageEditStore();
-        const collectionStore = useCollections();
-        await wrapper.vm.$nextTick();
-
-        //в активной коллекции должно быть 1 изображение.
-        expect(collectionStore.activeCollection?.arr.length).toBe(1);
-
-        //изначальное в сете 3 изображения
-        expect((store.image as ImageSet).arr.length).toBe(3);
-
-        //жмем кнопку удаления изображения в сете
-        await userEvent.click(wrapper.find('[data-test="form-edit-remove-image"]').element);
-
-        expect((store.image as ImageSet).arr.length).toBe(2);
-        expect(collectionStore.activeCollection?.arr.length).toBe(2);
-
-        //жмем кнопку удаления изображения в сете
-        await userEvent.click(wrapper.find('[data-test="form-edit-remove-image"]').element);
-
-        //сет должен разделиться на 2 отдельных изображения
-        expect((store.image as ImageSet).arr.length).toBe(0);
-        //в активной коллекции теперь 3 изображения
-        expect(collectionStore.activeCollection?.arr.length).toBe(3);
+        expect(store.separateImage).toBeCalledTimes(1);
     });
 
     it('изображение рендерится', async () => {
@@ -329,12 +302,15 @@ describe('FormImageEdit.vue', () => {
                         }
                     }
                 })],
-            }
+            },
+            attachTo: document.body
         });
+        //???
         await wrapper.vm.$nextTick();
+        await wrapper.vm.$forceUpdate();
 
         //Изображение получает src и рендерится
-        expect(wrapper.find<HTMLImageElement>('[data-test="form-edit-image"]').element.src).not.toBe('');
+        expect(wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img').element.src).not.toBe('');
     });
 
     it('Изображение ререндерится при смене активного изображения', async () => {
@@ -353,8 +329,9 @@ describe('FormImageEdit.vue', () => {
             }
         });
         await wrapper.vm.$nextTick();
+        await wrapper.vm.$forceUpdate();
 
-        const firstImageSrc = wrapper.find<HTMLImageElement>('[data-test="form-edit-image"]').element.src;
+        const firstImageSrc = wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img').element.src;
 
         //Изначальное зображение получает src и рендерится
         expect(firstImageSrc).not.toBe('');
@@ -363,6 +340,37 @@ describe('FormImageEdit.vue', () => {
         await userEvent.click(wrapper.findAll('[data-test="select-image-card"]')[1].element);
 
         //новое изображение рендерится, src нового изображения не равен src старого изображения
-        expect(wrapper.find<HTMLImageElement>('[data-test="form-edit-image"]').element.src).not.toBe(firstImageSrc);
+        expect(wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img').element.src).not.toBe(firstImageSrc);
+    });
+
+    it('Новое изображение вставляется', async () => {
+        const wrapper = mount(FormImageEdit, {
+            global: {
+                plugins: [createTestingPinia({
+                    initialState: {
+                        collections: {
+                            activeCollection: new Collection(jest.fn(), {} as any, {} as any)
+                        },
+                        imageEdit: {
+                            image: new ImageSet({} as any, [] as any),
+                        }
+                    }
+                })],
+            },
+            attachTo: document.body
+        });
+        const store = useImageEditStore();
+        jest.spyOn(store, 'changeImageBlob');
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$forceUpdate();
+
+        const fileUrl = wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img').element.src;
+        expect(fileUrl).not.toBe('');
+
+        await userEvent.pointer({keys: '[MouseRight]', target: wrapper.find('[data-test="form-edit-image"]').element});
+        await userEvent.click(wrapper.find('[data-test="input-image-context"]').element.children[0]);
+
+        expect(wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img').element.src).not.toBe(fileUrl);
+        expect(store.changeImageBlob).toBeCalledTimes(1);
     });
 });

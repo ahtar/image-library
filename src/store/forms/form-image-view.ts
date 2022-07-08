@@ -7,6 +7,14 @@ export const useImageViewStore = defineStore('imageView', {
             image: null as ImageSingle | ImageSet | null
         }
     },
+    getters: {
+        isSet: (state) => {
+            if(state.image) {
+                if('arr' in state.image) return true;
+            }
+            return false;
+        }
+    },
     actions: {
         /**
          * Изменение просматриваемого изображения.

@@ -9,6 +9,8 @@ interface Options {
     description?: string | undefined;
 }
 
+import memento from '@/modules/memento'
+
 
 class ImageSingleObject implements ImageSingle {
 
@@ -63,6 +65,25 @@ class ImageSingleObject implements ImageSingle {
     async getThumbnail(): Promise<FileSystemFileHandle> {
         if(this.thumbnailHandle == null) await this.loadThumbnail();
         return this.thumbnailHandle!;
+    }
+
+
+    saveState() {
+        memento.save(this.manifest, this.manifest.id);
+    }
+
+    restoreState() {
+        const restoredData = memento.restore<ImageSingleData>(this.manifest.id);
+        if(restoredData) this.manifest = restoredData;
+        else console.log('restoreState: Error');
+    }
+
+    checkChanges() {
+        const restoredStringData = memento.getString(this.manifest.id);
+        const stringData = JSON.stringify(this.manifest);
+
+        if(restoredStringData == stringData) return false;
+        else return true;
     }
 }
 

@@ -1,6 +1,6 @@
 <template>
     <modal-dark @close="close" data-test="form-view-close">
-        <div class="select-wrapper wrapper" v-if="isSet">
+        <div class="select-wrapper wrapper" v-if="store.isSet">
             <select-image :set="(image as ImageSet).arr" @change="changeImage" data-test="form-view-select"/>
         </div>
         <div class="image-wrapper wrapper">
@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref, computed } from 'vue'
+import { defineComponent, onBeforeMount, ref } from 'vue'
 import ModalDark from '@/components/ModalDark.vue'
 import SelectImage from '@/components/SelectImage.vue'
 import ViewerImage from '@/components/ViewerImage.vue'
@@ -27,13 +27,6 @@ export default defineComponent({
 
         const img = ref<null | HTMLImageElement>(null);
         const renderedImage = ref<ImageSingle | null>(null);
-        const isSet = computed(() => {
-            if('set' in store.image!.manifest) {
-                return true;
-            } else {
-                return false;
-            }
-        });
 
         onBeforeMount(() => {
             if('arr' in store.image!) {
@@ -48,13 +41,13 @@ export default defineComponent({
         }
         
         return {
+            store,
             close() {
                 store.close();
             },
             image: store.image,
             renderedImage,
             img,
-            isSet,
             changeImage,
         }
     },

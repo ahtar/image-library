@@ -1,9 +1,9 @@
 <template>
     <div class="select-images" @drop="drop($event)" @dragenter.prevent @dragover.prevent v-if="draggable">
-        <card-image-small v-for="(card, i) in set" draggable="true" data-test="select-image-card" @dragstart="drag($event, card)" @dragover="dragOver($event, card)" :key="card.manifest.id" :image="card" @click="change(card, $event)" :id="i"/>
+        <card-image-small v-for="(card, i) in set" draggable="true" data-test="select-image-card" @dragstart="drag($event, card)" @dragover="dragOver($event, card)" :key="card.manifest.id" :image="card" @click="change(card, i, $event)" :id="i"/>
     </div>
     <div class="select-images" v-else>
-        <card-image-small v-for="(card, i) in set" data-test="select-image-card" :key="card.manifest.id" :image="card" @click="change(card, $event)" :id="i"/>
+        <card-image-small v-for="(card, i) in set" data-test="select-image-card" :key="card.manifest.id" :image="card" @click="change(card, i, $event)" :id="i"/>
     </div>
 </template>
 
@@ -43,7 +43,6 @@ export default defineComponent({
             event.dataTransfer!.effectAllowed = 'move';
             event.dataTransfer!.dropEffect = 'move';
             event.dataTransfer!.setData('id', card.manifest.id);
-            change(card, event);
         }
 
         function dragOver(event: DragEvent, card: ImageSingle) {
@@ -59,7 +58,6 @@ export default defineComponent({
             const toIndex = (props.set as ImageSingle[]).findIndex((image) => image.manifest.id == dragOverId);
 
             const item = (props.set as ImageSingle[]).find((image) => image.manifest.id == id);
-            if(item) change(item, event);
 
             emit('dragSort', {
                 fromIndex,
@@ -68,9 +66,9 @@ export default defineComponent({
         }
 
         //Изменение активного изображения.
-        function change(card: ImageSingle, event: any) {
+        function change(card: ImageSingle, index: number, event: any) {
             if(selectedImage && event.target != selectedImage) {
-                emit('change', card);
+                emit('change', card, index);
                 selectedImage.classList.toggle('selected');
                 event.target.classList.toggle('selected');
                 selectedImage = event.target;

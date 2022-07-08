@@ -1,9 +1,10 @@
 interface Options {
-    set: Array<ImageSingleData>,
     id: string,
     dateCreated: string,
     dateEdited?: string,
 }
+
+import memento from '@/modules/memento'
 
 
 class ImageSetObject implements ImageSet {
@@ -12,7 +13,6 @@ class ImageSetObject implements ImageSet {
 
     constructor(options: Options, arr: ImageSingle[] = []) {
         this.manifest = {
-            set: options.set,
             id: options.id,
             dateCreated: options.dateCreated,
             dateEdited: options.dateEdited
@@ -33,11 +33,53 @@ class ImageSetObject implements ImageSet {
      * @param image Объект изображения.
      */
     removeImage(image: ImageSingle) {
-        let index = this.arr.findIndex((img) => img.manifest.id == image.manifest.id);
+        const index = this.arr.findIndex((img) => img.manifest.id == image.manifest.id);
         if(index != -1) this.arr.splice(index, 1);
+    }
 
-        index = this.manifest.set.findIndex((img) => img.id == image.manifest.id);
-        if(index != -1) this.manifest.set.splice(index, 1);
+    /**
+     * Сохранение состояния данных изображения для последующего восстановления.
+     */
+    saveState() {
+        console.log('set saveState');
+        memento.save({manifest: this.manifest, arrOrder: this.arr.map((i) => i.manifest.id)}, this.manifest.id);
+        for(const image of this.arr) {
+            image.saveState();
+        }
+    }
+
+    /**
+     * Восстановление изображения в сохраненное состояние
+     */
+    restoreState() {
+        console.log('set restoreState');
+        const restoredData = memento.restore<any>(this.manifest.id);
+
+        if(restoredData) {
+            this.manifest = restoredData.manifest;
+
+            const tempArr: ImageSingle[] = [];
+            for(const id of restoredData.arrOrder) {
+                const image = this.arr.find((i) => i.manifest.id == id);
+                if(image) tempArr.push(image);
+            }
+            this.arr = tempArr;
+        }
+
+        for(const image of this.arr) {
+            image.restoreState();
+        }
+    }
+
+    checkChanges() {
+        const restoredStringData = memento.getString(this.manifest.id);
+        const stringData = JSON.stringify({manifest: this.manifest, arrOrder: this.arr.map((i) => i.manifest.id)});
+
+        for(const image of this.arr) {
+            if(image.checkChanges()) return true;
+        }
+        if(restoredStringData == stringData) return false;
+        else return true;
     }
 }
 

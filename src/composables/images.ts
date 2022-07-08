@@ -19,21 +19,17 @@ export default function() {
         if(tagsRef.value.length == 0) return images.value;
         else {
             return images.value!.filter((image) => {
-                if('set' in image.manifest) {
-                    //работает криво
-                    //должен вернуть true если хоть в 1 изображении в сете есть нужный тег
-                    //а сейчас только если во всех изображениях есть нужный тег
-                    for(const t of (image as ImageSet).arr) {
-                        for(let i = 0; i < tagsRef.value.length; i++) {
-                            const tag = tagsRef.value[i];
+
+                if('arr' in image) {
+                    for(const t of image.arr) {
+                        for(const tag of tagsRef.value) {
                             if(!t.manifest.tags.includes(tag)) {
                                 return false;
                             }
                         }
                     }
                 } else {
-                    for(let i = 0; i < tagsRef.value.length; i++) {
-                        const tag = tagsRef.value[i];
+                    for(const tag of tagsRef.value) {
                         if(/!.+/.test(tag)) {
                             if(image.manifest.tags.includes(tag.replace('!', ''))) {
                                 return false;
@@ -45,6 +41,7 @@ export default function() {
                         }
                     }
                 }
+
                 return true;
             });
         }

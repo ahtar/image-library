@@ -1,6 +1,7 @@
 import { useCollections } from '@/store/collections'
 import { useNotificationStore } from '@/store/modals/modal-notification'
 import { defineStore } from 'pinia'
+import memento from '@/modules/memento'
 
 export const useImageEditStore = defineStore('imageEdit', {
     state: () => {
@@ -8,6 +9,8 @@ export const useImageEditStore = defineStore('imageEdit', {
             storeCollections: useCollections(),
             visible: false,
             image: null as ImageSingle | ImageSet | null,
+            imageBlobChanges: {} as { [key:string] : Blob },
+            imageSeparate: [] as ImageSingle[]
         }
     },
     getters: {
@@ -19,69 +22,62 @@ export const useImageEditStore = defineStore('imageEdit', {
         },
     },
     actions: {
-
-
-        setImage(image: ImageSingle | ImageSet | null) {
+        async setImage(image: ImageSingle | ImageSet) {
             this.image = image;
-        },
 
+            this.imageBlobChanges = {};
+            this.imageSeparate = [];
+
+            this.image.saveState();
+        },
 
         open() {
             this.visible = true;
         },
 
-
         close() {
             this.visible = false;
         },
 
-        async updateImage() {
-            const storeNotifications = useNotificationStore();
-            if(this.image != undefined) {
-                try {
-                    await this.storeCollections.activeCollection?.updateImage(this.image as any);
-                    storeNotifications.notify('Изображение измененно!');
-                } catch(err) {
-                    console.log(err);
-                    storeNotifications.notify('Изображение не измененно, что-то пошло не так', false);
-                }
-            }
+        changeImageBlob(image: ImageSingle, data: Blob) {
+            this.imageBlobChanges[image.manifest.id] = data;
         },
 
-        /*isSet() {
-            if(this.image) {
-                if('arr' in this.image) return true;
-            }
-            return false;
-        },*/
+        /**
+         * Отмена всех изменений изображения.
+         */
+        cancelUpdate() {
+            this.image?.restoreState();
+            this.close();
+        },
 
+        async updateImage() {
+            const storeNotifications = useNotificationStore();
+
+            const obj: ImageUpdateData = {};
+
+            if(this.imageSeparate.length > 0) obj.separate = this.imageSeparate as any;
+            if(Object.keys(this.imageBlobChanges).length > 0) obj.imageData = this.imageBlobChanges;
+            if(this.image?.checkChanges()) obj.manifest = this.image.manifest;
+
+            try {
+                await this.storeCollections.activeCollection?.updateImage(this.image as any, obj);
+            } catch(err) {
+                console.log(err);
+                storeNotifications.notify('Изображение не измененно, что-то пошло не так', false);
+            }
+
+            this.close();
+        },
+
+        /**
+         * Отметить изображение для отделения от сета.
+         * @param image 
+         */
         async separateImage(image: ImageSingle) {
-            if(this.image) {
-                if('arr' in this.image) {
-                    //Удаление ImageSingle из сета.
-                    this.image.removeImage(image);
-                    //Сохранение данных ImageSingle отдельным файлом.
-                    this.storeCollections.activeCollection!.updateImage(image);
-                    //Добавление ImageSingle в массив с изображениями.
-                    this.storeCollections.activeCollection!.addImage(image);
-
-                    //Если после удаления изображения из сета в сете останется лишь 1 изображение,
-                    //то сохранить его как отдельное изображение и удалить сет.
-                    if(this.image.arr.length == 1) {
-                        const lastImage = this.image.arr[0];
-                        //Удалить ImageSingle из сета.
-                        this.image.removeImage(lastImage as any);
-                        //Удалить пустой сет.
-                        await this.storeCollections.activeCollection!.deleteImage(lastImage as any);
-                        //Сохранение манифеста ImageSingle отдельным файлом.
-                        await this.storeCollections.activeCollection!.updateImage(lastImage as any);
-                        //Добавление ImageSingle в массив с изображениями.
-                        await this.storeCollections.activeCollection!.addImage(lastImage as any);
-
-                        this.close();
-                    }
-                }
-            }
+            const index = this.imageSeparate.findIndex((i) => i.manifest.id == image.manifest.id);
+            if(index == -1) this.imageSeparate.push(image);
+            else this.imageSeparate.splice(index, 1);
         }
     }
 });

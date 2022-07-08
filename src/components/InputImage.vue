@@ -1,17 +1,31 @@
 <template>
-    <div class="input-image" ref="imageField" :tabindex="tabindex" @paste="pasteEvent">
+    <div class="input-image" ref="imageField" :tabindex="tabindex" @paste="pasteEvent" @contextmenu.prevent="contextMenuOpen(null, $event)">
         <img ref="image">
         <div class="message" v-if="imageActive == false">Вставь картинку</div>
+
+        <transition-fade>
+            <menu-context class="menu-context" v-if="contextMenuActive" :event="contextMenuEvent!" @close="contextMenuClose" data-test="input-image-context">
+                <div @click="pasteEvent">Вставить</div>
+            </menu-context>
+        </transition-fade>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, ref, watch, PropType } from 'vue'
+
+import MenuContext from '@/components/MenuContext.vue'
+import TransitionFade from '@/components/TransitionFade.vue'
 
 import useClipboard from '@/composables/clipboard'
 import useImageRendering from '@/composables/image-rendering'
+import useContextMenu from '@/composables/context-menu'
 
 export default defineComponent({
+    components: {
+        MenuContext,
+        TransitionFade
+    },
     props: {
         tabindex: {
             type: Number,
@@ -22,7 +36,7 @@ export default defineComponent({
             defalut: true
         },
         blob: {
-            type: Blob
+            type: Object as PropType<Blob | FileSystemFileHandle>
         }
     },
 
@@ -36,11 +50,13 @@ export default defineComponent({
 
         const { readFromClipboard } = useClipboard();
         const { renderImage } = useImageRendering();
+        const { contextMenuActive, contextMenuEvent, contextMenuOpen, contextMenuClose } = useContextMenu();
 
         let blobObjectUrl: string;
 
         //Чтение первого изображения из буфера обмена
         async function pasteEvent() {
+            contextMenuClose();
             if(props.active) {
                 const item: any = await readFromClipboard();
                 const type = item[0].types.find((t: any) => t.includes('image'));
@@ -79,7 +95,12 @@ export default defineComponent({
             imageField,
             image,
             imageActive,
-            pasteEvent
+            pasteEvent,
+
+            contextMenuActive,
+            contextMenuOpen,
+            contextMenuClose,
+            contextMenuEvent,
         }
     },
 })
@@ -88,6 +109,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
     .input-image {
+        line-height: 0;
         @include z-depth();
         @include focus();
         .message {
@@ -106,6 +128,10 @@ export default defineComponent({
             &:hover {
                 cursor: default;
             }
+        }
+
+        .menu-context {
+            line-height: normal;
         }
 
         & img {

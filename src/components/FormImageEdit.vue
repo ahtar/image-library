@@ -1,15 +1,16 @@
 <template>
-    <modal-dark @close="close" data-test="form-edit-close">
+    <modal-dark @close="store.cancelUpdate" data-test="form-edit-close">
         <div class="section-wrapper wrapper">
-            <select-image :set="image.arr" @change="changeActiveImage" v-if="store.isSet" :draggable="true" @dragSort="dragSort" data-test="form-edit-select"/>
+            <select-image id="select-image" :set="image.arr" @change="changeActiveImage" v-if="store.isSet" :draggable="true" @dragSort="dragSort" data-test="form-edit-select"/>
             <div class="form-image-edit-wrapper">
                 <input-text v-model="fileUrl" label="Ссылка" :important="true" :active="false"/>
                 <input-tags :tags="computedTags" :definedTags="definedTags" @add="addTag" @remove="removeTag" data-test="input-tags"/>
                 <button-small v-if="store.isSet" class="button" @click="separateImage" data-test="form-edit-remove-image">Remove image from set</button-small>
+                <button-small @click="store.updateImage" data-test="form-edit-save">Save</button-small>
             </div>
         </div>
         <div class="image-wrapper wrapper">
-            <img  class="image-edit" ref="img" data-test="form-edit-image"/>
+            <input-image class="image-edit" :active="true" :blob="fielHandle" @paste="pasteHandler" data-test="form-edit-image"/>
         </div>
     </modal-dark>
 </template>
@@ -19,6 +20,7 @@ import { computed, defineComponent, onMounted, ref } from 'vue'
 
 import InputTags from '@/components/InputTag.vue'
 import InputText from '@/components/InputText.vue'
+import InputImage from '@/components/InputImage.vue'
 import SelectImage from '@/components/SelectImage.vue'
 import ButtonSmall from '@/components/ButtonSmall.vue'
 import ModalDark from '@/components/ModalDark.vue'
@@ -26,7 +28,6 @@ import ModalDark from '@/components/ModalDark.vue'
 import { useImageEditStore } from '@/store/forms/form-image-edit'
 
 import useTagActions from '@/composables/tags'
-import useRerenderImage from '@/composables/image-rendering'
 
 import misc from '@/modules/misc'
 
@@ -34,6 +35,7 @@ export default defineComponent({
     components: {
         InputTags,
         InputText,
+        InputImage,
         SelectImage,
         ButtonSmall,
         ModalDark,
@@ -42,17 +44,16 @@ export default defineComponent({
         const store = useImageEditStore();
 
         const { addTag, removeTag, setTagRef, definedTags } = useTagActions();
-        const { renderImage } = useRerenderImage();
 
-        //Ref на img.
-        const img = ref<null | HTMLImageElement>(null);
         const image = ref<any>(store.image);
+        const fielHandle = ref<FileSystemFileHandle | Blob>();
 
         //Текущее активное изображение.
         //Все изменения происходят на нем.
         //Если основное изображение это ImageSet, то активным  будет 1 из элементов этого сета
         //Если основное изображение это ImageSingle, то оно и будет активным.
-        const activeImage = ref<ImageSingle | null>(null);
+        const activeImage = ref<ImageSingle>();
+        const activeImageIndex = ref(0);
 
         //Ссылка на активное изображение.
         const fileUrl = computed(() => {
@@ -73,16 +74,17 @@ export default defineComponent({
                     activeImage.value = image.value;
                 }
                 setTagRef(ref(activeImage.value!.manifest.tags));
-                renderImage(img.value!, await activeImage.value!.getImage());
+                fielHandle.value = await activeImage.value?.getImage();
             }
         });
 
         //Смена активного изображения.
-        async function changeActiveImage(image: ImageSingle) {
+        async function changeActiveImage(image: ImageSingle, index: number) {
             if(image) {
+                activeImageIndex.value = index;
                 activeImage.value = image;
                 setTagRef(ref(activeImage.value.manifest.tags));
-                renderImage(img.value!, await activeImage.value.getImage());
+                fielHandle.value = await activeImage.value?.getImage();
             }
         }
 
@@ -90,7 +92,6 @@ export default defineComponent({
         function dragSort(obj: any) {
             if(store.image) {
                 if('arr' in store.image) {
-                    store.image.manifest.set = misc.arrayChangePosition(store.image.manifest.set, obj.fromIndex, obj.toIndex);
                     store.image.arr = misc.arrayChangePosition(store.image.arr, obj.fromIndex, obj.toIndex);
                 }
             }
@@ -99,20 +100,21 @@ export default defineComponent({
 
         //Отделение изображения из сета.
         async function separateImage() {
-            if(image.value != null) {
+            if(image.value) {
+                document.getElementById(`${activeImageIndex.value}`)?.children[0]?.classList.toggle('removed');
                 store.separateImage(activeImage.value! as any);
-                changeActiveImage(image.value.arr[0]);
             }
+        }
+
+        async function pasteHandler(data: Blob) {
+            store.changeImageBlob(activeImage.value!, data);
+            fielHandle.value = data;
         }
 
         return {
             store,
-            close() {
-                store.close();
-                store.updateImage();
-            },
-            img,
             image,
+            fielHandle,
             activeImage,
             changeActiveImage,
             fileUrl,
@@ -122,6 +124,7 @@ export default defineComponent({
             computedTags,
             dragSort,
             separateImage,
+            pasteHandler,
         }
     },
 })
