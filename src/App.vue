@@ -8,6 +8,10 @@
     <message-prompt v-if="storePrompt.visible"/>
   </transition-fade>
 
+  <transition-fade>
+    <progress-bar v-if="storeProgressBar.visible"/>
+  </transition-fade>
+
   <screen-init v-if="storeInit.visible" @data="addCollections"/>
 
 </template>
@@ -20,8 +24,10 @@ import MessagePrompt from '@/components/MessagePrompt.vue'
 import MessageNotification from '@/components/MessageNotification.vue'
 import TransitionFade from '@/components/TransitionFade.vue'
 import ScreenInit from '@/components/ScreenInit.vue'
+import ProgressBar from '@/components/ProgressBar.vue'
 
 import { usePromptStore } from '@/store/modals/modal-prompt'
+import { useProgressBarStore } from '@/store/modals/modal-progress-bar'
 import { useInitStore } from '@/store/modals/modal-init'
 import { useCollections } from '@/store/collections'
 
@@ -35,9 +41,11 @@ export default defineComponent({
     MessagePrompt,
     TransitionFade,
     ScreenInit,
+    ProgressBar,
   },
   setup() {
     const storePrompt = usePromptStore();
+    const storeProgressBar = useProgressBarStore();
     const storeInit = useInitStore();
     const storeCollections = useCollections();
     const { checkMainFolderAccess, initLoadCollections } = useFileSystem();
@@ -64,6 +72,7 @@ export default defineComponent({
 
     return {
       storePrompt,
+      storeProgressBar,
       storeInit,
       addCollections,
     }

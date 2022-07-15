@@ -182,8 +182,6 @@ export default defineComponent({
         height:40vh;
         border-radius: $radius-big;
         position: relative;
-        margin-top: 15px;
-        width: 100%;
         display: flex;
         flex-direction: column;
         @include z-depth(2);

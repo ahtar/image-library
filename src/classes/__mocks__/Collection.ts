@@ -7,7 +7,10 @@ const mockedClass =  jest.fn(() => {
             created: 'mocked created date',
             description: 'mocked description',
             theme: 'mocked theme',
-            lastModified: 'mocked lastModified date'
+            lastModified: 'mocked lastModified date',
+            options: {
+                corrupted: false
+            }
         },
         arr: [] as Array<ImageSet | ImageSingle>,
         tags: [],
@@ -67,7 +70,6 @@ const mockedClass =  jest.fn(() => {
             }
         },
         updateImage: jest.fn(),
-        log: jest.fn(),
         deleteCollection: jest.fn(),
         updateCollectionManifest: jest.fn(),
     }

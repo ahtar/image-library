@@ -7,6 +7,7 @@ interface Options {
     dateEdited?: string | undefined;
     dateCreated: string;
     description?: string | undefined;
+    corrupted?: boolean
 }
 
 import memento from '@/modules/memento'
@@ -28,7 +29,8 @@ class ImageSingleObject implements ImageSingle {
             previewFileUrl: options.previewFileUrl,
             dateCreated: options.dateCreated,
             description: options.description,
-            dateEdited: options.dateEdited
+            dateEdited: options.dateEdited,
+            corrupted: options.corrupted
         }; 
         this.collectionHandle = handle;
     }

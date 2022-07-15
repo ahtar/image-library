@@ -39,14 +39,18 @@ export default defineComponent({
         font-size: 1.5rem;
         background-color: $color-dark-2;
         border: thin solid $color-border-dark-2;
-        padding: 20px;
+        padding: 15px;
         @include z-depth(2);
 
         .button-box {
             display: flex;
             width: 100%;
             margin-top: 10px;
-            justify-content: space-evenly;
+            justify-content: center;
+            
+            .button-small {
+                margin: max(7px , 2%);
+            }
         }
     }
 </style>

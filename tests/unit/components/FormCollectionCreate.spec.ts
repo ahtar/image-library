@@ -5,6 +5,7 @@ import { createTestingPinia } from '@pinia/testing';
 import FormCollectionCreate from '@/components/FormCollectionCreate.vue'
 import InputImage from '@/components/InputImage.vue'
 import ModalDark from '@/components/ModalDark.vue'
+import InputCheckBox from '@/components/InputCheckBox.vue'
 
 import { useCollectionCreateStore } from '@/store/forms/form-collection-create'
 
@@ -149,6 +150,25 @@ describe('FormCollectionCreate.vue', () => {
 
         //src изображения меняется с пустой строки, следовательно это изображение отрисовано
         expect(wrapper.find<HTMLImageElement>('img').element.src).not.toBe('');
+    });
+
+    it('Настройка corrupted меняется', async () => {
+        const wrapper = mount(FormCollectionCreate, {
+            global: {
+                plugins: [createTestingPinia()],
+            }
+        });
+        const store = useCollectionCreateStore();
+        const checkbox = wrapper.find<HTMLInputElement>('[data-test="collection-create-corrupted"] input');
+
+        expect(checkbox.element.checked).toBe(false);
+        expect(store.form.options.corrupted).toBe(false);
+
+        await userEvent.click(checkbox.element);
+        await checkbox.trigger('change');
+
+        expect(checkbox.element.checked).toBe(true);
+        expect(store.form.options.corrupted).toBe(true);
     });
 
 });

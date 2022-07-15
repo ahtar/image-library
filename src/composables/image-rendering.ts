@@ -1,4 +1,4 @@
-
+import crypto from '@/modules/crypto'
 
 /**
  * Изменение src изображения.
@@ -14,7 +14,13 @@ async function renderImage(image: HTMLImageElement, file: FileSystemFileHandle |
             data = file;
         } else {
             if('getFile' in file) {
-                data = URL.createObjectURL(await file.getFile());
+                if(file.name.includes('.dpx') || file.name.includes('.tpx')) {
+                    const tempData = await file.getFile();
+                    const arrayBuffer = await tempData.arrayBuffer();
+                    data = URL.createObjectURL(await crypto.recover(arrayBuffer));
+                } else {
+                    data = URL.createObjectURL(await file.getFile());
+                }
             } else {
                 data = URL.createObjectURL(file);
             }

@@ -1,12 +1,14 @@
 <template>
     <modal-dark @close="store.cancelUpdate" data-test="form-edit-close">
-        <div class="section-wrapper wrapper">
+        <div class="form-wrapper wrapper">
             <select-image id="select-image" :set="image.arr" @change="changeActiveImage" v-if="store.isSet" :draggable="true" @dragSort="dragSort" data-test="form-edit-select"/>
             <div class="form-image-edit-wrapper">
-                <input-text v-model="fileUrl" label="Ссылка" :important="true" :active="false"/>
-                <input-tags :tags="computedTags" :definedTags="definedTags" @add="addTag" @remove="removeTag" data-test="input-tags"/>
-                <button-small v-if="store.isSet" class="button" @click="separateImage" data-test="form-edit-remove-image">Remove image from set</button-small>
-                <button-small @click="store.updateImage" data-test="form-edit-save">Save</button-small>
+                <input-text class="wrapper-section" v-model="fileUrl" label="Ссылка" :important="true" :active="false"/>
+                <input-tags class="wrapper-section" :tags="computedTags" :definedTags="definedTags" @add="addTag" @remove="removeTag" data-test="input-tags"/>
+                <div class="wrapper-section button-section">
+                    <button-small v-if="store.isSet" class="button" @click="separateImage" data-test="form-edit-remove-image">Remove image from set</button-small>
+                    <button-small @click="store.updateImage" data-test="form-edit-save">Save</button-small>
+                </div>
             </div>
         </div>
         <div class="image-wrapper wrapper">
@@ -142,22 +144,27 @@ export default defineComponent({
         border-radius: $radius-big;
         @include z-depth();
         display: flex;
-        align-items: flex-start;
         flex-direction: column;
-        padding: 20px;
         width: 30vw;
+        min-width: fit-content;
 
         .section {
             display: flex;
             align-items: center;
         }
+
+        .wrapper-section {
+            margin: max(7px, 2%);
+        }
+
+        .button-section {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
     }
 
-    .button {
-        margin-top: 5%;
-    }
-
-    .section-wrapper {
+    .form-wrapper {
         margin-left: 3vw;
         display: flex;
         flex-direction: row;

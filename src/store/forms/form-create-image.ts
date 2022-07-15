@@ -37,23 +37,30 @@ export const useImageCreateStore = defineStore('imageCreate', {
         /**
          * Сохранение нового изображения.
          */
-         async submitImage() {
+        async submitImage() {
             const store = useCollections();
             const storeNotifications = useNotificationStore();
             const id = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
 
+            const blobFormat = this.form.blob!.type.split('/')[1];
+
+            //Информация об изображении.
             const imageInstance: ImageSingleData = {
                 id: id,
-                fileUrl: id + '.png',
-                previewFileUrl: id + '.png',
+                fileUrl: `${id}.${blobFormat}`,
+                previewFileUrl: `${id}.${blobFormat}`,
                 hash: this.form.hash,
                 dateCreated: Date(),
                 tags: [],
+                corrupted: store.activeCollection?.manifest.options?.corrupted || false
             };
 
-            //создание ссылок на изображения
-            imageInstance.fileUrl = imageInstance.id + '.' + this.form.blob?.type.split('/')[1];
-            imageInstance.previewFileUrl = imageInstance.id + '.' + this.form.blob?.type.split('/')[1];
+
+            //Порча изображения.
+            if(imageInstance.corrupted) {
+                imageInstance.fileUrl = id + '.dpx';
+                imageInstance.previewFileUrl = id + '.tpx';
+            }
 
             //Создание тегов
             for(const tag of this.form.tags) {

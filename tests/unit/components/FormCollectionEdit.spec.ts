@@ -4,6 +4,7 @@ import { createTestingPinia } from '@pinia/testing';
 
 import FormCollectionEdit from '@/components/FormCollectionEdit.vue'
 import { useCollectionEditStore } from '@/store/forms/form-collection-edit'
+import { usePromptStore } from '@/store/modals/modal-prompt'
 
 import Collection from '@/classes/Collection'
 
@@ -215,5 +216,81 @@ describe('FormCollectionEdit', () => {
         await wrapper.find<HTMLInputElement>('[data-test="collection-edit-name"] input').setValue('');
         await userEvent.click(wrapper.find<HTMLButtonElement>('button').element);
         expect(store.save).toBeCalledTimes(0);
+    });
+
+    it('Настройка corrupted меняется', async () => {
+        const wrapper = mount( FormCollectionEdit, {
+            global: {
+                plugins: [createTestingPinia()],
+            }
+        });
+        const store = useCollectionEditStore();
+        const checkbox = wrapper.find<HTMLInputElement>('[data-test="collection-edit-corrupted"] input');
+
+        expect(checkbox.element.checked).toBe(false);
+        expect(store.form.options.corrupted).toBe(false);
+
+        await userEvent.click(checkbox.element);
+        await checkbox.trigger('change');
+
+        expect(checkbox.element.checked).toBe(true);
+        expect(store.form.options.corrupted).toBe(true);
+    });
+
+    it('У пользователя не спрашивают, нужно ли менять существующие изображения, если  параметр corrupted не был изменен', async () => {
+        const collection = new Collection({} as any, {} as any, {} as any);
+        const wrapper = mount( FormCollectionEdit, {
+            global: {
+                plugins: [createTestingPinia({ 
+                    stubActions: false
+                })],
+            }
+        });
+        const store = useCollectionEditStore();
+        const storeNotification = usePromptStore();
+        const saveButton = wrapper.find<HTMLElement>('[data-test="collection-edit-save"]');
+
+        //Инициализация.
+        store.open(collection);
+
+        //Окно prompt не показано.
+        expect(storeNotification.visible).toBe(false);
+
+        //Сохранение коллекции.
+        await userEvent.click(saveButton.element);
+
+        //Окно prompt всё ещё показано.
+        expect(storeNotification.visible).toBe(false);
+    });
+
+    it('У пользователя спрашивают, нужно ли менять существующие изображения, если  параметр corrupted был изменен', async () => {
+        const collection = new Collection({} as any, {} as any, {} as any);
+        const wrapper = mount( FormCollectionEdit, {
+            global: {
+                plugins: [createTestingPinia({ 
+                    stubActions: false
+                })],
+            }
+        });
+        const store = useCollectionEditStore();
+        const storeNotification = usePromptStore();
+        const checkbox = wrapper.find<HTMLInputElement>('[data-test="collection-edit-corrupted"] input');
+        const saveButton = wrapper.find<HTMLElement>('[data-test="collection-edit-save"]');
+
+        //Инициализация.
+        store.open(collection);
+
+        //Окно prompt не показано.
+        expect(storeNotification.visible).toBe(false);
+
+        //Изменение corrupted.
+        await userEvent.click(checkbox.element);
+        await checkbox.trigger('change');
+
+        //Сохранение коллекции.
+        await userEvent.click(saveButton.element);
+
+        //Окно prompt показано.
+        expect(storeNotification.visible).toBe(true);
     });
 });

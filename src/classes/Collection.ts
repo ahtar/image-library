@@ -2,6 +2,7 @@ import ImageSingle from '@/classes/ImageSingle'
 import ImageSet from '@/classes/ImageSet'
 
 import jimp from '@/modules/jimp'
+import crypto from '@/modules/crypto'
 
 import Fs from '@/composables/file-system'
 
@@ -12,7 +13,10 @@ interface CollectionOptions {
     description?: string,
     theme?: string,
     lastModified?: string,
-    count?: number
+    count?: number,
+    options?: {
+        corrupted?: boolean
+    }
 }
 
 
@@ -62,7 +66,10 @@ class CollectionOjbect implements Collection {
             created: options.created || Date(),
             description: options.description,
             theme: options.theme,
-            lastModified: options.lastModified
+            lastModified: options.lastModified,
+            options: {
+                corrupted: options.options?.corrupted || false
+            }
         };
         this.thumbnail = thumbnail;
         this.arr = [];
@@ -75,6 +82,7 @@ class CollectionOjbect implements Collection {
      * Загрузка всех изображений.
      */
     async initLoadCollection() {
+        console.log('init load collection!');
         const imageDataFolderHandler = await this.handle.getDirectoryHandle('imageData');
 
         const buffer: Array<ImageSingle | ImageSet> = [];
@@ -92,6 +100,8 @@ class CollectionOjbect implements Collection {
         }
 
         const images = await Promise.all(promises);
+
+        console.info('images', images);
 
         //Создание объекта изображения и его добавление в массив.
         for(const image of images) {
@@ -198,13 +208,25 @@ class CollectionOjbect implements Collection {
         const imageFileFolderHandle = await this.handle.getDirectoryHandle('images', { create: true });
         const imageThumbnailFolderHandle = await this.handle.getDirectoryHandle('thumbnails', { create: true });
 
-        await fs.writeFile(imageDataFolderHandle, manifest.id + '.json', JSON.stringify(manifest));
-        const imageHandle = await fs.writeFile(imageFileFolderHandle, manifest.fileUrl, image);
-        const thumbnailHandle = await fs.writeFile(imageThumbnailFolderHandle, manifest.previewFileUrl, await jimp.resize(image));
+        let imageBlob = image;
+        let thumbnailBlob = await jimp.resize(image);
 
+        //Если изображение испорчено, то испортить файл изображения.
+        if(manifest.corrupted) {
+            imageBlob = await crypto.corrupt(image);
+            thumbnailBlob = await crypto.corrupt(thumbnailBlob);
+        }
+
+        //Запись файлов.
+        await fs.writeFile(imageDataFolderHandle, manifest.id + '.json', JSON.stringify(manifest));
+        await fs.writeFile(imageFileFolderHandle, manifest.fileUrl, imageBlob);
+        await fs.writeFile(imageThumbnailFolderHandle, manifest.previewFileUrl, thumbnailBlob);
+
+        //Добавление изображения в коллекцию.
         const img = new ImageSingle(manifest, this.handle);
         this.addImage(img);
 
+        //Добавление тегов в коллекцию.
         for(const tag of manifest.tags) {
             this.addTag(tag);
         }
@@ -322,80 +344,218 @@ class CollectionOjbect implements Collection {
      * @param data Обновляемые данные.
      */
     async updateImage(image: ImageSingle | ImageSet, data?: ImageUpdateData): Promise<void> {
-        const fs = Fs();
-        const manifestFolderHandle = await this.handle.getDirectoryHandle('imageData');
-        const imageFolderHandle = await this.handle.getDirectoryHandle('images');
-        const thumbnailFolderHandle = await this.handle.getDirectoryHandle('thumbnails');
-        let manifest: ImageSingleData | ImageSetSavedData | null = null;
-
         //Замена изображения.
         if(data?.imageData) {
-            for(const keyId in data.imageData) {
-                const imageHandle = await fs.writeFile(imageFolderHandle, keyId + '.png', data.imageData[keyId]);
-                const thumbnailHandle = await fs.writeFile(thumbnailFolderHandle, keyId + '.png', await jimp.resize(data.imageData[keyId]));
-
-                if('arr' in image) {
-                    const imageSingle = image.arr.find((i) => i.manifest.id == keyId);
-                    if(imageSingle) {
-                        imageSingle.imageHandle = imageHandle;
-                        imageSingle.thumbnailHandle = thumbnailHandle;
-                    }
-                } else {
-                    image.imageHandle = imageHandle;
-                    image.thumbnailHandle = thumbnailHandle;
-                }
-            }
+            await this._updateBlob(image, data.imageData);
         }
 
         //Обновление данных об изображении.
         if(data?.manifest) {
-            if('arr' in image) {
-                const manifestData = data.manifest as ImageSetSavedData;
-                manifest = manifestData;
-                manifest.set = [];
-
-                manifest.set.push(...image.arr.map((i) => i.manifest));
-            } else {
-                const manifestData = data.manifest as ImageSingleData;
-                manifest = manifestData;
-            }
-
-            await fs.writeFile(manifestFolderHandle, manifest.id + '.json', JSON.stringify(manifest));
+            await this._updateManifest(image);
         }
 
         //Отделение изображений от сета.
-        if(data?.separate) {
-            //Подготовка manifest изображения.
-            if(!manifest) {
-                manifest = image.manifest as ImageSetSavedData;
-                manifest.set = [];
-                manifest.set.push(...(image as ImageSet).arr.map((i) => i.manifest));
-            } else {
-                (manifest as ImageSetSavedData).set = [];
-                (manifest as ImageSetSavedData).set.push(...(image as ImageSet).arr.map((i) => i.manifest));
-            }
+        if(data?.separate && 'arr' in image) {
+            await this._updateSeparate(image, data.separate);
+        }
 
-            //Удаление каждого изображения из сета и сохранение как одиночное изображение.
-            for(const imageSingle of data.separate) {
-                const index = (manifest as ImageSetSavedData).set.findIndex((i) => i.id == imageSingle.manifest.id);
-                if(index != -1) (manifest as ImageSetSavedData).set.splice(index, 1);
-                (image as ImageSet).removeImage(imageSingle);
-                this.addImage(imageSingle);
-                await this.updateImage(imageSingle, { manifest: imageSingle.manifest });
-            }
-
-            //Удаление пустого сета.
-            if((image as ImageSet).arr.length == 0) {
-                this.removeImage(image);
-                await this.deleteImage(image);
-            } else {
-                await this.updateImage(image, { manifest: image.manifest });
-            }
+        //Порча изображения.
+        if(data?.corrupt) {
+            const temp = this.manifest.options?.corrupted;
+            await this._updateCorrupt(image, temp!);
         }
     }
 
-    log() {
-        console.log(this);
+    /**
+     * Обновление manifest файла изображения.
+     * @param image Объект изображения.
+     */
+    private async _updateManifest(image: ImageSingle | ImageSet) {
+        const fs = Fs();
+        const manifestFolderHandle = await this.handle.getDirectoryHandle('imageData');
+        let manifest: ImageSingleData | ImageSetSavedData | null = null;
+
+        if('arr' in image) {
+            manifest = image.manifest as ImageSetSavedData;
+            manifest.set = [];
+            manifest.set.push(...image.arr.map((i) => i.manifest));
+        } else {
+            manifest = image.manifest;
+        }
+
+        await fs.writeFile(manifestFolderHandle, manifest.id + '.json', JSON.stringify(manifest));
+    }
+
+    /**
+     * Обновление blob изображения.
+     * @param image Объект изображения.
+     * @param data Новые изображения.
+     */
+    private async _updateBlob(image: ImageSingle | ImageSet, data: { [key: string]: Blob }) {
+        const fs = Fs();
+        const imageFolderHandle = await this.handle.getDirectoryHandle('images');
+        const thumbnailFolderHandle = await this.handle.getDirectoryHandle('thumbnails');
+
+        for(const key in data) {
+            let tempImage: ImageSingle | null = null;
+
+            //Получение объекта изображания, к которому относится blob.
+            if('arr' in image) {
+                const temp = image.arr.find((i) => i.manifest.id == key);
+                if(temp) tempImage = temp;
+                else console.log('_updateBlob:unknownId');
+            } else {
+                if(image.manifest.id == key) tempImage = image;
+                else console.log('_updateBlob:unknownId');
+            }
+
+            if(tempImage) {
+                let blobImage = data[key];
+                let blobThumbnail = await jimp.resize(data[key]);
+
+                //Если tempImage.manifest.corrupted == false и fileUrl.includes('.dpx').
+                //То что-то работает не ток как надо, файл будет обычным png, но считаться порченным.
+                //Фикс.
+                if(!tempImage.manifest.corrupted && (tempImage.manifest.fileUrl.includes('.dpx') || tempImage.manifest.previewFileUrl.includes('.tpx'))) {
+                    console.log('фикс ошибки');
+                    tempImage.manifest.corrupted = true;
+                }
+
+                //Порча нового blob, если это необходимо.
+                if(tempImage.manifest.corrupted) {
+                    blobImage = await crypto.corrupt(blobImage);
+                    blobThumbnail = await crypto.corrupt(blobThumbnail);
+                }
+
+                const imageHandle = await fs.writeFile(imageFolderHandle, tempImage.manifest.fileUrl, blobImage);
+                const thumbnailHandle = await fs.writeFile(thumbnailFolderHandle, tempImage.manifest.previewFileUrl, blobThumbnail);
+                
+                tempImage.imageHandle = imageHandle;
+                tempImage.thumbnailHandle = thumbnailHandle;
+            }
+
+        }
+    }
+
+    /**
+     * Разделение сета на отдельные изображения.
+     * @param image Разделяемый сет.
+     * @param data Массив с изображениями, которые надо отделить от сета.
+     */
+    private async _updateSeparate(image: ImageSet, data: ImageSingle[]) {
+        for(const imageSingle of data) {
+            const index = image.arr.findIndex((i) => i.manifest.id == imageSingle.manifest.id);
+            if(index != -1) {
+                image.removeImage(imageSingle);
+                this.addImage(imageSingle);
+                await this._updateManifest(imageSingle);
+            }
+        }
+
+        //Отделение единственного оставшегося изображения в сете,
+        //т. к. в сете не может быть 1 изображение.
+        if(image.arr.length == 1) {
+            const imageSingle = image.arr[0];
+            image.removeImage(imageSingle);
+            this.addImage(imageSingle);
+            await this._updateManifest(imageSingle);
+        }
+
+        //Удаление сета, если в нем не осталось изображений.
+        //Обновление manifest файла сета, если в нем остались изображения.
+        if(image.arr.length == 0) {
+            await this.deleteImage(image);
+        } else {
+            await this._updateManifest(image);
+        }
+    }
+
+    /**
+     * Порча изображения.
+     * @param image Объект изображения.
+     * @param corrupt Испортить изображение, или восстановить.
+     */
+    private async _updateCorrupt(image: ImageSingle | ImageSet, corrupt = true) {
+        // eslint-disable-next-line
+        const _this = this;
+        const fs = Fs();
+        const imageFolderHandle = await this.handle.getDirectoryHandle('images');
+        const thumbnailFolderHandle = await this.handle.getDirectoryHandle('thumbnails');
+
+        const promises: Promise<any>[] = [];
+        let manifestChanged = false;
+
+        if('arr' in image) {
+            for(const imageSingle of image.arr) {
+                await __corrupt(imageSingle);
+            }
+        } else {
+           await __corrupt(image);
+        }
+
+        const promisesStatus = await Promise.allSettled(promises);
+        //Обновление manifest изображения, если были проведены какие либо операции.
+        if(manifestChanged) {
+            await this._updateManifest(image);
+        }
+
+
+        async function __corrupt(image: ImageSingle) {
+            const imageBuffer = await (await (await image.getImage()).getFile()).arrayBuffer();
+            const thumbnailBuffer = await (await (await image.getThumbnail()).getFile()).arrayBuffer();
+
+            //Проверка изображения и превью на порченность.
+            const imageCorrupted = await crypto.isCorrupted(imageBuffer);
+            const thumbnailCorrupted = await crypto.isCorrupted(thumbnailBuffer);
+
+            if(imageCorrupted &&  thumbnailCorrupted) {
+                if(corrupt) {
+                    if(!image.manifest.corrupted) {
+                        image.manifest.corrupted = true;
+                        manifestChanged = true;
+                    }
+                } else {
+                    image.manifest.corrupted = false;
+                    manifestChanged = true;
+
+                    if(imageCorrupted) {
+                        const imageNewData = await crypto.recover(imageBuffer);
+                        promises.push(imageFolderHandle.removeEntry(image.manifest.fileUrl));
+                        image.manifest.fileUrl = image.manifest.id + '.png';
+                        promises.push(fs.writeFile(imageFolderHandle, image.manifest.fileUrl, imageNewData));
+                        image.imageHandle = null;
+                    }
+                    if(thumbnailCorrupted) {
+                        const thumbnailNewData = await crypto.recover(thumbnailBuffer);
+                        promises.push(thumbnailFolderHandle.removeEntry(image.manifest.previewFileUrl));
+                        image.manifest.previewFileUrl = image.manifest.id + '.png';
+                        promises.push(fs.writeFile(thumbnailFolderHandle, image.manifest.previewFileUrl, thumbnailNewData));
+                        image.thumbnailHandle = null;
+                    }
+                }
+            } else {
+                if(corrupt) {
+                    image.manifest.corrupted = true;
+                    manifestChanged = true;
+
+                    if(!imageCorrupted) {
+                        const imageNewData = await crypto.corrupt(imageBuffer);
+                        promises.push(imageFolderHandle.removeEntry(image.manifest.fileUrl));
+                        image.manifest.fileUrl = image.manifest.id + '.dpx';
+                        promises.push(fs.writeFile(imageFolderHandle, image.manifest.fileUrl, imageNewData));
+                        image.imageHandle = null;
+                    }
+
+                    if(!thumbnailCorrupted) {
+                        const thumbnailNewData = await crypto.corrupt(thumbnailBuffer);
+                        promises.push(thumbnailFolderHandle.removeEntry(image.manifest.previewFileUrl));
+                        image.manifest.previewFileUrl = image.manifest.id + '.tpx';
+                        promises.push(fs.writeFile(thumbnailFolderHandle, image.manifest.previewFileUrl, thumbnailNewData));
+                        image.thumbnailHandle = null;
+                    }
+                }
+            }
+        }
     }
 
     /**

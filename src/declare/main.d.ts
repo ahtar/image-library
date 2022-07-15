@@ -5,11 +5,12 @@ interface Window {
 }
 
 interface ImageUpdateData {
-    manifest?: ImageSingleData | ImageSetData,
+    manifest?: boolean,
     imageData?: {
         [key: string]: Blob
     },
-    separate?: ImageSingle[]
+    separate?: ImageSingle[],
+    corrupt?: boolean
 }
 
 interface Collection {
@@ -37,6 +38,9 @@ interface CollectionManifest {
     theme?: string,
     created: string,
     lastModified?: string,
+    options?: {
+        corrupted?: boolean
+    }
 
 }
 
@@ -76,7 +80,8 @@ interface ImageSingleData extends ImageManifest {
     tags: Array<string>,
     fileUrl: string,
     previewFileUrl: string,
-    description?: string
+    description?: string,
+    corrupted?: boolean
 }
 
 interface ImageSetData extends ImageManifest {

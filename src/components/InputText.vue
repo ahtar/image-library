@@ -89,7 +89,6 @@ export default defineComponent({
         position: relative;
         border-radius: $radius-big;
         overflow: hidden;
-        margin: $margin-big;
         background-color: $color-dark-2;
         border: thin solid $color-border-dark-2;
         height: 2rem;

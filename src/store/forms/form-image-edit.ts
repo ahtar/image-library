@@ -58,16 +58,15 @@ export const useImageEditStore = defineStore('imageEdit', {
 
             if(this.imageSeparate.length > 0) obj.separate = this.imageSeparate as any;
             if(Object.keys(this.imageBlobChanges).length > 0) obj.imageData = this.imageBlobChanges;
-            if(this.image?.checkChanges()) obj.manifest = this.image.manifest;
+            if(this.image?.checkChanges()) obj.manifest = true;
 
+            this.close();
             try {
                 await this.storeCollections.activeCollection?.updateImage(this.image as any, obj);
             } catch(err) {
                 console.log(err);
                 storeNotifications.notify('Изображение не измененно, что-то пошло не так', false);
             }
-
-            this.close();
         },
 
         /**

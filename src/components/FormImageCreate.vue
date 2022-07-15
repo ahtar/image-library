@@ -5,15 +5,15 @@
                 <card-tag-small v-for="(tag, i) in oldTagsCopy" :key="i" :tag="tag" @click="reuseOldTag(i)"/>
             </div>
             <div class="form-image-create" data-test="form-create-wrapper">
-                <div class="section">
+                <div class="section-wrapper">
                     <input-text v-model="store.form.fileUrl" label="Id" :important="true" :active="store.urlInputActive" placeholder="Идентификатор изображения"/>
                 </div>
-                <input-tags :tags="store.form.tags" :definedTags="definedTags" @add="addTag" @remove="removeTagHandler" data-test="input-tags"/>
-                <div class="buttons">
+                <input-tags class="section-wrapper" :tags="store.form.tags" :definedTags="definedTags" @add="addTag" @remove="removeTagHandler" data-test="input-tags"/>
+                <div class="buttons section-wrapper">
                     <button-small @click="store.clearForm" data-test="form-clear">Отчистить</button-small>
                     <button-small @click="store.submitImage" :blocked="saveButtonBlocked" data-test="form-save">Сохранить</button-small>
                 </div>
-                <div class="similar-images" v-if="haveDoubles">
+                <div class="similar-images section-wrapper" v-if="haveDoubles">
                     <card-image-small v-for="(image) in doublicateImages" :image="image" :key="image.manifest.id" class="image-card"/>
                 </div>
             </div>
@@ -153,35 +153,21 @@ export default defineComponent({
         border-radius: $radius-big;
         @include z-depth();
         display: flex;
-        align-items: flex-start;
         flex-direction: column;
-        padding: 20px;
         margin-left: 1vw;
         width: 30vw;
+        min-width: fit-content;
 
-        .section {
-            display: flex;
-            align-items: center;
-            width: 100%;
-
-            .input-wrapper {
-                width: 100%;
-            }
+        .section-wrapper {
+            margin: max(7px, 2%);
         }
 
         .buttons {
-            width: 100%;
             display: flex;
-            justify-content: space-between;
-        }
-
-        .tag-input-wrapper {
-            margin-bottom: 5%;
+            justify-content: space-around;
         }
 
         .similar-images {
-            height: 260px;
-            width: 100%;
             display: flex;
             overflow-x: auto;
             align-items: center;

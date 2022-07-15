@@ -20,6 +20,9 @@ export const useCollectionCreateStore = defineStore('collectionCreate', {
                 description: '',
                 theme: '',
                 blob: undefined as Blob | undefined,
+                options: {
+                    corrupted: false
+                }
             }
         }
     },
@@ -42,6 +45,7 @@ export const useCollectionCreateStore = defineStore('collectionCreate', {
             this.form.description = '';
             this.form.theme = '';
             this.form.blob = undefined;
+            this.form.options.corrupted = false;
         },
 
 
@@ -68,6 +72,9 @@ export const useCollectionCreateStore = defineStore('collectionCreate', {
                         description: this.form.description || '',
                         created: Date(),
                         lastModified: Date(),
+                        options: {
+                            corrupted: this.form.options.corrupted
+                        }
                     };
                     const thumbnail = await jimp.resize(this.form.blob!);
 

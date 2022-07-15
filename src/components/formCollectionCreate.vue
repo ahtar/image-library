@@ -1,10 +1,13 @@
 <template>
     <modal-dark @close="store.close">
         <div class="content-wrapper" data-test="collection-create-wrapper">
-            <input-text id="input-name" v-model="store.form.name" label="Name" placeholder="Input collection name" :important="true" data-test="collection-create-name"/>
-            <input-text id="input-theme" v-model="store.form.theme" label="Theme" placeholder="Input collection theme" data-test="collection-create-theme"/>
-            <input-text id="input-desc" class="input-description" v-model="store.form.description" label="Description" placeholder="Input collection description" :textarea="true" data-test="collection-create-description"/>
-            <div class="button-wrapper">
+            <input-text class="section-wrapper" id="input-name" v-model="store.form.name" label="Name" placeholder="Input collection name" :important="true" data-test="collection-create-name"/>
+            <input-text class="section-wrapper" id="input-theme" v-model="store.form.theme" label="Theme" placeholder="Input collection theme" data-test="collection-create-theme"/>
+            <input-text class=" input-description section-wrapper" id="input-desc" v-model="store.form.description" label="Description" placeholder="Input collection description" :textarea="true" data-test="collection-create-description"/>
+            <div class="section-wrapper checkbox-wrapper">
+                <input-checkbox v-model="store.form.options.corrupted" label="Corrupted" data-test="collection-create-corrupted"/>
+            </div>
+            <div class="button-wrapper section-wrapper">
                 <button-small id="form-save" @click="store.createCollection" :blocked="saveButtonActive == false" data-test="collection-create-save">Save</button-small>
                 <button-small id="form-clear" @click="store.clearForm" data-test="collection-create-clear">Clear</button-small>
             </div>
@@ -21,6 +24,7 @@ import { defineComponent, computed } from 'vue'
 import ModalDark from '@/components/ModalDark.vue'
 import InputText from '@/components/InputText.vue'
 import InputImage from '@/components/InputImage.vue'
+import InputCheckbox from '@/components/InputCheckbox.vue'
 import ButtonSmall from '@/components/ButtonSmall.vue'
 
 import { useCollectionCreateStore } from '@/store/forms/form-collection-create'
@@ -30,6 +34,7 @@ export default defineComponent({
         ModalDark,
         InputText,
         InputImage,
+        InputCheckbox,
         ButtonSmall,
     },
     setup() {
@@ -56,30 +61,31 @@ export default defineComponent({
 <style lang="scss" scoped>
     .content-wrapper {
         width: 30vw;
-        height: 40vh;
+        min-width: fit-content;
         margin-left: 10vw;
         background-color: $color-dark-1;
         border: thin solid $color-border-dark-1;
         border-radius: $radius-big;
         @include z-depth();
         display: flex;
-        align-items: flex-start;
         flex-direction: column;
 
         .button-wrapper {
             display: flex;
             flex-direction: row;
-            width: 100%;
             justify-content: space-around;
         }
 
-        .input-wrapper {
-            width: 96%;
-            margin: 2%;
+        .section-wrapper {
+            margin: max(7px, 2%);
         }
 
         .input-description {
-            height: 50%;
+            height: 20vh;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
         }
     }
 

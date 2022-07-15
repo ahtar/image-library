@@ -16,7 +16,10 @@ async function resize(data: Blob, max = {x: 160, y: 200}) {
     } else {
         await image.resize(Jimp.AUTO, max.y);
     }
-    return image.getBufferAsync(image.getMIME());
+
+    //buffer to blob
+    const tempData = await image.getBufferAsync(image.getMIME());
+    return new Blob([(tempData as Uint8Array).buffer]);
 }
 
 export default {

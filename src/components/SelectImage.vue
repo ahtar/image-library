@@ -90,6 +90,7 @@ export default defineComponent({
         @include flex;
         @include scroll;
         max-height: 80vh;
+        min-width: fit-content;
         overflow-y: auto;
         overflow-x: hidden;
         flex-wrap: nowrap;
