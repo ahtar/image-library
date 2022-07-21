@@ -1,39 +1,34 @@
 <template>
+  <router-view />
 
-  <router-view/>
-
-  <message-notification/>
+  <message-notification />
 
   <transition-fade>
-    <message-prompt v-if="storePrompt.visible"/>
+    <message-prompt v-if="storePrompt.visible" />
   </transition-fade>
 
   <transition-fade>
-    <progress-bar v-if="storeProgressBar.visible"/>
+    <progress-bar v-if="storeProgressBar.visible" />
   </transition-fade>
 
-  <screen-init v-if="storeInit.visible" @data="addCollections"/>
-
+  <screen-init v-if="storeInit.visible" @data="addCollections" />
 </template>
 
-
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue'
+import { defineComponent, onMounted } from "vue";
 
-import MessagePrompt from '@/components/MessagePrompt.vue'
-import MessageNotification from '@/components/MessageNotification.vue'
-import TransitionFade from '@/components/TransitionFade.vue'
-import ScreenInit from '@/components/ScreenInit.vue'
-import ProgressBar from '@/components/ProgressBar.vue'
+import MessagePrompt from "@/components/MessagePrompt.vue";
+import MessageNotification from "@/components/MessageNotification.vue";
+import TransitionFade from "@/components/TransitionFade.vue";
+import ScreenInit from "@/components/ScreenInit.vue";
+import ProgressBar from "@/components/ProgressBar.vue";
 
-import { usePromptStore } from '@/store/modals/modal-prompt'
-import { useProgressBarStore } from '@/store/modals/modal-progress-bar'
-import { useInitStore } from '@/store/modals/modal-init'
-import { useCollections } from '@/store/collections'
+import { usePromptStore } from "@/store/modals/modal-prompt";
+import { useProgressBarStore } from "@/store/modals/modal-progress-bar";
+import { useInitStore } from "@/store/modals/modal-init";
+import { useCollections } from "@/store/collections";
 
-import useFileSystem from '@/composables/file-system'
-
-
+import fs from "@/modules/file-system";
 
 export default defineComponent({
   components: {
@@ -48,15 +43,15 @@ export default defineComponent({
     const storeProgressBar = useProgressBarStore();
     const storeInit = useInitStore();
     const storeCollections = useCollections();
-    const { checkMainFolderAccess, initLoadCollections } = useFileSystem();
+    const { checkMainFolderAccess, initLoadCollections } = fs;
 
     onMounted(async () => {
       console.clear();
 
       //Проверка, загруженны ли коллекции, если не загружены, то запросить доступ к коллекциям.
-      if(!storeCollections.collectionsInitialized) {
-          const status = await checkMainFolderAccess();
-        if(!status) {
+      if (!storeCollections.collectionsInitialized) {
+        const status = await checkMainFolderAccess();
+        if (!status) {
           storeInit.show();
         } else {
           const data = await initLoadCollections();
@@ -75,14 +70,12 @@ export default defineComponent({
       storeProgressBar,
       storeInit,
       addCollections,
-    }
-  }
-})
+    };
+  },
+});
 </script>
 
-
 <style lang="scss">
-
 html {
   font-size: $base-font-size * 0.6;
   line-height: $base-line-height;
@@ -97,16 +90,15 @@ html {
   }
 
   @media #{$mq-xlarge} {
-    font-size: $base-font-size*1.5;
+    font-size: $base-font-size * 1.5;
   }
 
   @media #{$mq-xxlarge} {
-    font-size: $base-font-size*2;
+    font-size: $base-font-size * 2;
   }
 }
 body {
   margin: 0;
-
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

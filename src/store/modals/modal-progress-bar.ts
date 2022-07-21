@@ -1,37 +1,36 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-export const useProgressBarStore = defineStore('progressBar', {
-    state: () => {
-        return {
-            visible: false,
-            max: 0,
-            value: 0,
-        }
+export const useProgressBarStore = defineStore("progressBar", {
+  state: () => {
+    return {
+      visible: false,
+      max: 0,
+      value: 0,
+    };
+  },
+
+  getters: {},
+
+  actions: {
+    show() {
+      this.visible = true;
     },
 
-    getters: {
+    close() {
+      this.visible = false;
     },
 
-    actions: {
-        show() {
-            this.visible = true;
-        },
+    init(max: number) {
+      this.max = max;
+      this.value = 0;
+      this.show();
 
-        close() {
-            this.visible = false;
-        },
+      console.log(this);
+    },
 
-        init(max: number) {
-            this.max = max;
-            this.value = 0;
-            this.show();
-
-            console.log(this);
-        },
-
-        increment(num = 1) {
-            if(this.value) this.value += num;
-            else this.value = num;
-        }
-    }
+    increment(num = 1) {
+      if (this.value) this.value += num;
+      else this.value = num;
+    },
+  },
 });
