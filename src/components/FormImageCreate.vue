@@ -149,6 +149,7 @@ export default defineComponent({
 
     .card-tag-small {
         margin-bottom: 12px;
+        overflow-wrap: break-word;
     }
 }
 
@@ -161,7 +162,6 @@ export default defineComponent({
     flex-direction: column;
     margin-left: 1vw;
     width: 30vw;
-    min-width: fit-content;
 
     .section-wrapper {
         margin: max(7px, 2%);

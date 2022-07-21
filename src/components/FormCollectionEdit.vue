@@ -101,7 +101,6 @@ export default defineComponent({
 .content-wrapper {
     width: 30vw;
     height: fit-content;
-    min-width: fit-content;
     margin-left: 10vw;
     background-color: $color-dark-1;
     border: thin solid $color-border-dark-1;

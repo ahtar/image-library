@@ -69,7 +69,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 .content-wrapper {
     width: 30vw;
-    min-width: fit-content;
     margin-left: 10vw;
     background-color: $color-dark-1;
     border: thin solid $color-border-dark-1;

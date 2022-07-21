@@ -206,7 +206,7 @@ export default defineComponent({
     }
 
     .tag-container {
-        height: auto;
+        height: 100%;
         overflow-y: auto;
         @include scroll();
 

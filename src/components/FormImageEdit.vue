@@ -156,7 +156,6 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     width: 30vw;
-    min-width: fit-content;
 
     .section {
         display: flex;
