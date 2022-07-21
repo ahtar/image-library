@@ -1,7 +1,7 @@
 <template>
-  <transition name="fade">
-    <slot></slot>
-  </transition>
+    <transition name="fade">
+        <slot></slot>
+    </transition>
 </template>
 
 <script lang="ts">
@@ -13,10 +13,11 @@ export default defineComponent({});
 <style lang="scss" scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
-  opacity: 0;
+    opacity: 0;
 }
 </style>

@@ -1,17 +1,17 @@
 <template>
-  <router-view />
+    <router-view />
 
-  <message-notification />
+    <message-notification />
 
-  <transition-fade>
-    <message-prompt v-if="storePrompt.visible" />
-  </transition-fade>
+    <transition-fade>
+        <message-prompt v-if="storePrompt.visible" />
+    </transition-fade>
 
-  <transition-fade>
-    <progress-bar v-if="storeProgressBar.visible" />
-  </transition-fade>
+    <transition-fade>
+        <progress-bar v-if="storeProgressBar.visible" />
+    </transition-fade>
 
-  <screen-init v-if="storeInit.visible" @data="addCollections" />
+    <screen-init v-if="storeInit.visible" @data="addCollections" />
 </template>
 
 <script lang="ts">
@@ -31,96 +31,98 @@ import { useCollections } from "@/store/collections";
 import fs from "@/modules/file-system";
 
 export default defineComponent({
-  components: {
-    MessageNotification,
-    MessagePrompt,
-    TransitionFade,
-    ScreenInit,
-    ProgressBar,
-  },
-  setup() {
-    const storePrompt = usePromptStore();
-    const storeProgressBar = useProgressBarStore();
-    const storeInit = useInitStore();
-    const storeCollections = useCollections();
-    const { checkMainFolderAccess, initLoadCollections } = fs;
+    components: {
+        MessageNotification,
+        MessagePrompt,
+        TransitionFade,
+        ScreenInit,
+        ProgressBar,
+    },
+    setup() {
+        const storePrompt = usePromptStore();
+        const storeProgressBar = useProgressBarStore();
+        const storeInit = useInitStore();
+        const storeCollections = useCollections();
+        const { checkMainFolderAccess, initLoadCollections } = fs;
 
-    onMounted(async () => {
-      console.clear();
+        onMounted(async () => {
+            console.clear();
 
-      //Проверка, загруженны ли коллекции, если не загружены, то запросить доступ к коллекциям.
-      if (!storeCollections.collectionsInitialized) {
-        const status = await checkMainFolderAccess();
-        if (!status) {
-          storeInit.show();
-        } else {
-          const data = await initLoadCollections();
-          storeCollections.addCollection(data);
+            //Проверка, загруженны ли коллекции, если не загружены, то запросить доступ к коллекциям.
+            if (!storeCollections.collectionsInitialized) {
+                const status = await checkMainFolderAccess();
+                if (!status) {
+                    storeInit.show();
+                } else {
+                    const data = await initLoadCollections();
+                    storeCollections.addCollection(data);
+                }
+            }
+        });
+
+        function addCollections(data: Collection[]) {
+            storeCollections.addCollection(data);
+            storeInit.hide();
         }
-      }
-    });
 
-    function addCollections(data: Collection[]) {
-      storeCollections.addCollection(data);
-      storeInit.hide();
-    }
-
-    return {
-      storePrompt,
-      storeProgressBar,
-      storeInit,
-      addCollections,
-    };
-  },
+        return {
+            storePrompt,
+            storeProgressBar,
+            storeInit,
+            addCollections,
+        };
+    },
 });
 </script>
 
 <style lang="scss">
 html {
-  font-size: $base-font-size * 0.6;
-  line-height: $base-line-height;
-
-  @media #{$mq-medium} {
-    font-size: $base-font-size * 0.8;
+    font-size: $base-font-size * 0.6;
     line-height: $base-line-height;
-  }
 
-  @media #{$mq-large} {
-    font-size: $base-font-size;
-  }
+    @media #{$mq-medium} {
+        font-size: $base-font-size * 0.8;
+        line-height: $base-line-height;
+    }
 
-  @media #{$mq-xlarge} {
-    font-size: $base-font-size * 1.5;
-  }
+    @media #{$mq-large} {
+        font-size: $base-font-size;
+    }
 
-  @media #{$mq-xxlarge} {
-    font-size: $base-font-size * 2;
-  }
+    @media #{$mq-xlarge} {
+        font-size: $base-font-size * 1.5;
+    }
+
+    @media #{$mq-xxlarge} {
+        font-size: $base-font-size * 2;
+    }
 }
+
 body {
-  margin: 0;
+    margin: 0;
 }
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  width: 100vw;
-  height: 100vh;
-  background-color: $color-dark-0;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    width: 100vw;
+    height: 100vh;
+    background-color: $color-dark-0;
 }
 
 #nav {
-  padding: 30px;
+    padding: 30px;
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+    a {
+        font-weight: bold;
+        color: #2c3e50;
 
-    &.router-link-exact-active {
-      color: #42b983;
+        &.router-link-exact-active {
+            color: #42b983;
+        }
     }
-  }
 }
 </style>

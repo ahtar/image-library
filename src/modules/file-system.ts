@@ -13,26 +13,26 @@ let callback: any;
  * @returns status.
  */
 async function checkMainFolderAccess() {
-  const data: FileSystemDirectoryHandle | undefined = await get("entryHandle");
-  if (data == undefined) return false;
-  if (Array.isArray(data) && data.length == 0) return false;
+    const data: FileSystemDirectoryHandle | undefined = await get("entryHandle");
+    if (data == undefined) return false;
+    if (Array.isArray(data) && data.length == 0) return false;
 
-  handler = data;
+    handler = data;
 
-  return verifyPermission(data);
+    return verifyPermission(data);
 }
 
 /**
  * Запрос папки с коллекциями.
  */
 async function requestMainFolderAccess() {
-  try {
-    handler = await window.showDirectoryPicker();
-    await set("entryHandle", handler);
-    if (callback) callback();
-  } catch (err) {
-    console.log(err);
-  }
+    try {
+        handler = await window.showDirectoryPicker();
+        await set("entryHandle", handler);
+        if (callback) callback();
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 /**
@@ -41,8 +41,8 @@ async function requestMainFolderAccess() {
  * @returns Файл.
  */
 async function loadFile(handle: FileSystemFileHandle) {
-  const data = await handle.getFile();
-  return data;
+    const data = await handle.getFile();
+    return data;
 }
 
 /**
@@ -53,20 +53,20 @@ async function loadFile(handle: FileSystemFileHandle) {
  * @returns FileHandle созданного файла.
  */
 async function writeFile(
-  handle: FileSystemDirectoryHandle,
-  name: string,
-  content: FileSystemWriteChunkType
+    handle: FileSystemDirectoryHandle,
+    name: string,
+    content: FileSystemWriteChunkType
 ) {
-  try {
-    const fileHandler = await handle.getFileHandle(name, { create: true });
-    const stream = await fileHandler.createWritable();
-    await stream.write(content);
-    await stream.close();
-    return fileHandler;
-  } catch (err) {
-    console.log(err);
-    throw err;
-  }
+    try {
+        const fileHandler = await handle.getFileHandle(name, { create: true });
+        const stream = await fileHandler.createWritable();
+        await stream.write(content);
+        await stream.close();
+        return fileHandler;
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
 }
 
 /**
@@ -74,18 +74,18 @@ async function writeFile(
  * @returns Массив с коллекциями.
  */
 async function initLoadCollections() {
-  const arr: Array<Collection> = [];
+    const arr: Array<Collection> = [];
 
-  if (handler != undefined) {
-    for await (const [key, h] of handler.entries()) {
-      if (h.kind == "directory") {
-        const collection = await Collection.fromFolderHandle(h);
-        if (collection) arr.push(collection);
-      }
+    if (handler != undefined) {
+        for await (const [key, h] of handler.entries()) {
+            if (h.kind == "directory") {
+                const collection = await Collection.fromFolderHandle(h);
+                if (collection) arr.push(collection);
+            }
+        }
     }
-  }
 
-  return arr;
+    return arr;
 }
 
 /**
@@ -93,14 +93,14 @@ async function initLoadCollections() {
  * @returns DirectoryHandle папки приложения.
  */
 function getHandle() {
-  return handler;
+    return handler;
 }
 
 export default {
-  checkMainFolderAccess,
-  requestMainFolderAccess,
-  writeFile,
-  loadFile,
-  initLoadCollections,
-  getHandle,
+    checkMainFolderAccess,
+    requestMainFolderAccess,
+    writeFile,
+    loadFile,
+    initLoadCollections,
+    getHandle,
 };

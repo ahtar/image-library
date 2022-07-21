@@ -6,13 +6,13 @@ import ScreenLoading from "@/components/ScreenLoading.vue";
 import Spinner from "@/components/Spinner.vue";
 
 describe("ScreenLoading.vue", () => {
-  it("рендерится", () => {
-    const wrapper = mount(ScreenLoading, {
-      global: {
-        plugins: [createTestingPinia({})],
-      },
-    });
+    it("рендерится", () => {
+        const wrapper = mount(ScreenLoading, {
+            global: {
+                plugins: [createTestingPinia({})],
+            },
+        });
 
-    expect(wrapper.findComponent(Spinner)).toBeDefined();
-  });
+        expect(wrapper.findComponent(Spinner)).toBeDefined();
+    });
 });

@@ -1,7 +1,7 @@
 <template>
-  <base-card class="collection-card-big">
-    <img ref="imgRef" />
-  </base-card>
+    <base-card class="collection-card-big">
+        <img ref="imgRef" />
+    </base-card>
 </template>
 
 <script lang="ts">
@@ -12,41 +12,42 @@ import BaseCard from "@/components/base/BaseCard.vue";
 import useImageRendering from "@/composables/image-rendering";
 
 export default defineComponent({
-  props: {
-    fileHandle: {
-      required: true,
-      type: Object as PropType<FileSystemFileHandle | string>,
+    props: {
+        fileHandle: {
+            required: true,
+            type: Object as PropType<FileSystemFileHandle | string>,
+        },
     },
-  },
-  components: {
-    BaseCard,
-  },
-  setup(props) {
-    const { renderImage } = useImageRendering();
+    components: {
+        BaseCard,
+    },
+    setup(props) {
+        const { renderImage } = useImageRendering();
 
-    const imgRef = ref<null | HTMLImageElement>(null);
+        const imgRef = ref<null | HTMLImageElement>(null);
 
-    onMounted(() => {
-      renderImage(imgRef.value!, props.fileHandle);
-    });
+        onMounted(() => {
+            renderImage(imgRef.value!, props.fileHandle);
+        });
 
-    onUpdated(() => {
-      renderImage(imgRef.value!, props.fileHandle);
-    });
+        onUpdated(() => {
+            renderImage(imgRef.value!, props.fileHandle);
+        });
 
-    return {
-      imgRef,
-    };
-  },
+        return {
+            imgRef,
+        };
+    },
 });
 </script>
 
 <style lang="scss" scoped>
 .collection-card-big {
-  position: relative;
-  margin: 10px;
-  img {
-    max-width: 30vw;
-  }
+    position: relative;
+    margin: 10px;
+
+    img {
+        max-width: 30vw;
+    }
 }
 </style>

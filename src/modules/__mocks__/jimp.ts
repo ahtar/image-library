@@ -1,4 +1,4 @@
 export default {
-  getHash: jest.fn(),
-  resize: jest.fn(),
+    getHash: jest.fn(),
+    resize: jest.fn(),
 };

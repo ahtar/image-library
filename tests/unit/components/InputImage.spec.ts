@@ -12,52 +12,52 @@ globalThis.URL.createObjectURL = jest.fn();
 globalThis.URL.revokeObjectURL = jest.fn();
 
 describe("InputImage.vue", () => {
-  it("изображение вставляется", async () => {
-    const wrapper = mount(InputImage, {
-      global: {
-        plugins: [createTestingPinia({})],
-      },
-      props: {
-        active: true,
-      },
-      attachTo: document.body,
-    });
-    const user = userEvent.setup();
+    it("изображение вставляется", async () => {
+        const wrapper = mount(InputImage, {
+            global: {
+                plugins: [createTestingPinia({})],
+            },
+            props: {
+                active: true,
+            },
+            attachTo: document.body,
+        });
+        const user = userEvent.setup();
 
-    await user.click(wrapper.element);
-    await user.paste();
+        await user.click(wrapper.element);
+        await user.paste();
 
-    expect(wrapper.emitted().paste).toBeDefined();
-  });
-
-  it("Изображение рендерится", () => {
-    const wrapper = mount(InputImage, {
-      global: {
-        plugins: [createTestingPinia({})],
-      },
-      props: {
-        blob: new Blob(),
-      },
+        expect(wrapper.emitted().paste).toBeDefined();
     });
 
-    expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe("");
-  });
+    it("Изображение рендерится", () => {
+        const wrapper = mount(InputImage, {
+            global: {
+                plugins: [createTestingPinia({})],
+            },
+            props: {
+                blob: new Blob(),
+            },
+        });
 
-  it("компонент ожидает вставку изображения, если оно не вставлено", async () => {
-    const wrapper = mount(InputImage, {
-      global: {
-        plugins: [createTestingPinia({})],
-      },
-      attachTo: document.body,
+        expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe("");
     });
 
-    //Никакое изображение не отображенно, ожидается вставка изображения
-    expect(wrapper.html()).toContain("Вставь картинку");
-    expect(wrapper.find<HTMLImageElement>("img").element.src).toBe("");
+    it("компонент ожидает вставку изображения, если оно не вставлено", async () => {
+        const wrapper = mount(InputImage, {
+            global: {
+                plugins: [createTestingPinia({})],
+            },
+            attachTo: document.body,
+        });
 
-    await wrapper.setProps({ blob: new Blob() });
+        //Никакое изображение не отображенно, ожидается вставка изображения
+        expect(wrapper.html()).toContain("Вставь картинку");
+        expect(wrapper.find<HTMLImageElement>("img").element.src).toBe("");
 
-    //Изображение отображенно, новое изображение не ожидается
-    expect(wrapper.html()).not.toContain("Вставь картинку");
-  });
+        await wrapper.setProps({ blob: new Blob() });
+
+        //Изображение отображенно, новое изображение не ожидается
+        expect(wrapper.html()).not.toContain("Вставь картинку");
+    });
 });

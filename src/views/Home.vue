@@ -1,36 +1,28 @@
 <template>
-  <div class="home">
-    <div class="block">
-      <card-new-big @click="storeCollectionCreate.open" />
-      <router-link
-        :to="link(collection)"
-        v-for="(collection, i) in store.collections"
-        :key="i"
-        @contextmenu="contextMenuOpen(collection, $event)"
-      >
-        <card-collection-big :fileHandle="collection.thumbnail" />
-      </router-link>
+    <div class="home">
+        <div class="block">
+            <card-new-big @click="storeCollectionCreate.open" />
+            <router-link :to="link(collection)" v-for="(collection, i) in store.collections" :key="i"
+                @contextmenu="contextMenuOpen(collection, $event)">
+                <card-collection-big :fileHandle="collection.thumbnail" />
+            </router-link>
+        </div>
     </div>
-  </div>
 
-  <transition-fade>
-    <form-collection-create v-if="storeCollectionCreate.visible" />
-  </transition-fade>
+    <transition-fade>
+        <form-collection-create v-if="storeCollectionCreate.visible" />
+    </transition-fade>
 
-  <transition-fade>
-    <form-collection-edit v-if="storeCollectionEdit.visible" />
-  </transition-fade>
+    <transition-fade>
+        <form-collection-edit v-if="storeCollectionEdit.visible" />
+    </transition-fade>
 
-  <transition-fade>
-    <menu-context
-      :event="contextMenuEvent!"
-      v-if="contextMenuActive"
-      @close="contextMenuClose"
-    >
-      <div @click="editCollection">Изменить</div>
-      <div @click="deleteCollection">Удалить</div>
-    </menu-context>
-  </transition-fade>
+    <transition-fade>
+        <menu-context :event="contextMenuEvent!" v-if="contextMenuActive" @close="contextMenuClose">
+            <div @click="editCollection">Изменить</div>
+            <div @click="deleteCollection">Удалить</div>
+        </menu-context>
+    </transition-fade>
 </template>
 
 <script lang="ts">
@@ -50,76 +42,77 @@ import { useCollectionEditStore } from "@/store/forms/form-collection-edit";
 import useContextMenu from "@/composables/context-menu";
 
 export default defineComponent({
-  components: {
-    CardCollectionBig,
-    CardNewBig,
-    TransitionFade,
-    FormCollectionCreate,
-    FormCollectionEdit,
-    MenuContext,
-  },
+    components: {
+        CardCollectionBig,
+        CardNewBig,
+        TransitionFade,
+        FormCollectionCreate,
+        FormCollectionEdit,
+        MenuContext,
+    },
 
-  setup() {
-    const store = useCollections();
-    const storeCollectionCreate = useCollectionCreateStore();
-    const storeCollectionEdit = useCollectionEditStore();
-    const storePrompt = usePromptStore();
-    const {
-      contextMenuActive,
-      contextMenuEvent,
-      contextMenuOpen,
-      contextMenuClose,
-      contextMenuAction,
-    } = useContextMenu();
+    setup() {
+        const store = useCollections();
+        const storeCollectionCreate = useCollectionCreateStore();
+        const storeCollectionEdit = useCollectionEditStore();
+        const storePrompt = usePromptStore();
+        const {
+            contextMenuActive,
+            contextMenuEvent,
+            contextMenuOpen,
+            contextMenuClose,
+            contextMenuAction,
+        } = useContextMenu();
 
-    function link(collection: Collection) {
-      return "/collections/" + collection.manifest.name;
-    }
-
-    function editCollection() {
-      contextMenuAction<Collection>((item) => {
-        storeCollectionEdit.open(item);
-      });
-    }
-
-    function deleteCollection() {
-      contextMenuAction<Collection>(async (item) => {
-        const answer = await storePrompt.showPrompt("Удалить коллекцию?");
-        if (answer) {
-          store.deleteCollection(item);
+        function link(collection: Collection) {
+            return "/collections/" + collection.manifest.name;
         }
-      });
-    }
 
-    return {
-      store,
-      storeCollectionCreate,
-      storeCollectionEdit,
-      editCollection,
-      deleteCollection,
-      link,
+        function editCollection() {
+            contextMenuAction<Collection>((item) => {
+                storeCollectionEdit.open(item);
+            });
+        }
 
-      contextMenuEvent,
-      contextMenuActive,
-      contextMenuClose,
-      contextMenuOpen,
-    };
-  },
+        function deleteCollection() {
+            contextMenuAction<Collection>(async (item) => {
+                const answer = await storePrompt.showPrompt("Удалить коллекцию?");
+                if (answer) {
+                    store.deleteCollection(item);
+                }
+            });
+        }
+
+        return {
+            store,
+            storeCollectionCreate,
+            storeCollectionEdit,
+            editCollection,
+            deleteCollection,
+            link,
+
+            contextMenuEvent,
+            contextMenuActive,
+            contextMenuClose,
+            contextMenuOpen,
+        };
+    },
 });
 </script>
 
 <style lang="scss" scoped>
 .home {
-  padding-top: 15vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    padding-top: 15vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 .block {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 </style>

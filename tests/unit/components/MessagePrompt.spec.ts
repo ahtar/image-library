@@ -7,63 +7,63 @@ import ModalDark from "@/components/ModalDark.vue";
 import { usePromptStore } from "@/store/modals/modal-prompt";
 
 describe("MessagePrompt.vue", () => {
-  it("сообщение оповещения отображается", () => {
-    const wrapper = mount(MessagePrompt, {
-      global: {
-        plugins: [
-          createTestingPinia({
-            initialState: {
-              prompt: {
-                message: "test message",
-              },
+    it("сообщение оповещения отображается", () => {
+        const wrapper = mount(MessagePrompt, {
+            global: {
+                plugins: [
+                    createTestingPinia({
+                        initialState: {
+                            prompt: {
+                                message: "test message",
+                            },
+                        },
+                    }),
+                ],
             },
-          }),
-        ],
-      },
+        });
+
+        expect(wrapper.html()).toContain("test message");
     });
 
-    expect(wrapper.html()).toContain("test message");
-  });
+    it("оповещение можно подтвердить", async () => {
+        const wrapper = mount(MessagePrompt, {
+            global: {
+                plugins: [createTestingPinia({})],
+            },
+        });
+        const store = usePromptStore();
+        jest.spyOn(store, "confirm");
 
-  it("оповещение можно подтвердить", async () => {
-    const wrapper = mount(MessagePrompt, {
-      global: {
-        plugins: [createTestingPinia({})],
-      },
+        await userEvent.click(wrapper.findAll("button")[1].element);
+
+        expect(store.confirm).toBeCalledTimes(1);
     });
-    const store = usePromptStore();
-    jest.spyOn(store, "confirm");
 
-    await userEvent.click(wrapper.findAll("button")[1].element);
+    it("оповещение можно отклонить", async () => {
+        const wrapper = mount(MessagePrompt, {
+            global: {
+                plugins: [createTestingPinia({})],
+            },
+        });
+        const store = usePromptStore();
+        jest.spyOn(store, "close");
 
-    expect(store.confirm).toBeCalledTimes(1);
-  });
+        await userEvent.click(wrapper.findAll("button")[0].element);
 
-  it("оповещение можно отклонить", async () => {
-    const wrapper = mount(MessagePrompt, {
-      global: {
-        plugins: [createTestingPinia({})],
-      },
+        expect(store.close).toBeCalledTimes(1);
     });
-    const store = usePromptStore();
-    jest.spyOn(store, "close");
 
-    await userEvent.click(wrapper.findAll("button")[0].element);
+    it("окно закрывается", async () => {
+        const wrapper = mount(MessagePrompt, {
+            global: {
+                plugins: [createTestingPinia({})],
+            },
+        });
+        const store = usePromptStore();
+        jest.spyOn(store, "close");
 
-    expect(store.close).toBeCalledTimes(1);
-  });
+        await userEvent.click(wrapper.findComponent(ModalDark).element);
 
-  it("окно закрывается", async () => {
-    const wrapper = mount(MessagePrompt, {
-      global: {
-        plugins: [createTestingPinia({})],
-      },
+        expect(store.close).toBeCalledTimes(1);
     });
-    const store = usePromptStore();
-    jest.spyOn(store, "close");
-
-    await userEvent.click(wrapper.findComponent(ModalDark).element);
-
-    expect(store.close).toBeCalledTimes(1);
-  });
 });

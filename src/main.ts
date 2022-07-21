@@ -7,7 +7,7 @@ import "./registerServiceWorker";
 import router from "./router";
 
 createApp(App)
-  .use(createPinia())
-  .use(router)
-  .use(VueVirtualScroller as any)
-  .mount("#app");
+    .use(createPinia())
+    .use(router)
+    .use(VueVirtualScroller as any)
+    .mount("#app");
