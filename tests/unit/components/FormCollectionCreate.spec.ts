@@ -1,11 +1,11 @@
-import { mount } from "@vue/test-utils";
+import { mount, VueWrapper } from "@vue/test-utils";
+import { VueNode } from "@vue/test-utils/dist/types";
 import userEvent from "@testing-library/user-event";
 import { createTestingPinia } from "@pinia/testing";
 
 import FormCollectionCreate from "@/components/FormCollectionCreate.vue";
 import InputImage from "@/components/InputImage.vue";
 import ModalDark from "@/components/ModalDark.vue";
-import InputCheckBox from "@/components/InputCheckBox.vue";
 
 import { useCollectionCreateStore } from "@/store/forms/form-collection-create";
 
@@ -16,6 +16,11 @@ globalThis.URL.createObjectURL = jest.fn();
 globalThis.URL.revokeObjectURL = jest.fn();
 
 describe("FormCollectionCreate.vue", () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+    
     it("название коллекции вводится", () => {
         const wrapper = mount(FormCollectionCreate, {
             global: {
@@ -83,25 +88,64 @@ describe("FormCollectionCreate.vue", () => {
         expect(store.clearForm).toBeCalledTimes(1);
     });
 
-    it("коллекция не сохраняется, если название не введено", async () => {
-        const wrapper = mount(FormCollectionCreate, {
-            global: {
-                plugins: [createTestingPinia()],
-            },
+    describe('коллекция не сохраняется', () => {
+        let wrapper: VueWrapper<any> | null = null;
+        let saveButton: VueNode<Element> | null = null;
+
+        beforeEach(() => {
+            wrapper = mount(FormCollectionCreate, {
+                global: {
+                    plugins: [createTestingPinia()],
+                },
+            });
+
+            saveButton = wrapper.find('[data-test="collection-create-save"]').element;
         });
-        const store = useCollectionCreateStore();
-        jest.spyOn(store, "createCollection");
+        
+        it("если название не введено и изображение не вставленно", async () => {
+            const store = useCollectionCreateStore();
+            jest.spyOn(store, "createCollection");
 
-        expect(store.form.name).toBeFalsy();
+            expect(store.form.name).toBeFalsy();
+            expect(store.form.blob).toBeFalsy();
 
-        await userEvent.click(
-            wrapper.find('[data-test="collection-create-save"]').element
-        );
+            await userEvent.click(saveButton!);
 
-        expect(store.createCollection).toBeCalledTimes(0);
+            expect(store.createCollection).toBeCalledTimes(0);
+        });
+
+        it("если название введено и изображение не вставленно", async () => {
+            const store = useCollectionCreateStore();
+            jest.spyOn(store, "createCollection");
+
+            wrapper!
+                .find('[data-test="collection-create-name"] input')
+                .setValue("collection name");
+
+            expect(store.form.blob).toBeFalsy();
+            expect(store.form.name).toBe("collection name");
+
+            await userEvent.click(saveButton!);
+
+            expect(store.createCollection).toBeCalledTimes(0);
+        });
+
+        it('если название не введено и изображение вставленно', async () => {
+            const store = useCollectionCreateStore();
+            jest.spyOn(store, "createCollection");
+
+            store.form.blob = new Blob();
+
+            expect(store.form.blob).not.toBeFalsy();
+            expect(store.form.name).toBeFalsy();
+
+            await userEvent.click(saveButton!);
+
+            expect(store.createCollection).toBeCalledTimes(0);
+        });
     });
 
-    it("коллекция сохраняется, если название введено", async () => {
+    it('коллекция сохраняется, если название введено и изображение вставленно', async () => {
         const wrapper = mount(FormCollectionCreate, {
             global: {
                 plugins: [createTestingPinia()],
@@ -110,9 +154,14 @@ describe("FormCollectionCreate.vue", () => {
         const store = useCollectionCreateStore();
         jest.spyOn(store, "createCollection");
 
+        store.form.blob = new Blob();
         wrapper
             .find('[data-test="collection-create-name"] input')
             .setValue("collection name");
+
+        expect(store.form.blob).not.toBeFalsy();
+        expect(store.form.name).toBe("collection name");
+
         await userEvent.click(
             wrapper.find('[data-test="collection-create-save"]').element
         );
@@ -141,26 +190,48 @@ describe("FormCollectionCreate.vue", () => {
         expect(store.close).toBeCalledTimes(1);
     });
 
-    it("Изображение вставляется", async () => {
-        const wrapper = mount(FormCollectionCreate, {
-            global: {
-                plugins: [createTestingPinia()],
-            },
-            attachTo: document.body,
+    describe('изображение вставляется', () => {
+        let wrapper: VueWrapper<any> | null = null;
+        let img: VueNode<HTMLImageElement> | null = null;
+        let inputImage: VueNode<HTMLElement> | null = null;
+
+        beforeEach(() => {
+            wrapper = mount(FormCollectionCreate, {
+                global: {
+                    plugins: [createTestingPinia()],
+                },
+                attachTo: document.body,
+            });
+
+            img = wrapper.find<HTMLImageElement>("img").element;
+            inputImage = wrapper!.find<HTMLElement>('[data-test="collection-create-image"]').element;
+        })
+
+        it("через paste event", async () => {
+            const user = userEvent.setup();
+
+            //src изображения это пустая строка, следовательно изображение не отрисовано
+            expect(img!.src).toBe("");
+
+            //пользователь жмет на элемент и вставляет изображение из буфера обмена
+            await userEvent.click(inputImage!);
+            await user.paste();
+
+            //src изображения меняется с пустой строки, следовательно это изображение отрисовано
+            expect(img!.src).not.toBe("");
         });
-        const user = userEvent.setup();
 
-        //src изображения это пустая строка, следовательно изображение не отрисовано
-        expect(wrapper.find<HTMLImageElement>("img").element.src).toBe("");
+        it('через контекст меню', async () => {
+            //src изображения это пустая строка, следовательно изображение не отрисовано
+            expect(img!.src).toBe("");
 
-        //пользователь жмет на элемент и вставляет изображение из буфера обмена
-        await userEvent.click(
-            wrapper.find<HTMLElement>('[data-test="collection-create-image"]').element
-        );
-        await user.paste();
+            //вызов контекс меню
+            await userEvent.pointer({ keys: '[MouseRight]', target: inputImage! });
+            await userEvent.click(wrapper!.find<HTMLElement>('[data-test="input-image-context-paste"]').element);
 
-        //src изображения меняется с пустой строки, следовательно это изображение отрисовано
-        expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe("");
+            //src изображения меняется с пустой строки, следовательно это изображение отрисовано
+            expect(img!.src).not.toBe("");
+        });
     });
 
     it("Настройка corrupted меняется", async () => {

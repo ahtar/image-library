@@ -1,5 +1,5 @@
 <template>
-    <modal-dark>
+    <modal-dark data-test="screen-init">
         <div class="init-wrapper" v-if="compatibility">
             <p class="message">
                 Due to a restriction of the File System Access API and Permissions API,

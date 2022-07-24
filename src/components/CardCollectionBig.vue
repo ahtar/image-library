@@ -1,5 +1,5 @@
 <template>
-    <base-card class="collection-card-big">
+    <base-card class="collection-card-big" data-test="collection-card-big">
         <img ref="imgRef" />
     </base-card>
 </template>

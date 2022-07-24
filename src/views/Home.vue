@@ -1,7 +1,7 @@
 <template>
     <div class="home">
         <div class="block">
-            <card-new-big @click="storeCollectionCreate.open" />
+            <card-new-big @click="storeCollectionCreate.open" data-test="home-card-new"/>
             <router-link :to="link(collection)" v-for="(collection, i) in store.collections" :key="i"
                 @contextmenu="contextMenuOpen(collection, $event)">
                 <card-collection-big :fileHandle="collection.thumbnail" />

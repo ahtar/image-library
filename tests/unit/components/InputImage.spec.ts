@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { mount, VueWrapper } from "@vue/test-utils";
 import userEvent from "@testing-library/user-event";
 import { createTestingPinia } from "@pinia/testing";
 
@@ -12,24 +12,38 @@ globalThis.URL.createObjectURL = jest.fn();
 globalThis.URL.revokeObjectURL = jest.fn();
 
 describe("InputImage.vue", () => {
-    it("изображение вставляется", async () => {
-        const wrapper = mount(InputImage, {
-            global: {
-                plugins: [createTestingPinia({})],
-            },
-            props: {
-                active: true,
-            },
-            attachTo: document.body,
+    describe("изображение вставляется", () => {
+        let wrapper: VueWrapper<any> | null = null;
+        
+        beforeEach(() => {
+            wrapper = mount(InputImage, {
+                global: {
+                    plugins: [createTestingPinia({})],
+                },
+                props: {
+                    active: true,
+                },
+                attachTo: document.body,
+            });
+        })
+
+        it("через paste event", async () => {
+            const user = userEvent.setup();
+    
+            await user.click(wrapper!.element);
+            await user.paste();
+    
+            expect(wrapper!.emitted().paste).toBeDefined();
         });
-        const user = userEvent.setup();
 
-        await user.click(wrapper.element);
-        await user.paste();
-
-        expect(wrapper.emitted().paste).toBeDefined();
+        it("через контекс меню", async () => {
+            //вызов контекс меню
+            await userEvent.pointer({ keys: '[MouseRight]', target: wrapper!.element });
+            await userEvent.click(wrapper!.find<HTMLElement>('[data-test="input-image-context-paste"]').element);
+    
+            expect(wrapper!.emitted().paste).toBeDefined();
+        });
     });
-
     it("Изображение рендерится", () => {
         const wrapper = mount(InputImage, {
             global: {

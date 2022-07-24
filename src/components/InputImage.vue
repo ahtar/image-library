@@ -7,7 +7,7 @@
         <transition-fade>
             <menu-context class="menu-context" v-if="contextMenuActive" :event="contextMenuEvent!"
                 @close="contextMenuClose" data-test="input-image-context">
-                <div @click="pasteEvent">Вставить</div>
+                <div @click="pasteEvent" data-test="input-image-context-paste">Вставить</div>
             </menu-context>
         </transition-fade>
     </div>

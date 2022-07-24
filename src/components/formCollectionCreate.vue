@@ -13,7 +13,7 @@
                     data-test="collection-create-corrupted" />
             </div>
             <div class="button-wrapper section-wrapper">
-                <button-small id="form-save" @click="store.createCollection" :blocked="saveButtonActive == false"
+                <button-small id="form-save" @click="store.createCollection" :blocked="saveButtonActive"
                     data-test="collection-create-save">Save</button-small>
                 <button-small id="form-clear" @click="store.clearForm" data-test="collection-create-clear">Clear
                 </button-small>
@@ -49,8 +49,7 @@ export default defineComponent({
         const store = useCollectionCreateStore();
 
         const saveButtonActive = computed(() => {
-            if (store.form.name == "" || store.form.name == undefined) return false;
-            return true;
+            return ((store.form.name == "" || store.form.name == undefined) || (store.form.blob == undefined));
         });
 
         async function imagePasteEvent(data: Blob) {
