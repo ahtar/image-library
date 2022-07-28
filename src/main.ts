@@ -1,13 +1,13 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
-import VueVirtualScroller from "vue-virtual-scroller";
 import App from "./App.vue";
-import "./registerServiceWorker";
 import router from "./router";
+import "./registerServiceWorker";
+
+import tooltip from '@/directives/v-tooltip'
 
 createApp(App)
     .use(createPinia())
     .use(router)
-    .use(VueVirtualScroller as any)
+    .directive('tooltip', tooltip())
     .mount("#app");
