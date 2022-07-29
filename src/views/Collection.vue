@@ -2,14 +2,14 @@
     <div class="wrapper">
         <sidebar>
             <router-link to="/">
-                <button-small>Back</button-small>
+                <button-small>{{ t('BUTTON.BACK') }}</button-small>
             </router-link>
             <input-tag :tags="tags" @add="addTag" @remove="removeTag" :definedTags="definedTags" />
-            <button-small @click="startSetCreation">Create set</button-small>
+            <button-small @click="startSetCreation">{{ t('BUTTON.CREATE_SET') }}</button-small>
         </sidebar>
         <div class="content-wrapper" ref="container">
             <div class="content" v-if="loaded">
-                <card-new-big @click="storeImageCreate.open()" />
+                <card-new-big @click="storeImageCreate.open()"/>
                 <transition-fade-group :items="filteredImages" v-slot="slotProps">
                     <card-image-small :image="slotProps.item" @click="imageHandler(slotProps.item, $event)"
                         @contextmenu="contextMenuOpen(slotProps.item, $event)" />
@@ -40,9 +40,9 @@
 
     <transition-fade>
         <menu-context v-if="contextMenuActive" :event="contextMenuEvent!" @close="contextMenuClose">
-            <div @click="editImage">Изменить</div>
-            <div @click="copyImage">Копировать</div>
-            <div @click="deleteImage">Удалить</div>
+            <div @click="editImage">{{ t('BUTTON.EDIT') }}</div>
+            <div @click="copyImage">{{ t('BUTTON.COPY') }}</div>
+            <div @click="deleteImage">{{ t('BUTTON.DELETE') }}</div>
         </menu-context>
     </transition-fade>
 </template>
@@ -50,6 +50,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 
 import { useCollections } from "@/store/collections";
 import { useImageViewStore } from "@/store/forms/form-image-view";
@@ -101,6 +102,7 @@ export default defineComponent({
         ScrollBar,
     },
     setup() {
+        const { t } = useI18n();
         const route = useRoute();
         let collection = ref<Collection | null>(null);
         const loaded = ref(false);
@@ -211,7 +213,7 @@ export default defineComponent({
                 return true;
             } catch (err) {
                 storeNotification.notify(
-                    "При загрузке коллекции что то пошло не так",
+                    t('NOTIFICATION.MESSAGE.COLLECTION_LOAD_ERROR'),
                     false
                 );
                 console.log(err);
@@ -304,7 +306,7 @@ export default defineComponent({
         function copyImage() {
             contextMenuAction<ImageSingle | ImageSet>(async (image) => {
                 await copyToClipboard(image);
-                storeNotification.notify("Изображение скопировано!");
+                storeNotification.notify(t('NOTIFICATION.MESSAGE.IMAGE_COPIED'));
             });
         }
 
@@ -312,15 +314,15 @@ export default defineComponent({
             contextMenuAction<ImageSingle | ImageSet>(async (image) => {
                 try {
                     const answer = await storePrompt.showPrompt(
-                        "Удалить изображение?",
+                        t('PROMPT.DELETE_IMAGE'),
                         "confirmation"
                     );
                     if (answer && collection.value) {
                         await collection.value.deleteImage(image);
-                        storeNotification.notify("Изображение удалено!");
+                        storeNotification.notify(t('NOTIFICATION.MESSAGE.IMAGE_DELETED'));
                     }
                 } catch (err) {
-                    storeNotification.notify("Изображение не было удалено", false);
+                    storeNotification.notify(t('NOTIFICATION.MESSAGE.IMAGE_DELETE_ERROR'), false);
                     console.log(err);
                 }
             });
@@ -369,6 +371,7 @@ export default defineComponent({
             deleteImage,
 
             loaded,
+            t,
         };
     },
 });
@@ -377,7 +380,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .wrapper {
     display: flex;
-    height: 100vh;
+    height: 100%;
 }
 
 .content-wrapper {
@@ -392,6 +395,8 @@ export default defineComponent({
         flex-grow: 1;
         @include flex-center;
         justify-content: flex-start;
+        align-items: center;
+        align-content: flex-start;
 
         .image-card {
             margin: 15px;

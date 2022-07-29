@@ -1,5 +1,4 @@
-import { mount, shallowMount } from "@vue/test-utils";
-import userEvent from "@testing-library/user-event";
+import { mount } from "@vue/test-utils";
 import { createTestingPinia } from "@pinia/testing";
 
 import TransitionFade from "@/components/TransitionFade.vue";

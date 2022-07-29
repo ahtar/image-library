@@ -1,5 +1,8 @@
 <template>
-    <router-view />
+    <header-vue/>
+    <div class="content">
+        <router-view />
+    </div>
 
     <message-notification />
 
@@ -17,6 +20,7 @@
 <script lang="ts">
 import { defineComponent, onMounted } from "vue";
 
+import HeaderVue from "@/components/Header.vue";
 import MessagePrompt from "@/components/MessagePrompt.vue";
 import MessageNotification from "@/components/MessageNotification.vue";
 import TransitionFade from "@/components/TransitionFade.vue";
@@ -32,6 +36,7 @@ import fs from "@/modules/file-system";
 
 export default defineComponent({
     components: {
+        HeaderVue,
         MessageNotification,
         MessagePrompt,
         TransitionFade,
@@ -46,7 +51,7 @@ export default defineComponent({
         const { checkMainFolderAccess, initLoadCollections } = fs;
 
         onMounted(async () => {
-            console.clear();
+            //console.clear();
 
             //Проверка, загруженны ли коллекции, если не загружены, то запросить доступ к коллекциям.
             if (!storeCollections.collectionsInitialized) {
@@ -113,6 +118,10 @@ body {
     background-color: $color-dark-0;
 }
 
+.content {
+    height: 96vh;
+}
+
 #nav {
     padding: 30px;
 
@@ -123,6 +132,50 @@ body {
         &.router-link-exact-active {
             color: #42b983;
         }
+    }
+}
+
+.tooltip {
+    background-color: $color-dark-5;
+    border: thin solid $color-border-dark-5;
+    color: $color-text-main;
+    padding: 5px 7px 5px 7px;
+    width: 100px;
+    transition: opacity 0.5s;
+    --left: 4px;
+    --bottom-outer: -10px;
+    --bottom-inner: -12px;
+    --path: polygon(100% 0, 50% 100%, 0 0);
+    @include z-depth();
+
+    
+
+    &::before {
+        content: "";
+        display: inline-block;
+        position: absolute;
+        background-color: $color-border-dark-5;
+        bottom: var(--bottom-inner);
+        left: var(--left);
+        width: 12px;
+        height: 12px;
+        clip-path: var(--path);
+    }
+
+    &::after {
+        content: "";
+        display: inline-block;
+        position: absolute;
+        background-color: $color-dark-5;
+        bottom: var(--bottom-outer);
+        left: calc(var(--left) + 1px);
+        width: 10px;
+        height: 10px;
+        clip-path: var(--path);
+    }
+
+    p {
+        margin: 0;
     }
 }
 </style>

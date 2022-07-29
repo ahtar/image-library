@@ -19,14 +19,15 @@
 
     <transition-fade>
         <menu-context :event="contextMenuEvent!" v-if="contextMenuActive" @close="contextMenuClose">
-            <div @click="editCollection">Изменить</div>
-            <div @click="deleteCollection">Удалить</div>
+            <div @click="editCollection">{{t('BUTTON.EDIT')}}</div>
+            <div @click="deleteCollection">{{t('BUTTON.DELETE')}}</div>
         </menu-context>
     </transition-fade>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { useI18n } from "vue-i18n";
 
 import CardCollectionBig from "@/components/CardCollectionBig.vue";
 import CardNewBig from "@/components/CardNewBig.vue";
@@ -52,6 +53,7 @@ export default defineComponent({
     },
 
     setup() {
+        const { t } = useI18n();
         const store = useCollections();
         const storeCollectionCreate = useCollectionCreateStore();
         const storeCollectionEdit = useCollectionEditStore();
@@ -76,7 +78,7 @@ export default defineComponent({
 
         function deleteCollection() {
             contextMenuAction<Collection>(async (item) => {
-                const answer = await storePrompt.showPrompt("Удалить коллекцию?");
+                const answer = await storePrompt.showPrompt(t('PROMPT.DELETE_COLLECTION'));
                 if (answer) {
                     store.deleteCollection(item);
                 }
@@ -95,6 +97,7 @@ export default defineComponent({
             contextMenuActive,
             contextMenuClose,
             contextMenuOpen,
+            t
         };
     },
 });

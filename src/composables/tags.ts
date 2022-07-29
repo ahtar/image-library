@@ -40,8 +40,6 @@ export default function () {
      */
     function addTag(data: string | Tag) {
         if (typeof data == "string") {
-            /*const tag = collectionsStore.activeCollection?.tags.find(tag => tag.name == data) 
-                  || {name: data, count: 0};*/
             tags.value.push(data);
         } else {
             tags.value.push(data.name);

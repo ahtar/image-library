@@ -1,27 +1,14 @@
-import { mount } from "@vue/test-utils";
+import { mount, VueWrapper } from "@vue/test-utils";
 import userEvent from "@testing-library/user-event";
 import { createTestingPinia } from "@pinia/testing";
 
 import InputTag from "@/components/InputTag.vue";
 
 describe("InputTag.vue", () => {
-    it("теги отображаются", async () => {
-        const wrapper = mount(InputTag, {
-            global: {
-                plugins: [createTestingPinia({})],
-            },
-            props: {
-                tags: ["tag 1", "tag 2", "tag 3"],
-            },
-        });
+    let wrapper: VueWrapper<any>;
 
-        for (const tag of wrapper.props().tags) {
-            expect(wrapper.html()).toContain(tag);
-        }
-    });
-
-    it("новый тег добавляется", async () => {
-        const wrapper = mount(InputTag, {
+    beforeEach(() => {
+        wrapper = mount(InputTag, {
             global: {
                 plugins: [createTestingPinia({})],
             },
@@ -30,7 +17,19 @@ describe("InputTag.vue", () => {
             },
             attachTo: document.body,
         });
+    });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it("теги отображаются", async () => {
+        for (const tag of wrapper.props().tags) {
+            expect(wrapper.html()).toContain(tag);
+        }
+    });
+
+    it("новый тег добавляется", async () => {
         await wrapper.find("input").setValue("tag 4");
         wrapper.find("input").element.focus();
 
@@ -40,16 +39,6 @@ describe("InputTag.vue", () => {
     });
 
     it("новый тег не добавляется, если он уже существует", async () => {
-        const wrapper = mount(InputTag, {
-            global: {
-                plugins: [createTestingPinia({})],
-            },
-            props: {
-                tags: ["tag 1", "tag 2", "tag 3"],
-            },
-            attachTo: document.body,
-        });
-
         await wrapper.find("input").setValue("tag 3");
         wrapper.find("input").element.focus();
 
@@ -59,20 +48,14 @@ describe("InputTag.vue", () => {
     });
 
     it("существующие теги предлагаются", async () => {
-        const wrapper = mount(InputTag, {
-            global: {
-                plugins: [createTestingPinia({})],
-            },
-            props: {
-                tags: ["tag 1", "tag 2", "tag 3"],
-                definedTags: [
-                    {
-                        name: "tag 4",
-                        count: 10,
-                    },
-                ],
-            },
-        });
+        await wrapper.setProps({
+            definedTags: [
+                {
+                    name: "tag 4",
+                    count: 10,
+                },
+            ]
+        })
 
         await wrapper.find("input").setValue("tag 4");
 
@@ -80,21 +63,14 @@ describe("InputTag.vue", () => {
     });
 
     it("предложенный тег добавляется кликом", async () => {
-        const wrapper = mount(InputTag, {
-            global: {
-                plugins: [createTestingPinia({})],
-            },
-            props: {
-                tags: ["tag 1", "tag 2", "tag 3"],
-                definedTags: [
-                    {
-                        name: "tag 4",
-                        count: 10,
-                    },
-                ],
-            },
-            attachTo: document.body,
-        });
+        await wrapper.setProps({
+            definedTags: [
+                {
+                    name: "tag 4",
+                    count: 10,
+                },
+            ]
+        })
 
         wrapper.find("input").element.focus();
         await wrapper.find("input").setValue("tag 4");
@@ -108,21 +84,14 @@ describe("InputTag.vue", () => {
     });
 
     it("автозаполнение работает", async () => {
-        const wrapper = mount(InputTag, {
-            global: {
-                plugins: [createTestingPinia({})],
-            },
-            props: {
-                tags: ["tag 1", "tag 2", "tag 3"],
-                definedTags: [
-                    {
-                        name: "tag 4",
-                        count: 10,
-                    },
-                ],
-            },
-            attachTo: document.body,
-        });
+        await wrapper.setProps({
+            definedTags: [
+                {
+                    name: "tag 4",
+                    count: 10,
+                },
+            ]
+        })
 
         wrapper.find("input").element.focus();
         await wrapper.find("input").setValue("tag");
@@ -133,15 +102,6 @@ describe("InputTag.vue", () => {
     });
 
     it("тег удаляется", async () => {
-        const wrapper = mount(InputTag, {
-            global: {
-                plugins: [createTestingPinia({})],
-            },
-            props: {
-                tags: ["tag 1", "tag 2", "tag 3"],
-            },
-        });
-
         await userEvent.click(wrapper.find('[data-test="tag-container"]').element);
 
         expect(wrapper.emitted().remove).toBeDefined();

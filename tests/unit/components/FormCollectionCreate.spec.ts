@@ -16,17 +16,21 @@ globalThis.URL.createObjectURL = jest.fn();
 globalThis.URL.revokeObjectURL = jest.fn();
 
 describe("FormCollectionCreate.vue", () => {
+    let wrapper: VueWrapper<any>;
 
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-    
-    it("название коллекции вводится", () => {
-        const wrapper = mount(FormCollectionCreate, {
+    beforeEach(() => {
+        wrapper = mount(FormCollectionCreate, {
             global: {
                 plugins: [createTestingPinia()],
             },
         });
+    })
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it("название коллекции вводится", () => {
         const store = useCollectionCreateStore();
 
         expect(store.form.name).toBe("");
@@ -39,11 +43,6 @@ describe("FormCollectionCreate.vue", () => {
     });
 
     it("тема коллекции вводится", () => {
-        const wrapper = mount(FormCollectionCreate, {
-            global: {
-                plugins: [createTestingPinia()],
-            },
-        });
         const store = useCollectionCreateStore();
 
         expect(store.form.theme).toBe("");
@@ -56,11 +55,6 @@ describe("FormCollectionCreate.vue", () => {
     });
 
     it("описание коллекции вводится", () => {
-        const wrapper = mount(FormCollectionCreate, {
-            global: {
-                plugins: [createTestingPinia()],
-            },
-        });
         const store = useCollectionCreateStore();
 
         expect(store.form.description).toBe("");
@@ -73,11 +67,6 @@ describe("FormCollectionCreate.vue", () => {
     });
 
     it("данные коллекции сбрасываются", async () => {
-        const wrapper = mount(FormCollectionCreate, {
-            global: {
-                plugins: [createTestingPinia()],
-            },
-        });
         const store = useCollectionCreateStore();
         jest.spyOn(store, "clearForm");
 
@@ -88,69 +77,7 @@ describe("FormCollectionCreate.vue", () => {
         expect(store.clearForm).toBeCalledTimes(1);
     });
 
-    describe('коллекция не сохраняется', () => {
-        let wrapper: VueWrapper<any> | null = null;
-        let saveButton: VueNode<Element> | null = null;
-
-        beforeEach(() => {
-            wrapper = mount(FormCollectionCreate, {
-                global: {
-                    plugins: [createTestingPinia()],
-                },
-            });
-
-            saveButton = wrapper.find('[data-test="collection-create-save"]').element;
-        });
-        
-        it("если название не введено и изображение не вставленно", async () => {
-            const store = useCollectionCreateStore();
-            jest.spyOn(store, "createCollection");
-
-            expect(store.form.name).toBeFalsy();
-            expect(store.form.blob).toBeFalsy();
-
-            await userEvent.click(saveButton!);
-
-            expect(store.createCollection).toBeCalledTimes(0);
-        });
-
-        it("если название введено и изображение не вставленно", async () => {
-            const store = useCollectionCreateStore();
-            jest.spyOn(store, "createCollection");
-
-            wrapper!
-                .find('[data-test="collection-create-name"] input')
-                .setValue("collection name");
-
-            expect(store.form.blob).toBeFalsy();
-            expect(store.form.name).toBe("collection name");
-
-            await userEvent.click(saveButton!);
-
-            expect(store.createCollection).toBeCalledTimes(0);
-        });
-
-        it('если название не введено и изображение вставленно', async () => {
-            const store = useCollectionCreateStore();
-            jest.spyOn(store, "createCollection");
-
-            store.form.blob = new Blob();
-
-            expect(store.form.blob).not.toBeFalsy();
-            expect(store.form.name).toBeFalsy();
-
-            await userEvent.click(saveButton!);
-
-            expect(store.createCollection).toBeCalledTimes(0);
-        });
-    });
-
     it('коллекция сохраняется, если название введено и изображение вставленно', async () => {
-        const wrapper = mount(FormCollectionCreate, {
-            global: {
-                plugins: [createTestingPinia()],
-            },
-        });
         const store = useCollectionCreateStore();
         jest.spyOn(store, "createCollection");
 
@@ -170,24 +97,38 @@ describe("FormCollectionCreate.vue", () => {
     });
 
     it("форма закрывается, если нажать за границу окна", async () => {
-        const wrapper = mount(FormCollectionCreate, {
-            global: {
-                plugins: [createTestingPinia()],
-            },
-        });
         const store = useCollectionCreateStore();
         jest.spyOn(store, "close");
 
-        //при нажании в границе окна, окно не закрывается
+        await userEvent.click(wrapper.findComponent(ModalDark).element);
+        expect(store.close).toBeCalledTimes(1);
+    });
+
+    it("форма не закрывается, если нажать в пределах окна", async () => {
+        const store = useCollectionCreateStore();
+        jest.spyOn(store, "close");
+
         await userEvent.click(
             wrapper.find('[data-test="collection-create-wrapper"]').element
         );
         await userEvent.click(wrapper.findComponent(InputImage).element);
         expect(store.close).not.toBeCalled();
+    });
 
-        //при нажатии за границу окна, окно закроется
-        await userEvent.click(wrapper.findComponent(ModalDark).element);
-        expect(store.close).toBeCalledTimes(1);
+    it("Настройка corrupted меняется", async () => {
+        const store = useCollectionCreateStore();
+        const checkbox = wrapper.find<HTMLInputElement>(
+            '[data-test="collection-create-corrupted"] input'
+        );
+
+        expect(checkbox.element.checked).toBe(false);
+        expect(store.form.options.corrupted).toBe(false);
+
+        await userEvent.click(checkbox.element);
+        await checkbox.trigger("change");
+
+        expect(checkbox.element.checked).toBe(true);
+        expect(store.form.options.corrupted).toBe(true);
     });
 
     describe('изображение вставляется', () => {
@@ -234,24 +175,60 @@ describe("FormCollectionCreate.vue", () => {
         });
     });
 
-    it("Настройка corrupted меняется", async () => {
-        const wrapper = mount(FormCollectionCreate, {
-            global: {
-                plugins: [createTestingPinia()],
-            },
+    describe('коллекция не сохраняется', () => {
+        let wrapper: VueWrapper<any> | null = null;
+        let saveButton: VueNode<Element> | null = null;
+
+        beforeEach(() => {
+            wrapper = mount(FormCollectionCreate, {
+                global: {
+                    plugins: [createTestingPinia()],
+                },
+            });
+
+            saveButton = wrapper.find('[data-test="collection-create-save"]').element;
         });
-        const store = useCollectionCreateStore();
-        const checkbox = wrapper.find<HTMLInputElement>(
-            '[data-test="collection-create-corrupted"] input'
-        );
 
-        expect(checkbox.element.checked).toBe(false);
-        expect(store.form.options.corrupted).toBe(false);
+        it("если название не введено и изображение не вставленно", async () => {
+            const store = useCollectionCreateStore();
+            jest.spyOn(store, "createCollection");
 
-        await userEvent.click(checkbox.element);
-        await checkbox.trigger("change");
+            expect(store.form.name).toBeFalsy();
+            expect(store.form.blob).toBeFalsy();
 
-        expect(checkbox.element.checked).toBe(true);
-        expect(store.form.options.corrupted).toBe(true);
+            await userEvent.click(saveButton!);
+
+            expect(store.createCollection).toBeCalledTimes(0);
+        });
+
+        it("если название введено и изображение не вставленно", async () => {
+            const store = useCollectionCreateStore();
+            jest.spyOn(store, "createCollection");
+
+            wrapper!
+                .find('[data-test="collection-create-name"] input')
+                .setValue("collection name");
+
+            expect(store.form.blob).toBeFalsy();
+            expect(store.form.name).toBe("collection name");
+
+            await userEvent.click(saveButton!);
+
+            expect(store.createCollection).toBeCalledTimes(0);
+        });
+
+        it('если название не введено и изображение вставленно', async () => {
+            const store = useCollectionCreateStore();
+            jest.spyOn(store, "createCollection");
+
+            store.form.blob = new Blob();
+
+            expect(store.form.blob).not.toBeFalsy();
+            expect(store.form.name).toBeFalsy();
+
+            await userEvent.click(saveButton!);
+
+            expect(store.createCollection).toBeCalledTimes(0);
+        });
     });
 });

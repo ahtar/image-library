@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { mount, VueWrapper } from "@vue/test-utils";
 import userEvent from "@testing-library/user-event";
 import { createTestingPinia } from "@pinia/testing";
 
@@ -17,28 +17,36 @@ globalThis.URL.createObjectURL = jest.fn();
 globalThis.URL.revokeObjectURL = jest.fn();
 
 describe("FormImageCreate.vue", () => {
-    it("Теги Добавляются", async () => {
-        const wrapper = mount(FormImageCreate, {
+
+    let wrapper: VueWrapper<any>;
+    let collection: Collection;
+
+    beforeEach(() => {
+        collection = new Collection(jest.fn(), {} as any, {} as any);
+        wrapper = mount(FormImageCreate, {
             global: {
                 plugins: [
                     createTestingPinia({
                         initialState: {
                             collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
+                                activeCollection: collection
                             },
                         },
                     }),
                 ],
             },
             props: {
-                definedTags: [],
+                definedTags: []
             },
             attachTo: document.body,
         });
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    })
+
+    it("Теги Добавляются", async () => {
         const storeImages = useImageCreateStore();
 
         await wrapper
@@ -61,26 +69,6 @@ describe("FormImageCreate.vue", () => {
     });
 
     it("данные формы сбрасываются", async () => {
-        const wrapper = mount(FormImageCreate, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                        },
-                    }),
-                ],
-            },
-            props: {
-                definedTags: [],
-            },
-        });
         const storeImages = useImageCreateStore();
         jest.spyOn(storeImages, "clearForm");
 
@@ -90,26 +78,6 @@ describe("FormImageCreate.vue", () => {
     });
 
     it("форма закрывается, если нажать за границу окна", async () => {
-        const wrapper = mount(FormImageCreate, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                        },
-                    }),
-                ],
-            },
-            props: {
-                definedTags: [],
-            },
-        });
         const storeImages = useImageCreateStore();
         jest.spyOn(storeImages, "close");
 
@@ -123,27 +91,6 @@ describe("FormImageCreate.vue", () => {
     });
 
     it("изображение вставляется", async () => {
-        const wrapper = mount(FormImageCreate, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                        },
-                    }),
-                ],
-            },
-            props: {
-                definedTags: [],
-            },
-            attachTo: document.body,
-        });
         const user = userEvent.setup();
         const storeImages = useImageCreateStore();
 
@@ -160,27 +107,6 @@ describe("FormImageCreate.vue", () => {
     });
 
     it("изображение рендерится, если оно вставлено", async () => {
-        const wrapper = mount(FormImageCreate, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                        },
-                    }),
-                ],
-            },
-            props: {
-                definedTags: [],
-            },
-            attachTo: document.body,
-        });
         const storeImages = useImageCreateStore();
 
         //изначально img.src Должен быть не задан
@@ -201,27 +127,6 @@ describe("FormImageCreate.vue", () => {
     });
 
     it("форма сохраняется, если изображение вставлено", async () => {
-        const wrapper = mount(FormImageCreate, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                        },
-                    }),
-                ],
-            },
-            props: {
-                definedTags: [],
-            },
-            attachTo: document.body,
-        });
         const storeImages = useImageCreateStore();
         jest.spyOn(storeImages, "submitImage");
 
@@ -233,27 +138,6 @@ describe("FormImageCreate.vue", () => {
     });
 
     it("форма не сохраняется, если изображение не вставлено", async () => {
-        const wrapper = mount(FormImageCreate, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                        },
-                    }),
-                ],
-            },
-            props: {
-                definedTags: [],
-            },
-            attachTo: document.body,
-        });
         const storeImages = useImageCreateStore();
         jest.spyOn(storeImages, "submitImage");
 
@@ -264,30 +148,10 @@ describe("FormImageCreate.vue", () => {
     });
 
     it("Окно с тегами предыдущего изображения не активно, если ни 1 изображение ещё не было создано в этой сессии", () => {
-        const collection = new Collection(jest.fn(), {} as any, {} as any);
-        const wrapper = mount(FormImageCreate, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: collection,
-                            },
-                        },
-                    }),
-                ],
-            },
-            props: {
-                definedTags: [],
-            },
-            attachTo: document.body,
-        });
-
         expect(wrapper.find('[data-test="old-tags"]').exists()).not.toBeTruthy();
     });
 
-    it("Окно с тегами предыдущего изображения активно, если в сессии уже было создано новое изображение", () => {
-        const collection = new Collection(jest.fn(), {} as any, {} as any);
+    it("Окно с тегами предыдущего изображения активно, если в сессии уже было создано новое изображение", async () => {
         collection.lastTags.push(
             ...[
                 { name: "test tag 1", count: 1 },
@@ -295,30 +159,12 @@ describe("FormImageCreate.vue", () => {
                 { name: "test tag 3", count: 1 },
             ]
         );
-        const wrapper = mount(FormImageCreate, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: collection,
-                            },
-                        },
-                    }),
-                ],
-            },
-            props: {
-                definedTags: [],
-                priorTags: collection.lastTags,
-            },
-            attachTo: document.body,
-        });
+        await wrapper.setProps({priorTags: collection.lastTags});
 
         expect(wrapper.find('[data-test="old-tags"]').exists()).toBeTruthy();
     });
 
     it("Старые теги можно добавить", async () => {
-        const collection = new Collection(jest.fn(), {} as any, {} as any);
         collection.lastTags.push(
             ...[
                 { name: "test tag 1", count: 1 },
@@ -326,24 +172,8 @@ describe("FormImageCreate.vue", () => {
                 { name: "test tag 3", count: 1 },
             ]
         );
-        const wrapper = mount(FormImageCreate, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: collection,
-                            },
-                        },
-                    }),
-                ],
-            },
-            props: {
-                definedTags: [],
-                priorTags: collection.lastTags,
-            },
-            attachTo: document.body,
-        });
+        await wrapper.setProps({priorTags: collection.lastTags});
+
         const storeImages = useImageCreateStore();
 
         expect(storeImages.form.tags.length).toBe(0);
@@ -356,26 +186,13 @@ describe("FormImageCreate.vue", () => {
     });
 
     it("Окно со старыми тегами пропадает, если использованы все старые теги", async () => {
-        const collection = new Collection(jest.fn(), {} as any, {} as any);
-        collection.lastTags.push(...[{ name: "test tag 1", count: 1 }]);
-        const wrapper = mount(FormImageCreate, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: collection,
-                            },
-                        },
-                    }),
-                ],
-            },
-            props: {
-                definedTags: [],
-                priorTags: collection.lastTags,
-            },
-            attachTo: document.body,
-        });
+        collection.lastTags.push(
+            ...[
+                { name: "test tag 1", count: 1 }
+            ]
+        );
+        await wrapper.setProps({priorTags: collection.lastTags});
+
         expect(wrapper.find('[data-test="old-tags"]').exists()).toBeTruthy();
 
         await userEvent.click(

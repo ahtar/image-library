@@ -1,12 +1,13 @@
 <template>
     <div class="set-wrapper">
-        <button-small @click="cancel" class="button">Отмена</button-small>
-        <button-small @click="save" class="button">Сохранить</button-small>
+        <button-small @click="cancel" class="button">{{t('BUTTON.CANCEL')}}</button-small>
+        <button-small @click="save" class="button">{{t('BUTTON.CONFIRM')}}</button-small>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { useI18n } from 'vue-i18n'
 import ButtonSmall from "@/components/ButtonSmall.vue";
 
 export default defineComponent({
@@ -15,6 +16,8 @@ export default defineComponent({
     },
     emits: ["cancel", "save"],
     setup(props, { emit }) {
+        
+        const { t } = useI18n();
         return {
             save() {
                 emit("save");
@@ -22,6 +25,7 @@ export default defineComponent({
             cancel() {
                 emit("cancel");
             },
+            t
         };
     },
 });

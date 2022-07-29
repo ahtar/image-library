@@ -1,6 +1,7 @@
 import { useCollections } from "@/store/collections";
 import { useNotificationStore } from "@/store/modals/modal-notification";
 import { defineStore } from "pinia";
+import i18n from "@/locales/i18n";
 
 /**
  * Надо будет обновить, подправить
@@ -83,11 +84,11 @@ export const useImageCreateStore = defineStore("imageCreate", {
                     this.form.blob!
                 );
                 this.clearForm();
-                storeNotifications.notify("Изображение создано!");
+                storeNotifications.notify(i18n.global.t('NOTIFICATION.MESSAGE.IMAGE_CREATED'));
             } catch (err) {
                 console.log(err);
                 storeNotifications.notify(
-                    "Изображение не было создано, что-то пошло не так.",
+                    i18n.global.t('NOTIFICATION.MESSAGE.IMAGE_CREATE_ERROR'),
                     false
                 );
             }

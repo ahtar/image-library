@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { mount, VueWrapper } from "@vue/test-utils";
 import userEvent from "@testing-library/user-event";
 import { createTestingPinia } from "@pinia/testing";
 
@@ -12,54 +12,11 @@ jest.mock("@/classes/ImageSingle");
 jest.mock("@/composables/image-rendering");
 
 describe("FormImageView.vue", () => {
-    it("форма закрывается, если нажать за границу окна", async () => {
-        const wrapper = mount(FormImageView, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            imageView: {
-                                image: new ImageSet({} as any, {} as any),
-                            },
-                        },
-                    }),
-                ],
-            },
-        });
-        const store = useImageViewStore();
-        jest.spyOn(store, "close");
 
-        await userEvent.click(
-            wrapper.find('[data-test="form-view-close"]').element
-        );
+    let wrapper: VueWrapper<any>;
 
-        expect(store.close).toBeCalledTimes(1);
-    });
-
-    it("изображение рендерится", async () => {
-        const wrapper = mount(FormImageView, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            imageView: {
-                                image: new ImageSet({} as any, {} as any),
-                            },
-                        },
-                    }),
-                ],
-            },
-        });
-        await wrapper.vm.$nextTick();
-
-        expect(
-            wrapper.find<HTMLImageElement>('[data-test="form-view-viewer"] img')
-                .element.src
-        ).not.toBe("");
-    });
-
-    it("активное изображение меняется", async () => {
-        const wrapper = mount(FormImageView, {
+    beforeEach(() => {
+        wrapper = mount(FormImageView, {
             global: {
                 plugins: [
                     createTestingPinia({
@@ -73,6 +30,33 @@ describe("FormImageView.vue", () => {
             },
             attachTo: document.body,
         });
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it("форма закрывается, если нажать за границу окна", async () => {
+        const store = useImageViewStore();
+        jest.spyOn(store, "close");
+
+        await userEvent.click(
+            wrapper.find('[data-test="form-view-close"]').element
+        );
+
+        expect(store.close).toBeCalledTimes(1);
+    });
+
+    it("изображение рендерится", async () => {
+        await wrapper.vm.$nextTick();
+
+        expect(
+            wrapper.find<HTMLImageElement>('[data-test="form-view-viewer"] img')
+                .element.src
+        ).not.toBe("");
+    });
+
+    it("активное изображение меняется", async () => {
         await wrapper.vm.$nextTick();
 
         //изначально отрисованное изображение

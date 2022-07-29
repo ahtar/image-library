@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { mount, VueWrapper } from "@vue/test-utils";
 import userEvent from "@testing-library/user-event";
 import { createTestingPinia } from "@pinia/testing";
 
@@ -10,6 +10,24 @@ jest.mock("@/classes/ImageSingle");
 jest.mock("@/composables/image-rendering");
 
 describe("SelectImage.vue", () => {
+    /*let wrapper: VueWrapper<any>;
+
+   beforeEach(() => {
+        wrapper = mount(SelectImage, {
+            global: {
+                plugins: [createTestingPinia({})],
+            },
+            props: {
+                set: [
+                    new ImageSingle({} as any, {} as any),
+                    new ImageSingle({} as any, {} as any),
+                    new ImageSingle({} as any, {} as any),
+                ],
+            },
+            attachTo: document.body,
+        });
+    });*/
+    
     it("Полученный сет рендерится", async () => {
         const wrapper = mount(SelectImage, {
             global: {
@@ -60,6 +78,9 @@ describe("SelectImage.vue", () => {
         wrapper.unmount();
     });
 
+    /**
+     * тест перестает работать, если раскоментировать beforeEach
+     */
     it("при смене на то же самое изображение, событие change не отправляется", async () => {
         const wrapper = mount(SelectImage, {
             global: {

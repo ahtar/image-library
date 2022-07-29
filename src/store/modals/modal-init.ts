@@ -37,7 +37,6 @@ export const useInitStore = defineStore("init", {
       ];
       for (const opt of options) {
         if (opt.data == undefined) {
-          console.info("no compatibility", opt.text);
           return false;
         }
       }

@@ -1,10 +1,10 @@
 <template>
     <modal-dark @close="store.close">
-        <div class="prompt-wrapper">
+        <div class="prompt-wrapper" data-test="message-prompt">
             {{ store.message }}
             <div class="button-box">
-                <button-small @click="store.close">Нет</button-small>
-                <button-small @click="store.confirm">Да</button-small>
+                <button-small @click="store.close">{{t('BUTTON.CANCEL')}}</button-small>
+                <button-small @click="store.confirm">{{t('BUTTON.CONFIRM')}}</button-small>
             </div>
         </div>
     </modal-dark>
@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-
+import { useI18n } from 'vue-i18n'
 import { usePromptStore } from "@/store/modals/modal-prompt";
 
 import ModalDark from "@/components/ModalDark.vue";
@@ -25,9 +25,11 @@ export default defineComponent({
     },
     setup() {
         const store = usePromptStore();
+         const { t } = useI18n() 
 
         return {
             store,
+            t
         };
     },
 });

@@ -1,21 +1,22 @@
 <template>
     <modal-dark @close="store.close">
         <div class="content-wrapper" data-test="collection-create-wrapper">
-            <input-text class="section-wrapper" id="input-name" v-model="store.form.name" label="Name"
-                placeholder="Input collection name" :important="true" data-test="collection-create-name" />
-            <input-text class="section-wrapper" id="input-theme" v-model="store.form.theme" label="Theme"
-                placeholder="Input collection theme" data-test="collection-create-theme" />
+            <input-text class="section-wrapper" id="input-name" v-model="store.form.name" :label="t('LABEL.NAME')"
+                :placeholder="t('PLACEHOLDER.NAME')" :important="true" data-test="collection-create-name" />
+            <input-text class="section-wrapper" id="input-theme" v-model="store.form.theme" :label="t('LABEL.THEME')"
+                :placeholder="t('PLACEHOLDER.THEME')" data-test="collection-create-theme" />
             <input-text class="input-description section-wrapper" id="input-desc" v-model="store.form.description"
-                label="Description" placeholder="Input collection description" :textarea="true"
+                :label="t('LABEL.DESC')" :placeholder="t('PLACEHOLDER.DESC')" :textarea="true"
                 data-test="collection-create-description" />
             <div class="section-wrapper checkbox-wrapper">
-                <input-checkbox v-model="store.form.options.corrupted" label="Corrupted"
+                <input-checkbox v-model="store.form.options.corrupted" :label="t('LABEL.CORR')"
                     data-test="collection-create-corrupted" />
             </div>
             <div class="button-wrapper section-wrapper">
                 <button-small id="form-save" @click="store.createCollection" :blocked="saveButtonActive"
-                    data-test="collection-create-save">Save</button-small>
-                <button-small id="form-clear" @click="store.clearForm" data-test="collection-create-clear">Clear
+                    data-test="collection-create-save">{{ t('BUTTON.SAVE') }}</button-small>
+                <button-small id="form-clear" @click="store.clearForm" data-test="collection-create-clear">
+                    {{ t('BUTTON.CLEAR') }}
                 </button-small>
             </div>
         </div>
@@ -28,6 +29,7 @@
 
 <script lang="ts">
 import { defineComponent, computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import ModalDark from "@/components/ModalDark.vue";
 import InputText from "@/components/InputText.vue";
@@ -47,6 +49,7 @@ export default defineComponent({
     },
     setup() {
         const store = useCollectionCreateStore();
+        const { t } = useI18n();
 
         const saveButtonActive = computed(() => {
             return ((store.form.name == "" || store.form.name == undefined) || (store.form.blob == undefined));
@@ -60,6 +63,7 @@ export default defineComponent({
             store,
             imagePasteEvent,
             saveButtonActive,
+            t
         };
     },
 });

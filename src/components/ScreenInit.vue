@@ -2,14 +2,14 @@
     <modal-dark data-test="screen-init">
         <div class="init-wrapper" v-if="compatibility">
             <p class="message">
-                Due to a restriction of the File System Access API and Permissions API,
-                the user must grant access to the folder every time he visits the site.
+                {{ t('INIT_SCREEN.MESSAGE') }}
             </p>
-            <button-small @click="requestFolderAccess()">Pick folder</button-small>
+            <button-small @click="requestFolderAccess()">
+                {{ t('BUTTON.PICK_FOLDER') }}</button-small>
         </div>
         <div class="init-wrapper" v-else>
             <p class="message">
-                Данный браузер не поддерживает функционал этого сайта.
+                {{ t('INIT_SCREEN.BROWSER_INCOMPATIBLE') }}
             </p>
         </div>
     </modal-dark>
@@ -17,6 +17,7 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from "vue";
+import { useI18n } from 'vue-i18n'
 
 import { useInitStore } from "@/store/modals/modal-init";
 
@@ -32,6 +33,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const store = useInitStore();
         const compatibility = ref(true);
+        const { t } = useI18n();
 
         async function requestFolderAccess() {
             emit("data", await store.requestFolderAccess());
@@ -44,6 +46,7 @@ export default defineComponent({
         return {
             requestFolderAccess,
             compatibility,
+            t,
         };
     },
 });

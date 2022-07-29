@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
+    "serve:production": "vue-cli-service serve --mode production",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
@@ -16,8 +17,8 @@
     "pinia": "^2.0.13",
     "register-service-worker": "^1.7.1",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0-0",
-    "vue-virtual-scroller": "^2.0.0-alpha.1"
+    "vue-i18n": "9",
+    "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
     "@pinia/testing": "^0.0.12",
@@ -42,7 +43,9 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-loader": "^8.2.5",
     "blob-polyfill": "^7.0.20220408",
+    "clipboardy": "^3.0.0",
     "cypress": "^9.7.0",
+    "cypress-wait-until": "^1.7.2",
     "eslint": "^6.7.2",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.0.0",

@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { useNotificationStore } from "@/store/modals/modal-notification";
 import { usePromptStore } from "@/store/modals/modal-prompt";
 import { useProgressBarStore } from "@/store/modals/modal-progress-bar";
+import i18n from "@/locales/i18n";
 
 export const useCollectionEditStore = defineStore("collectionEdit", {
     state: () => {
@@ -64,11 +65,11 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
                 if (oldCorruptedStatus != this.form.options.corrupted) {
                     if (this.form.options.corrupted)
                         promtAnswer = await storePromt.showPrompt(
-                            "Коллекция станет порченной. Конвентировать изображения?"
+                            i18n.global.t("PROMPT.COLL_CORR_CONVERT_IMAGES")
                         );
                     else
                         promtAnswer = await storePromt.showPrompt(
-                            "Коллекция станет обычной. Конвентировать изображения?"
+                            i18n.global.t('PROMPT.COLL_NORMAL_CONVERT_IMAGES')
                         );
                 } else promtAnswer = false;
 
@@ -87,10 +88,10 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
                 }
 
                 this.close();
-                storeNotification.notify("Информация о коллекции обновлена.");
+                storeNotification.notify(i18n.global.t('NOTIFICATION.MESSAGE.COLLECTION_INFO_UPDATED'));
             } catch (err) {
                 console.log(err);
-                storeNotification.notify("Что-то пошло не так.", false);
+                storeNotification.notify(i18n.global.t('NOTIFICATION.MESSAGE.ERROR'), false);
             }
         },
     },

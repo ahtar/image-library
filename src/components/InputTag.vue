@@ -1,7 +1,8 @@
 <template>
     <div class="tag-input-wrapper" ref="input">
-        <input-text :important="true" label="Теги" placeholder="Тег" :active="true" class="input-tag" v-model="item"
-            @enterKey="createTag" @quickSuggestion="quickSuggestion" :tabindex="tabindex" />
+        <input-text :important="true" :label="t('LABEL.TAGS')" :placeholder="t('PLACEHOLDER.TAGS')" :active="true"
+            class="input-tag" v-model="item" @enterKey="createTag" @quickSuggestion="quickSuggestion"
+            :tabindex="tabindex" />
         <div class="tag-container">
             <div class="container">
                 <card-tag-small v-for="(tag, i) in tags" :key="i" :tag="getTagObject(tag)" @click="removeTag(tag, i)"
@@ -20,6 +21,7 @@ import { computed, defineComponent, PropType, ref } from "vue";
 
 import InputText from "@/components/InputText.vue";
 import CardTagSmall from "@/components/CardTagSmall.vue";
+import { useI18n } from "vue-i18n";
 
 export default defineComponent({
     components: {
@@ -56,6 +58,7 @@ export default defineComponent({
          */
         const item = ref("");
         const input = ref<HTMLElement | null>(null);
+        const { t } = useI18n();
 
         /**
          * Существующие теги, подходящие под запрос.
@@ -175,6 +178,7 @@ export default defineComponent({
             getTag,
             quickSuggestion,
             getTagObject,
+            t
         };
     },
 });
@@ -219,15 +223,18 @@ export default defineComponent({
     .suggestions {
         position: absolute;
         top: -1px;
-        right: -10px;
+        right: -20px;
         transform: translateX(100%);
         padding: 10px;
         max-width: 150px;
+        max-height: 50vh;
+        overflow-y: auto;
         background-color: $section-color;
         border: thin solid $section-border-color;
         border-radius: 5px;
         @include box-shadow;
         @include flex-start;
+        @include scroll;
     }
 }
 </style>

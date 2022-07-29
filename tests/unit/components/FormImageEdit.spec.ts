@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { mount, VueWrapper } from "@vue/test-utils";
 import userEvent from "@testing-library/user-event";
 import { createTestingPinia } from "@pinia/testing";
 
@@ -20,8 +20,11 @@ globalThis.URL.createObjectURL = jest.fn();
 globalThis.URL.revokeObjectURL = jest.fn();
 
 describe("FormImageEdit.vue", () => {
-    it("изменение изображения отменяется при нажатии за границу формы", async () => {
-        const wrapper = mount(FormImageEdit, {
+
+    let wrapper: VueWrapper<any>;
+
+    beforeEach(() => {
+        wrapper = mount(FormImageEdit, {
             global: {
                 plugins: [
                     createTestingPinia({
@@ -42,6 +45,13 @@ describe("FormImageEdit.vue", () => {
             },
             attachTo: document.body,
         });
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it("изменение изображения отменяется при нажатии за границу формы", async () => {
         const store = useImageEditStore();
         jest.spyOn(store, "cancelUpdate");
 
@@ -53,27 +63,6 @@ describe("FormImageEdit.vue", () => {
     });
 
     it("Изменения в изображении сохраняются", async () => {
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                            imageEdit: {
-                                image: new ImageSingle({} as any, [] as any),
-                            },
-                        },
-                    }),
-                ],
-            },
-        });
-
         const store = useImageEditStore();
         jest.spyOn(store, "updateImage");
 
@@ -83,27 +72,6 @@ describe("FormImageEdit.vue", () => {
     });
 
     it("новый тег добавляется", async () => {
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                            imageEdit: {
-                                image: new ImageSingle({} as any, [] as any),
-                            },
-                        },
-                    }),
-                ],
-            },
-            attachTo: document.body,
-        });
         const store = useImageEditStore();
 
         //Изначально в изменяемом изображении есть 2 тега
@@ -125,27 +93,6 @@ describe("FormImageEdit.vue", () => {
     });
 
     it("повторный тег не добавляется", async () => {
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                            imageEdit: {
-                                image: new ImageSingle({} as any, [] as any),
-                            },
-                        },
-                    }),
-                ],
-            },
-            attachTo: document.body,
-        });
         const store = useImageEditStore();
 
         //Изначально в изменяемом изображении есть 2 тега
@@ -167,27 +114,6 @@ describe("FormImageEdit.vue", () => {
     });
 
     it("тег удаляется при нажатии на него", async () => {
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                            imageEdit: {
-                                image: new ImageSingle({} as any, [] as any),
-                            },
-                        },
-                    }),
-                ],
-            },
-            attachTo: document.body,
-        });
         const store = useImageEditStore();
         await wrapper.vm.$nextTick();
 
@@ -201,307 +127,191 @@ describe("FormImageEdit.vue", () => {
         expect((store.image as ImageSingle).manifest.tags.length).toBe(1);
     });
 
-    it("активное изображение менятся", async () => {
-        //изменяемое изображение
-        const image = new ImageSet({} as any, [] as any);
-        image.arr[0].manifest.tags = ["1 tag", "2 tag", "3 tag"];
-        image.arr[1].manifest.tags = ["11 tag", "12 tag", "13 tag"];
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
+    describe('', () => {
+        let wrapper: VueWrapper<any>;
+        let image: ImageSet;
+        let collection: Collection;
+        beforeEach(() => {
+            image = new ImageSet({} as any, [] as any);
+            image.arr[0].manifest.tags = ["1 tag", "2 tag", "3 tag"];
+            image.arr[1].manifest.tags = ["11 tag", "12 tag", "13 tag"];
+            collection = new Collection(jest.fn(), {} as any, {} as any)
+            wrapper = mount(FormImageEdit, {
+                global: {
+                    plugins: [
+                        createTestingPinia({
+                            initialState: {
+                                collections: {
+                                    activeCollection: collection
+                                },
+                                imageEdit: {
+                                    image,
+                                },
                             },
-                            imageEdit: {
-                                image,
-                            },
-                        },
-                    }),
-                ],
-            },
-            attachTo: document.body,
+                        }),
+                    ],
+                },
+                attachTo: document.body,
+            });
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$forceUpdate();
 
-        let imgSrc = wrapper.find<HTMLImageElement>(
-            '[data-test="form-edit-image"] img'
-        ).element.src;
-        let firstTag = wrapper
-            .find<HTMLElement>('[data-test="tag-container"]')
-            .text();
+        it("активное изображение менятся", async () => {
+            await wrapper.vm.$nextTick();
+            await wrapper.vm.$forceUpdate();
 
-        //пользователь выбирает 2 изображение в списке изображений
-        await userEvent.click(
-            wrapper.findAll('[data-test="select-image-card"]')[1].element
-        );
-        //src нового изображения не должен быть равен src предыдущего изображения
-        expect(
-            wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
-                .element.src
-        ).not.toBe(imgSrc);
-        //теги нового изображения не должны быть равны тегам предыдущего изображения
-        expect(
-            wrapper.find<HTMLElement>('[data-test="tag-container"]').text()
-        ).not.toBe(firstTag);
-        imgSrc = wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
-            .element.src;
-        firstTag = wrapper.find<HTMLElement>('[data-test="tag-container"]').text();
+            let imgSrc = wrapper.find<HTMLImageElement>(
+                '[data-test="form-edit-image"] img'
+            ).element.src;
+            let firstTag = wrapper
+                .find<HTMLElement>('[data-test="tag-container"]')
+                .text();
 
-        await userEvent.click(
-            wrapper.findAll('[data-test="select-image-card"]')[0].element
-        );
-        expect(
-            wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
-                .element.src
-        ).not.toBe(imgSrc);
-        expect(
-            wrapper.find<HTMLElement>('[data-test="tag-container"]').text()
-        ).not.toBe(firstTag);
-    });
+            //пользователь выбирает 2 изображение в списке изображений
+            await userEvent.click(
+                wrapper.findAll('[data-test="select-image-card"]')[1].element
+            );
 
-    it("активное изображение меняется, и меняются теги во всех изображениях", async () => {
-        const image = new ImageSet({} as any, [] as any);
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                            imageEdit: {
-                                image,
-                            },
-                        },
-                    }),
-                ],
-            },
-            attachTo: document.body,
+            //src нового изображения не должен быть равен src предыдущего изображения
+            expect(
+                wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
+                    .element.src
+            ).not.toBe(imgSrc);
+
+            //теги нового изображения не должны быть равны тегам предыдущего изображения
+            expect(
+                wrapper.find<HTMLElement>('[data-test="tag-container"]').text()
+            ).not.toBe(firstTag);
+
+            imgSrc = wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
+                .element.src;
+            firstTag = wrapper.find<HTMLElement>('[data-test="tag-container"]').text();
+
+            await userEvent.click(
+                wrapper.findAll('[data-test="select-image-card"]')[0].element
+            );
+
+            expect(
+                wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
+                    .element.src
+            ).not.toBe(imgSrc);
+            expect(
+                wrapper.find<HTMLElement>('[data-test="tag-container"]').text()
+            ).not.toBe(firstTag);
         });
-        await wrapper.vm.$nextTick();
-        //изначально активно первое изображение и в нем есть 2 тега.
-        expect(
-            wrapper.findAll<HTMLElement>('[data-test="tag-container"]').length
-        ).toBe(2);
 
-        //добавляем новый тег.
-        //в активном изображении теперь 3 тега.
-        await wrapper.find('[data-test="input-tags"] input').setValue("test");
-        wrapper.find<HTMLElement>('[data-test="input-tags"] input').element.focus();
-        await userEvent.keyboard("{Enter}");
-        expect(
-            wrapper.findAll<HTMLElement>('[data-test="tag-container"]').length
-        ).toBe(3);
+        it("активное изображение меняется, и меняются теги во всех изображениях", async () => {
+            await wrapper.vm.$nextTick();
+            //изначально активно первое изображение и в нем есть 3 тега.
+            expect(
+                wrapper.findAll<HTMLElement>('[data-test="tag-container"]').length
+            ).toBe(3);
 
-        //делаем активным второе изображение и удаляем из него 1 тег.
-        //в активном изображении теперь 1 тег.
-        await userEvent.click(
-            wrapper.findAll('[data-test="select-image-card"]')[1].element
-        );
-        expect(
-            wrapper.findAll<HTMLElement>('[data-test="tag-container"]').length
-        ).toBe(2);
+            //добавляем новый тег.
+            //в активном изображении теперь 4 тега.
+            await wrapper.find('[data-test="input-tags"] input').setValue("test");
+            wrapper.find<HTMLElement>('[data-test="input-tags"] input').element.focus();
+            await userEvent.keyboard("{Enter}");
+            expect(
+                wrapper.findAll<HTMLElement>('[data-test="tag-container"]').length
+            ).toBe(4);
 
-        await userEvent.click(wrapper.find('[data-test="tag-container"]').element);
-        expect(
-            wrapper.findAll<HTMLElement>('[data-test="tag-container"]').length
-        ).toBe(1);
-    });
+            //делаем активным второе изображение и удаляем из него 1 тег.
+            //в активном изображении теперь 2 тега.
+            await userEvent.click(
+                wrapper.findAll('[data-test="select-image-card"]')[1].element
+            );
+            expect(
+                wrapper.findAll<HTMLElement>('[data-test="tag-container"]').length
+            ).toBe(3);
 
-    it("изображения меняются местами", async () => {
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                            imageEdit: {
-                                image: new ImageSet({} as any, [] as any),
-                            },
-                        },
-                    }),
-                ],
-            },
+            await userEvent.click(wrapper.find('[data-test="tag-container"]').element);
+            expect(
+                wrapper.findAll<HTMLElement>('[data-test="tag-container"]').length
+            ).toBe(2);
         });
-        await wrapper.vm.$nextTick();
-        const store = useImageEditStore();
-        const firstImage = (store.image as ImageSet).arr[0];
 
-        wrapper
-            .findComponent(SelectImage)
-            .vm.$emit("dragSort", { fromIndex: 1, toIndex: 0 });
+        it("изображения меняются местами", async () => {
+            await wrapper.vm.$nextTick();
+            const store = useImageEditStore();
+            const firstImage = (store.image as ImageSet).arr[0];
 
-        expect((store.image as ImageSet).arr[0]).not.toBe(firstImage);
-    });
+            wrapper
+                .findComponent(SelectImage)
+                .vm.$emit("dragSort", { fromIndex: 1, toIndex: 0 });
 
-    it("отдельное изображение отделяется от сета", async () => {
-        const collection = new Collection(jest.fn(), {} as any, {} as any);
-        const image = new ImageSet({} as any, [] as any);
-        collection.addImage(image);
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: collection,
-                            },
-                            imageEdit: {
-                                image,
-                            },
-                        },
-                    }),
-                ],
-            },
+            expect((store.image as ImageSet).arr[0]).not.toBe(firstImage);
         });
-        const store = useImageEditStore();
-        await wrapper.vm.$nextTick();
-        jest.spyOn(store, "separateImage");
 
-        //жмем кнопку удаления изображения в сете
-        await userEvent.click(
-            wrapper.find('[data-test="form-edit-remove-image"]').element
-        );
-        expect(store.separateImage).toBeCalledTimes(1);
-    });
+        it("отдельное изображение отделяется от сета", async () => {
+            const store = useImageEditStore();
+            await wrapper.vm.$nextTick();
+            jest.spyOn(store, "separateImage");
 
-    it("изображение рендерится", async () => {
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                            imageEdit: {
-                                image: new ImageSet({} as any, [] as any),
-                            },
-                        },
-                    }),
-                ],
-            },
-            attachTo: document.body,
+            //жмем кнопку удаления изображения в сете
+            await userEvent.click(
+                wrapper.find('[data-test="form-edit-remove-image"]').element
+            );
+            expect(store.separateImage).toBeCalledTimes(1);
         });
-        //???
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$forceUpdate();
 
-        //Изображение получает src и рендерится
-        expect(
-            wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
-                .element.src
-        ).not.toBe("");
-    });
+        it("изображение рендерится", async () => {
+            await wrapper.vm.$nextTick();
+            await wrapper.vm.$forceUpdate();
 
-    it("Изображение ререндерится при смене активного изображения", async () => {
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                            imageEdit: {
-                                image: new ImageSet({} as any, [] as any),
-                            },
-                        },
-                    }),
-                ],
-            },
+            expect(
+                wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
+                    .element.src
+            ).not.toBe("");
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$forceUpdate();
 
-        const firstImageSrc = wrapper.find<HTMLImageElement>(
-            '[data-test="form-edit-image"] img'
-        ).element.src;
+        it("Изображение ререндерится при смене активного изображения", async () => {
+            await wrapper.vm.$nextTick();
+            await wrapper.vm.$forceUpdate();
 
-        //Изначальное зображение получает src и рендерится
-        expect(firstImageSrc).not.toBe("");
+            const firstImageSrc = wrapper.find<HTMLImageElement>(
+                '[data-test="form-edit-image"] img'
+            ).element.src;
 
-        //меняем активное изображение
-        await userEvent.click(
-            wrapper.findAll('[data-test="select-image-card"]')[1].element
-        );
+            //Изначальное изображение получает src и рендерится
+            expect(firstImageSrc).not.toBe("");
 
-        //новое изображение рендерится, src нового изображения не равен src старого изображения
-        expect(
-            wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
-                .element.src
-        ).not.toBe(firstImageSrc);
-    });
+            //меняем активное изображение
+            await userEvent.click(
+                wrapper.findAll('[data-test="select-image-card"]')[1].element
+            );
 
-    it("Новое изображение вставляется", async () => {
-        const wrapper = mount(FormImageEdit, {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        initialState: {
-                            collections: {
-                                activeCollection: new Collection(
-                                    jest.fn(),
-                                    {} as any,
-                                    {} as any
-                                ),
-                            },
-                            imageEdit: {
-                                image: new ImageSet({} as any, [] as any),
-                            },
-                        },
-                    }),
-                ],
-            },
-            attachTo: document.body,
+            //новое изображение рендерится, src нового изображения не равен src старого изображения
+            expect(
+                wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
+                    .element.src
+            ).not.toBe(firstImageSrc);
         });
-        const store = useImageEditStore();
-        jest.spyOn(store, "changeImageBlob");
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$forceUpdate();
 
-        const fileUrl = wrapper.find<HTMLImageElement>(
-            '[data-test="form-edit-image"] img'
-        ).element.src;
-        expect(fileUrl).not.toBe("");
+        it("Новое изображение вставляется", async () => {
+            const store = useImageEditStore();
+            jest.spyOn(store, "changeImageBlob");
+            
+            await wrapper.vm.$nextTick();
+            await wrapper.vm.$forceUpdate();
 
-        await userEvent.pointer({
-            keys: "[MouseRight]",
-            target: wrapper.find('[data-test="form-edit-image"]').element,
+            const fileUrl = wrapper.find<HTMLImageElement>(
+                '[data-test="form-edit-image"] img'
+            ).element.src;
+            expect(fileUrl).not.toBe("");
+
+            await userEvent.pointer({
+                keys: "[MouseRight]",
+                target: wrapper.find('[data-test="form-edit-image"]').element,
+            });
+            await userEvent.click(
+                wrapper.find('[data-test="input-image-context"]').element.children[0]
+            );
+
+            expect(
+                wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
+                    .element.src
+            ).not.toBe(fileUrl);
+            expect(store.changeImageBlob).toBeCalledTimes(1);
         });
-        await userEvent.click(
-            wrapper.find('[data-test="input-image-context"]').element.children[0]
-        );
-
-        expect(
-            wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
-                .element.src
-        ).not.toBe(fileUrl);
-        expect(store.changeImageBlob).toBeCalledTimes(1);
-    });
+    })
 });

@@ -21,26 +21,29 @@ export default function () {
     watch(
         () => hash.value,
         (newHash) => {
+
             if (newHash == null || newHash == "") {
                 doublicateImages.value = [];
-            } else {
-                const t: ImageSingle[] = [];
-                const temp = images.value.filter((img) => {
-                    if ("arr" in img) {
-                        for (const t of img.arr) {
-                            if (hammingDistance(newHash, t.manifest.hash) < 0.25) {
-                                return true;
-                            }
-                        }
-                    } else {
-                        if (hammingDistance(newHash, img.manifest.hash) < 0.25) {
+                return;
+            }
+
+            const temp = images.value.filter((img) => {
+                if ("arr" in img) {
+                    for (const t of img.arr) {
+                        if (hammingDistance(newHash, t.manifest.hash) < 0.25) {
                             return true;
                         }
                     }
                     return false;
-                });
-                doublicateImages.value = [...(temp as any as ImageSingle[]), ...t];
-            }
+                }
+
+                if (hammingDistance(newHash, img.manifest.hash) < 0.25) {
+                    return true;
+                }
+                return false;
+            });
+            
+            doublicateImages.value = [...(temp as any as ImageSingle[])];
         }
     );
 

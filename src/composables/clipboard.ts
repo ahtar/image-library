@@ -4,40 +4,42 @@ import crypto from "@/modules/crypto";
  * @param data Объект изображения.
  */
 async function copyToClipboard(data: ImageSingle | ImageSet) {
-    let item: null | ClipboardItem = null;
-    if ("arr" in data) {
-        const image = data.arr[0];
-
-        if (image.manifest.corrupted) {
-            const blob = await (
-                await (await image.getImage()).getFile()
-            ).arrayBuffer();
-            const newBlob = await crypto.recover(blob);
-            const file = new File([newBlob], image.manifest.id + ".png", {
-                type: "image/png",
-            });
-            item = new ClipboardItem({ [file.type]: file });
-        } else {
-            const file = await (await image.getImage()).getFile();
-            item = new ClipboardItem({ [file.type]: file });
-        }
-    } else {
-        if (data.manifest.corrupted) {
-            const blob = await (
-                await (await data.getImage()).getFile()
-            ).arrayBuffer();
-            const newBlob = await crypto.recover(blob);
-            const file = new File([newBlob], data.manifest.id + ".png", {
-                type: "image/png",
-            });
-            item = new ClipboardItem({ [file.type]: file });
-        } else {
-            const file = await (await data.getImage()).getFile();
-            item = new ClipboardItem({ [file.type]: file });
-        }
+    if ("arr" in data && data.arr[0].manifest.corrupted) {
+        const blob = await (
+            await (await data.arr[0].getImage()).getFile()
+        ).arrayBuffer();
+        const newBlob = await crypto.recover(blob);
+        const file = new File([newBlob], data.arr[0].manifest.id + ".png", {
+            type: "image/png",
+        });
+        const item = new ClipboardItem({ [file.type]: file });
+        await navigator.clipboard.write([item]);
+        return;
     }
 
-    if (item != null) await navigator.clipboard.write([item]);
+    if ("arr" in data) {
+        const file = await (await data.arr[0].getImage()).getFile();
+        const item = new ClipboardItem({ [file.type]: file });
+        await navigator.clipboard.write([item]);
+        return;
+    }
+
+    if (data.manifest.corrupted) {
+        const blob = await (
+            await (await data.getImage()).getFile()
+        ).arrayBuffer();
+        const newBlob = await crypto.recover(blob);
+        const file = new File([newBlob], data.manifest.id + ".png", {
+            type: "image/png",
+        });
+        const item = new ClipboardItem({ [file.type]: file });
+        await navigator.clipboard.write([item]);
+        return;
+    }
+
+    const file = await (await data.getImage()).getFile();
+    const item = new ClipboardItem({ [file.type]: file });
+    await navigator.clipboard.write([item]);
 }
 
 /**

@@ -1,21 +1,21 @@
 <template>
     <modal-dark @close="store.close" data-test="modal">
         <div class="content-wrapper" data-test="collection-edit-wrapper">
-            <input-text class="wrapper-section" label="Name" placeholder="Collection name" :important="true"
-                v-model="data.name" data-test="collection-edit-name" />
-            <input-text class="wrapper-section" label="Theme" placeholder="Collection theme" v-model="data.theme"
-                data-test="collection-edit-theme" />
-            <input-text class="wrapper-section input-description" label="Description"
-                placeholder="Collection description" v-model="data.description" :textarea="true"
+            <input-text class="wrapper-section" :label="t('LABEL.NAME')" :placeholder="t('PLACEHOLDER.NAME')"
+                :important="true" v-model="data.name" data-test="collection-edit-name" />
+            <input-text class="wrapper-section" :label="t('LABEL.THEME')" :placeholder="t('PLACEHOLDER.THEME')"
+                v-model="data.theme" data-test="collection-edit-theme" />
+            <input-text class="wrapper-section input-description" :label="t('LABEL.DESC')"
+                :placeholder="t('PLACEHOLDER.DESC')" v-model="data.description" :textarea="true"
                 data-test="collection-edit-description" />
             <div class="wrapper-section section-checkbox">
-                <input-checkbox v-model="store.form.options.corrupted" label="Corrupted"
+                <input-checkbox v-model="store.form.options.corrupted" :label="t('LABEL.CORR')"
                     data-test="collection-edit-corrupted" />
             </div>
             <div class="wrapper-section button-container">
-                <button-small @click="store.save" :blocked="!buttonSaveActive" data-test="collection-edit-save">Save
+                <button-small @click="store.save" :blocked="!buttonSaveActive" data-test="collection-edit-save">
+                    {{ t('BUTTON.SAVE') }}
                 </button-small>
-                <button-small @click="fix">Fix</button-small>
             </div>
         </div>
 
@@ -27,6 +27,7 @@
 
 <script lang="ts">
 import { defineComponent, computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import ModalDark from "@/components/ModalDark.vue";
 import InputText from "@/components/InputText.vue";
@@ -46,6 +47,7 @@ export default defineComponent({
     },
     setup() {
         const store = useCollectionEditStore();
+        const { t } = useI18n();
 
         const buttonSaveActive = computed(() => {
             return store.form.name != "";
@@ -55,43 +57,12 @@ export default defineComponent({
             store.form.blob = data;
         }
 
-        async function fix() {
-            if (!store.collection?.loaded)
-                await store.collection?.initLoadCollection();
-            const sets = store.collection?.arr.filter((image) => {
-                if ("arr" in image) return image;
-            });
-            const doublesArr: ImageSingle[] = [];
-
-            for (const imageSet of sets!) {
-                for (const image of (imageSet as ImageSet).arr) {
-                    const double = store.collection!.arr.find(
-                        (i) => i.manifest.id == image.manifest.id
-                    );
-                    if (double) {
-                        doublesArr.push(double as any as ImageSingle);
-                        console.log("found double!");
-                    }
-                }
-            }
-
-            console.info("number of doubles:", doublesArr.length);
-
-            for (const image of doublesArr) {
-                //console.info('image double:', image);
-                image.manifest.fileUrl = "";
-                image.manifest.previewFileUrl = "";
-            }
-
-            console.log(doublesArr);
-        }
-
         return {
             store,
             data: store.form,
             imagePasteEvent,
             buttonSaveActive,
-            fix,
+            t
         };
     },
 });

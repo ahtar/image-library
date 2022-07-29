@@ -1,7 +1,7 @@
 import { useCollections } from "@/store/collections";
 import { useNotificationStore } from "@/store/modals/modal-notification";
 import { defineStore } from "pinia";
-import memento from "@/modules/memento";
+import i18n from "@/locales/i18n";
 
 export const useImageEditStore = defineStore("imageEdit", {
     state: () => {
@@ -68,10 +68,13 @@ export const useImageEditStore = defineStore("imageEdit", {
                     this.image as any,
                     obj
                 );
+                storeNotifications.notify(
+                    i18n.global.t('NOTIFICATION.MESSAGE.IMAGE_EDITED')
+                );
             } catch (err) {
                 console.log(err);
                 storeNotifications.notify(
-                    "Изображение не измененно, что-то пошло не так",
+                    i18n.global.t('NOTIFICATION.MESSAGE.IMAGE_EDIT_ERROR'),
                     false
                 );
             }

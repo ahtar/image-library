@@ -2,7 +2,7 @@
     <div class="wrapper" @click="close">
         <div class="success"></div>
         <div class="notification">
-            <div class="title">Success</div>
+            <div class="title">{{t('NOTIFICATION.TITLE.SUCCESS')}}</div>
             <div class="message">{{ message }}</div>
         </div>
     </div>
@@ -10,6 +10,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default defineComponent({
     props: {
@@ -20,10 +21,12 @@ export default defineComponent({
     },
     emits: ["close"],
     setup(props, { emit }) {
+        const { t } = useI18n();
         return {
             close() {
                 emit("close");
             },
+            t
         };
     },
 });

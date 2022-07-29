@@ -2,12 +2,12 @@
     <div class="input-image" ref="imageField" :tabindex="tabindex" @paste="pasteEvent"
         @contextmenu.prevent="contextMenuOpen(null, $event)">
         <img ref="image" />
-        <div class="message" v-if="imageActive == false">Вставь картинку</div>
+        <div class="message" v-if="imageActive == false">{{t('INPUT_IMAGE.MESSAGE')}}</div>
 
         <transition-fade>
             <menu-context class="menu-context" v-if="contextMenuActive" :event="contextMenuEvent!"
                 @close="contextMenuClose" data-test="input-image-context">
-                <div @click="pasteEvent" data-test="input-image-context-paste">Вставить</div>
+                <div @click="pasteEvent" data-test="input-image-context-paste">{{t('BUTTON.INPUT')}}</div>
             </menu-context>
         </transition-fade>
     </div>
@@ -29,6 +29,8 @@ import TransitionFade from "@/components/TransitionFade.vue";
 import useClipboard from "@/composables/clipboard";
 import useImageRendering from "@/composables/image-rendering";
 import useContextMenu from "@/composables/context-menu";
+
+import { useI18n } from "vue-i18n";
 
 export default defineComponent({
     components: {
@@ -55,6 +57,7 @@ export default defineComponent({
         const imageField = ref<HTMLElement | null>(null);
         const image = ref<HTMLImageElement | null>(null);
         const imageActive = ref(false);
+        const { t } = useI18n();
 
         const { readFromClipboard } = useClipboard();
         const { renderImage } = useImageRendering();
@@ -117,6 +120,7 @@ export default defineComponent({
             contextMenuOpen,
             contextMenuClose,
             contextMenuEvent,
+            t
         };
     },
 });
@@ -151,6 +155,7 @@ export default defineComponent({
     }
 
     & img {
+        display: block;
         max-height: 90vh;
         max-width: 40vw;
     }

@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { mount, VueWrapper } from "@vue/test-utils";
 import userEvent from "@testing-library/user-event";
 import { createTestingPinia } from "@pinia/testing";
 
@@ -7,8 +7,10 @@ import ModalDark from "@/components/ModalDark.vue";
 import { usePromptStore } from "@/store/modals/modal-prompt";
 
 describe("MessagePrompt.vue", () => {
-    it("сообщение оповещения отображается", () => {
-        const wrapper = mount(MessagePrompt, {
+    let wrapper: VueWrapper<any>;
+
+    beforeEach(() => {
+        wrapper = mount(MessagePrompt, {
             global: {
                 plugins: [
                     createTestingPinia({
@@ -21,16 +23,17 @@ describe("MessagePrompt.vue", () => {
                 ],
             },
         });
+    });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+    
+    it("сообщение оповещения отображается", () => {
         expect(wrapper.html()).toContain("test message");
     });
 
     it("оповещение можно подтвердить", async () => {
-        const wrapper = mount(MessagePrompt, {
-            global: {
-                plugins: [createTestingPinia({})],
-            },
-        });
         const store = usePromptStore();
         jest.spyOn(store, "confirm");
 
@@ -40,11 +43,6 @@ describe("MessagePrompt.vue", () => {
     });
 
     it("оповещение можно отклонить", async () => {
-        const wrapper = mount(MessagePrompt, {
-            global: {
-                plugins: [createTestingPinia({})],
-            },
-        });
         const store = usePromptStore();
         jest.spyOn(store, "close");
 
@@ -54,11 +52,6 @@ describe("MessagePrompt.vue", () => {
     });
 
     it("окно закрывается", async () => {
-        const wrapper = mount(MessagePrompt, {
-            global: {
-                plugins: [createTestingPinia({})],
-            },
-        });
         const store = usePromptStore();
         jest.spyOn(store, "close");
 

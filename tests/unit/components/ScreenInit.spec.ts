@@ -19,9 +19,7 @@ describe("ScreenInit.vue", () => {
             },
         });
 
-        expect(wrapper.html()).toContain(
-            "Due to a restriction of the File System Access API"
-        );
+        expect(wrapper.html()).toContain('INIT_SCREEN.MESSAGE');
     });
 
     it("Компонент не активен, если браузер не поддерживает функционал.", () => {
@@ -35,9 +33,7 @@ describe("ScreenInit.vue", () => {
             },
         });
 
-        expect(wrapper.html()).toContain(
-            "Данный браузер не поддерживает функционал этого сайта."
-        );
+        expect(wrapper.html()).toContain("INIT_SCREEN.BROWSER_INCOMPATIBLE");
     });
 
     it("коллекции загружаются", async () => {

@@ -4,14 +4,15 @@
             <select-image id="select-image" :set="image.arr" @change="changeActiveImage" v-if="store.isSet"
                 :draggable="true" @dragSort="dragSort" data-test="form-edit-select" />
             <div class="form-image-edit-wrapper">
-                <input-text class="wrapper-section" v-model="fileUrl" label="Ссылка" :important="true"
+                <input-text class="wrapper-section" v-model="fileUrl" :label="t('LABEL.URL')" :important="true"
                     :active="false" />
                 <input-tags class="wrapper-section" :tags="computedTags" :definedTags="definedTags" @add="addTag"
                     @remove="removeTag" data-test="input-tags" />
                 <div class="wrapper-section button-section">
                     <button-small v-if="store.isSet" class="button" @click="separateImage"
-                        data-test="form-edit-remove-image">Remove image from set</button-small>
-                    <button-small @click="store.updateImage" data-test="form-edit-save">Save</button-small>
+                        data-test="form-edit-remove-image">{{ t('BUTTON.SET_SEPARATE') }}</button-small>
+                    <button-small @click="store.updateImage" data-test="form-edit-save">{{ t('BUTTON.SAVE') }}
+                    </button-small>
                 </div>
             </div>
         </div>
@@ -24,6 +25,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 import InputTags from "@/components/InputTag.vue";
 import InputText from "@/components/InputText.vue";
@@ -37,7 +39,6 @@ import { useImageEditStore } from "@/store/forms/form-image-edit";
 import useTagActions from "@/composables/tags";
 
 import misc from "@/modules/misc";
-
 export default defineComponent({
     components: {
         InputTags,
@@ -51,6 +52,7 @@ export default defineComponent({
         const store = useImageEditStore();
 
         const { addTag, removeTag, setTagRef, definedTags } = useTagActions();
+        const { t } = useI18n();
 
         const image = ref<any>(store.image);
         const fielHandle = ref<FileSystemFileHandle | Blob>();
@@ -137,6 +139,7 @@ export default defineComponent({
             dragSort,
             separateImage,
             pasteHandler,
+            t
         };
     },
 });

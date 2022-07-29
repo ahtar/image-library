@@ -5,6 +5,8 @@ import Collection from "@/classes/Collection";
 import jimp from "@/modules/jimp";
 import fs from "@/modules/file-system";
 
+import i18n from "@/locales/i18n";
+
 /**
  * Надо будет обновить, подправить
  */
@@ -60,7 +62,7 @@ export const useCollectionCreateStore = defineStore("collectionCreate", {
             try {
                 await handle.getDirectoryHandle(this.form.name);
                 storeNotifications.notify(
-                    "Коллекция с таким именем уже существует",
+                    i18n.global.t('NOTIFICATION.MESSAGE.COLLECTION_ALREADY_EXISTS'),
                     false
                 );
             } catch (err) {
@@ -110,9 +112,9 @@ export const useCollectionCreateStore = defineStore("collectionCreate", {
                     this.clearForm();
                     this.close();
 
-                    storeNotifications.notify("Коллекция создана");
+                    storeNotifications.notify(i18n.global.t('NOTIFICATION.MESSAGE.COLLECTION_CREATED'));
                 } else {
-                    storeNotifications.notify("Что-то пошло не так", false);
+                    storeNotifications.notify(i18n.global.t('NOTIFICATION.MESSAGE.ERROR'), false);
                     console.log(error);
                 }
             }

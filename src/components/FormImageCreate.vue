@@ -7,15 +7,15 @@
             </div>
             <div class="form-image-create" data-test="form-create-wrapper">
                 <div class="section-wrapper">
-                    <input-text v-model="store.form.fileUrl" label="Id" :important="true" :active="store.urlInputActive"
-                        placeholder="Идентификатор изображения" />
+                    <input-text v-model="store.form.fileUrl" :label="t('LABEL.ID')" :important="true"
+                        :active="false" :placeholder="t('PLACEHOLDER.ID')" />
                 </div>
                 <input-tags class="section-wrapper" :tags="store.form.tags" :definedTags="definedTags" @add="addTag"
                     @remove="removeTagHandler" data-test="input-tags" />
                 <div class="buttons section-wrapper">
-                    <button-small @click="store.clearForm" data-test="form-clear">Отчистить</button-small>
+                    <button-small @click="store.clearForm" data-test="form-clear">{{ t('BUTTON.CLEAR') }}</button-small>
                     <button-small @click="store.submitImage" :blocked="saveButtonBlocked" data-test="form-save">
-                        Сохранить</button-small>
+                        {{ t('BUTTON.SAVE') }}</button-small>
                 </div>
                 <div class="similar-images section-wrapper" v-if="haveDoubles">
                     <card-image-small v-for="image in doublicateImages" :image="image" :key="image.manifest.id"
@@ -30,7 +30,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, Ref } from "vue";
+import { defineComponent, PropType, ref, Ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import jimp from "@/modules/jimp";
 
 import ModalDark from "@/components/ModalDark.vue";
@@ -45,7 +46,6 @@ import { useImageCreateStore } from "@/store/forms/form-create-image";
 
 import useTagActions from "@/composables/tags";
 import useDublicateImages from "@/composables/dublicate-images";
-import { computed } from "@vue/reactivity";
 
 export default defineComponent({
     components: {
@@ -72,6 +72,7 @@ export default defineComponent({
 
         const { addTag, removeTag, setTagRef } = useTagActions();
         const { doublicateImages, setHash, haveDoubles } = useDublicateImages();
+        const { t } = useI18n();
 
         const saveButtonBlocked = computed(() => {
             if (store.form.blob == null) return true;
@@ -79,9 +80,9 @@ export default defineComponent({
         });
 
         //Теги прошлого созданного изображения.
-        const oldTagsCopy: Ref<Tag[]> = ref(
-            props.priorTags.filter((t) => !store.form.tags.includes(t.name))
-        );
+        const oldTagsCopy = computed(() => {
+            return props.priorTags.filter((t) => !store.form.tags.includes(t.name))
+        });
 
         setTagRef(ref(store.form.tags));
 
@@ -119,6 +120,7 @@ export default defineComponent({
             saveButtonBlocked,
             oldTagsCopy,
             reuseOldTag,
+            t
         };
     },
 });

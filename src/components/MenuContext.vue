@@ -1,5 +1,5 @@
 <template>
-    <div class="context-menu" @blur="closeContext" ref="menu" tabindex="0">
+    <div class="context-menu" @blur="closeContext" ref="menu" tabindex="0" @contextmenu.prevent>
         <slot class="option">
             <div class="option">test 1</div>
             <div class="option">test 2</div>

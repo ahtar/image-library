@@ -20,7 +20,7 @@ export default defineComponent({
 .scroll-component {
     position: absolute;
     right: 10px;
-    height: 100vh;
+    height: 96vh;
     width: 5vw;
     transition: opacity 0.5s ease;
     opacity: 0;
