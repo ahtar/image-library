@@ -81,12 +81,12 @@ describe("FormCollectionCreate.vue", () => {
         const store = useCollectionCreateStore();
         jest.spyOn(store, "createCollection");
 
-        store.form.blob = new Blob();
+        store.form.file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
         wrapper
             .find('[data-test="collection-create-name"] input')
             .setValue("collection name");
 
-        expect(store.form.blob).not.toBeFalsy();
+        expect(store.form.file).not.toBeFalsy();
         expect(store.form.name).toBe("collection name");
 
         await userEvent.click(
@@ -131,48 +131,18 @@ describe("FormCollectionCreate.vue", () => {
         expect(store.form.options.corrupted).toBe(true);
     });
 
-    describe('изображение вставляется', () => {
-        let wrapper: VueWrapper<any> | null = null;
-        let img: VueNode<HTMLImageElement> | null = null;
-        let inputImage: VueNode<HTMLElement> | null = null;
+    it("файл загружается", async () => {
+        const img = wrapper.find<HTMLImageElement>("img").element;
+        const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
 
-        beforeEach(() => {
-            wrapper = mount(FormCollectionCreate, {
-                global: {
-                    plugins: [createTestingPinia()],
-                },
-                attachTo: document.body,
-            });
+        //src изображения это пустая строка, следовательно изображение не отрисовано
+        expect(img!.src).toBe("");
 
-            img = wrapper.find<HTMLImageElement>("img").element;
-            inputImage = wrapper!.find<HTMLElement>('[data-test="collection-create-image"]').element;
-        })
+        //пользователь загружает файл
+        await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' }));
 
-        it("через paste event", async () => {
-            const user = userEvent.setup();
-
-            //src изображения это пустая строка, следовательно изображение не отрисовано
-            expect(img!.src).toBe("");
-
-            //пользователь жмет на элемент и вставляет изображение из буфера обмена
-            await userEvent.click(inputImage!);
-            await user.paste();
-
-            //src изображения меняется с пустой строки, следовательно это изображение отрисовано
-            expect(img!.src).not.toBe("");
-        });
-
-        it('через контекст меню', async () => {
-            //src изображения это пустая строка, следовательно изображение не отрисовано
-            expect(img!.src).toBe("");
-
-            //вызов контекс меню
-            await userEvent.pointer({ keys: '[MouseRight]', target: inputImage! });
-            await userEvent.click(wrapper!.find<HTMLElement>('[data-test="input-image-context-paste"]').element);
-
-            //src изображения меняется с пустой строки, следовательно это изображение отрисовано
-            expect(img!.src).not.toBe("");
-        });
+        //src изображения меняется с пустой строки, следовательно это изображение отрисовано
+        expect(img!.src).not.toBe("");
     });
 
     describe('коллекция не сохраняется', () => {
@@ -194,7 +164,7 @@ describe("FormCollectionCreate.vue", () => {
             jest.spyOn(store, "createCollection");
 
             expect(store.form.name).toBeFalsy();
-            expect(store.form.blob).toBeFalsy();
+            expect(store.form.file).toBeFalsy();
 
             await userEvent.click(saveButton!);
 
@@ -209,7 +179,7 @@ describe("FormCollectionCreate.vue", () => {
                 .find('[data-test="collection-create-name"] input')
                 .setValue("collection name");
 
-            expect(store.form.blob).toBeFalsy();
+            expect(store.form.file).toBeFalsy();
             expect(store.form.name).toBe("collection name");
 
             await userEvent.click(saveButton!);
@@ -221,9 +191,9 @@ describe("FormCollectionCreate.vue", () => {
             const store = useCollectionCreateStore();
             jest.spyOn(store, "createCollection");
 
-            store.form.blob = new Blob();
+            store.form.file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
 
-            expect(store.form.blob).not.toBeFalsy();
+            expect(store.form.file).not.toBeFalsy();
             expect(store.form.name).toBeFalsy();
 
             await userEvent.click(saveButton!);

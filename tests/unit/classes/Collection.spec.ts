@@ -219,7 +219,7 @@ describe("Collection.ts", () => {
                     previewFileUrl: "",
                     dateCreated: "",
                 },
-                new Blob()
+                new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' })
             );
 
             expect(collection!.arr.length).toBe(1);
@@ -245,7 +245,7 @@ describe("Collection.ts", () => {
                     dateCreated: "",
                     corrupted: true,
                 },
-                new Blob()
+                new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' })
             );
 
             expect(collection!.arr.length).toBe(1);

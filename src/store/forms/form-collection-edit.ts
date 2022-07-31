@@ -12,7 +12,7 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
                 name: "",
                 theme: "" as string | undefined,
                 description: "" as string | undefined,
-                blob: null as Blob | null,
+                file: null as File | null,
                 options: {
                     corrupted: false,
                 },
@@ -31,7 +31,7 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
             this.form.name = collection.manifest.name;
             this.form.theme = collection.manifest.theme;
             this.form.description = collection.manifest.description;
-            this.form.blob = await collection.thumbnail.getFile();
+            this.form.file = await collection.thumbnail.getFile();
             this.form.options.corrupted =
                 collection.manifest.options?.corrupted || false;
         },
@@ -55,9 +55,11 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
                         corrupted: this.form.options.corrupted || false,
                     },
                 };
+
+                //обновление файлов коллекции
                 await this.collection!.updateCollectionManifest(
                     manifest,
-                    this.form.blob!
+                    this.form.file!
                 );
 
                 //Конвертация изображений.

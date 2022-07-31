@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="image-wrapper wrapper">
-            <input-image :active="true" :blob="store.form.blob" @paste="imagePasteEvent" data-test="input-image" />
+            <input-image :active="true" :fileData="store.form.file" @paste="imagePasteEvent" data-test="input-image" />
         </div>
     </modal-dark>
 </template>
@@ -75,7 +75,7 @@ export default defineComponent({
         const { t } = useI18n();
 
         const saveButtonBlocked = computed(() => {
-            if (store.form.blob == null) return true;
+            if (store.form.file == null) return true;
             return false;
         });
 
@@ -86,8 +86,8 @@ export default defineComponent({
 
         setTagRef(ref(store.form.tags));
 
-        async function imagePasteEvent(data: Blob) {
-            store.form.blob = data;
+        async function imagePasteEvent(data: File) {
+            store.form.file = data;
             store.urlInputActive = false;
             store.form.hash = await jimp.getHash(data);
             setHash(store.form.hash);

@@ -289,7 +289,8 @@ describe("FormImageEdit.vue", () => {
 
         it("Новое изображение вставляется", async () => {
             const store = useImageEditStore();
-            jest.spyOn(store, "changeImageBlob");
+            const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
+            jest.spyOn(store, "changeImageFile");
             
             await wrapper.vm.$nextTick();
             await wrapper.vm.$forceUpdate();
@@ -297,21 +298,16 @@ describe("FormImageEdit.vue", () => {
             const fileUrl = wrapper.find<HTMLImageElement>(
                 '[data-test="form-edit-image"] img'
             ).element.src;
+
             expect(fileUrl).not.toBe("");
 
-            await userEvent.pointer({
-                keys: "[MouseRight]",
-                target: wrapper.find('[data-test="form-edit-image"]').element,
-            });
-            await userEvent.click(
-                wrapper.find('[data-test="input-image-context"]').element.children[0]
-            );
+            await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' }));
 
             expect(
                 wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
                     .element.src
             ).not.toBe(fileUrl);
-            expect(store.changeImageBlob).toBeCalledTimes(1);
+            expect(store.changeImageFile).toBeCalledTimes(1);
         });
     })
 });

@@ -20,7 +20,7 @@ export const useCollectionCreateStore = defineStore("collectionCreate", {
                 name: "",
                 description: "",
                 theme: "",
-                blob: undefined as Blob | undefined,
+                file: undefined as File | undefined,
                 options: {
                     corrupted: false,
                 },
@@ -45,7 +45,7 @@ export const useCollectionCreateStore = defineStore("collectionCreate", {
             this.form.name = "";
             this.form.description = "";
             this.form.theme = "";
-            this.form.blob = undefined;
+            this.form.file = undefined;
             this.form.options.corrupted = false;
         },
 
@@ -82,7 +82,7 @@ export const useCollectionCreateStore = defineStore("collectionCreate", {
                             corrupted: this.form.options.corrupted,
                         },
                     };
-                    const thumbnail = await jimp.resize(this.form.blob!);
+                    const thumbnail = await jimp.resize(this.form.file!);
 
                     await collectionHandle.getDirectoryHandle("imageData", {
                         create: true,

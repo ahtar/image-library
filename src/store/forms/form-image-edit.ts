@@ -9,7 +9,7 @@ export const useImageEditStore = defineStore("imageEdit", {
             storeCollections: useCollections(),
             visible: false,
             image: null as ImageSingle | ImageSet | null,
-            imageBlobChanges: {} as { [key: string]: Blob },
+            imageFileChanges: {} as { [key: string]: File },
             imageSeparate: [] as ImageSingle[],
         };
     },
@@ -25,7 +25,7 @@ export const useImageEditStore = defineStore("imageEdit", {
         async setImage(image: ImageSingle | ImageSet) {
             this.image = image;
 
-            this.imageBlobChanges = {};
+            this.imageFileChanges = {};
             this.imageSeparate = [];
 
             this.image.saveState();
@@ -39,8 +39,8 @@ export const useImageEditStore = defineStore("imageEdit", {
             this.visible = false;
         },
 
-        changeImageBlob(image: ImageSingle, data: Blob) {
-            this.imageBlobChanges[image.manifest.id] = data;
+        changeImageFile(image: ImageSingle, data: File) {
+            this.imageFileChanges[image.manifest.id] = data;
         },
 
         /**
@@ -58,8 +58,8 @@ export const useImageEditStore = defineStore("imageEdit", {
 
             if (this.imageSeparate.length > 0)
                 obj.separate = this.imageSeparate as any;
-            if (Object.keys(this.imageBlobChanges).length > 0)
-                obj.imageData = this.imageBlobChanges;
+            if (Object.keys(this.imageFileChanges).length > 0)
+                obj.imageData = this.imageFileChanges;
             if (this.image?.checkChanges()) obj.manifest = true;
 
             this.close();

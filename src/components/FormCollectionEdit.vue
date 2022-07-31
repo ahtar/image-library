@@ -20,7 +20,7 @@
         </div>
 
         <div class="image-wrapper wrapper">
-            <input-image :active="true" :blob="data.blob!" @paste="imagePasteEvent" data-test="collection-edit-image" />
+            <input-image :active="true" :fileData="data.file!" @paste="imagePasteEvent" data-test="collection-edit-image" />
         </div>
     </modal-dark>
 </template>
@@ -53,8 +53,8 @@ export default defineComponent({
             return store.form.name != "";
         });
 
-        async function imagePasteEvent(data: Blob) {
-            store.form.blob = data;
+        async function imagePasteEvent(data: File) {
+            store.form.file = data;
         }
 
         return {

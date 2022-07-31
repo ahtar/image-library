@@ -32,7 +32,7 @@ describe("FormCollectionEdit", () => {
                                     name: "mock name",
                                     theme: "mock theme",
                                     description: "mock description",
-                                    blob: new Blob(),
+                                    file: new Blob(),
                                 },
                                 collection: new Collection(jest.fn(), {} as any, {} as any),
                             },
@@ -94,17 +94,14 @@ describe("FormCollectionEdit", () => {
     });
 
     it("изображение меняется", async () => {
-        const user = userEvent.setup();
         await wrapper.vm.$nextTick();
 
         const imgSrc = wrapper.find<HTMLImageElement>("img").element.src;
+        const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
 
         expect(imgSrc).not.toBe("");
 
-        await userEvent.click(
-            wrapper.find<HTMLElement>('[data-test="collection-edit-image"]').element
-        );
-        await user.paste();
+        await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' }));
 
         expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe("");
         expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe(imgSrc);

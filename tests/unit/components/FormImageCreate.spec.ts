@@ -91,19 +91,16 @@ describe("FormImageCreate.vue", () => {
     });
 
     it("изображение вставляется", async () => {
-        const user = userEvent.setup();
+        const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
         const storeImages = useImageCreateStore();
 
-        expect(storeImages.form.blob).not.toBeDefined();
+        expect(storeImages.form.file).not.toBeDefined();
 
-        //пользователь жмет на элемент и вставляет изображение из буфера обмена
-        await userEvent.click(
-            wrapper.find<HTMLElement>('[data-test="input-image"]').element
-        );
-        await user.paste();
+        //пользователь загружает файл
+        await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' }));
 
         expect(wrapper.findComponent(InputImage).emitted().paste).toBeDefined();
-        expect(storeImages.form.blob).toBeDefined();
+        expect(storeImages.form.file).toBeDefined();
     });
 
     it("изображение рендерится, если оно вставлено", async () => {
@@ -116,7 +113,7 @@ describe("FormImageCreate.vue", () => {
         ).toBe("");
 
         //Вставляем изображение
-        storeImages.form.blob = new Blob();
+        storeImages.form.file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
         await wrapper.vm.$nextTick();
 
         //img.src Должен обновиться
@@ -130,7 +127,7 @@ describe("FormImageCreate.vue", () => {
         const storeImages = useImageCreateStore();
         jest.spyOn(storeImages, "submitImage");
 
-        storeImages.form.blob = new Blob();
+        storeImages.form.file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
 
         await userEvent.click(wrapper.find('[data-test="form-save"]').element);
 

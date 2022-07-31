@@ -205,7 +205,7 @@ class CollectionOjbect implements Collection {
      * @param manifest данные Изображения.
      * @param image Blob с изображением.
      */
-    async createImage(manifest: ImageSingleData, image: Blob) {
+    async createImage(manifest: ImageSingleData, image: File) {
         const imageDataFolderHandle = await this.handle.getDirectoryHandle(
             "imageData",
             { create: true }
@@ -219,8 +219,8 @@ class CollectionOjbect implements Collection {
             { create: true }
         );
 
-        let imageBlob = image;
-        let thumbnailBlob = await jimp.resize(image);
+        let imageBlob: Blob = image;
+        let thumbnailBlob: Blob = await jimp.resize(image);
 
         //Если изображение испорчено, то испортить файл изображения.
         if (manifest.corrupted) {

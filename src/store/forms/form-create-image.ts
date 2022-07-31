@@ -14,7 +14,7 @@ export const useImageCreateStore = defineStore("imageCreate", {
             imageInputActive: true,
             form: {
                 tags: [] as Array<string>,
-                blob: undefined as Blob | undefined,
+                file: undefined as File | undefined,
                 source: "",
                 fileUrl: "",
                 hash: "",
@@ -45,7 +45,7 @@ export const useImageCreateStore = defineStore("imageCreate", {
                 Math.random().toString(36).substr(2) +
                 Math.random().toString(36).substr(2);
 
-            const blobFormat = this.form.blob!.type.split("/")[1];
+            const blobFormat = this.form.file!.type.split('/')[1];
 
             //Информация об изображении.
             const imageInstance: ImageSingleData = {
@@ -77,11 +77,13 @@ export const useImageCreateStore = defineStore("imageCreate", {
                 );
             }
 
+            this.visible = false;
+
             try {
                 //сохранение изображения.
                 await store.activeCollection!.createImage(
                     imageInstance,
-                    this.form.blob!
+                    this.form.file!
                 );
                 this.clearForm();
                 storeNotifications.notify(i18n.global.t('NOTIFICATION.MESSAGE.IMAGE_CREATED'));
@@ -92,8 +94,6 @@ export const useImageCreateStore = defineStore("imageCreate", {
                     false
                 );
             }
-
-            this.visible = false;
         },
 
         /**
@@ -103,7 +103,7 @@ export const useImageCreateStore = defineStore("imageCreate", {
             this.urlInputActive = true;
             this.imageInputActive = true;
             this.form.tags.length = 0;
-            this.form.blob = undefined;
+            this.form.file = undefined;
             this.form.source = "";
             this.form.fileUrl = "";
             this.form.hash = "";

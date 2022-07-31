@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="image-wrapper wrapper">
-            <input-image :active="true" :blob="store.form.blob" @paste="imagePasteEvent"
+            <input-image :active="true" :fileData="store.form.file" @paste="imagePasteEvent"
                 data-test="collection-create-image" />
         </div>
     </modal-dark>
@@ -52,11 +52,11 @@ export default defineComponent({
         const { t } = useI18n();
 
         const saveButtonActive = computed(() => {
-            return ((store.form.name == "" || store.form.name == undefined) || (store.form.blob == undefined));
+            return ((store.form.name == "" || store.form.name == undefined) || (store.form.file == undefined));
         });
 
-        async function imagePasteEvent(data: Blob) {
-            store.form.blob = data;
+        async function imagePasteEvent(data: File) {
+            store.form.file = data;
         }
 
         return {

@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="image-wrapper wrapper">
-            <input-image class="image-edit" :active="true" :blob="fielHandle" @paste="pasteHandler"
+            <input-image class="image-edit" :active="true" :fileData="fielHandle" @paste="pasteHandler"
                 data-test="form-edit-image" />
         </div>
     </modal-dark>
@@ -55,7 +55,7 @@ export default defineComponent({
         const { t } = useI18n();
 
         const image = ref<any>(store.image);
-        const fielHandle = ref<FileSystemFileHandle | Blob>();
+        const fielHandle = ref<FileSystemFileHandle | File>();
 
         //Текущее активное изображение.
         //Все изменения происходят на нем.
@@ -120,8 +120,8 @@ export default defineComponent({
             }
         }
 
-        async function pasteHandler(data: Blob) {
-            store.changeImageBlob(activeImage.value!, data);
+        async function pasteHandler(data: File) {
+            store.changeImageFile(activeImage.value!, data);
             fielHandle.value = data;
         }
 

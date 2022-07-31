@@ -1,15 +1,13 @@
 <template>
-    <div class="input-image" ref="imageField" :tabindex="tabindex" @paste="pasteEvent"
-        @contextmenu.prevent="contextMenuOpen(null, $event)">
+    <div class="input-image" ref="imageField" :tabindex="tabindex">
         <img ref="image" />
-        <div class="message" v-if="imageActive == false">{{t('INPUT_IMAGE.MESSAGE')}}</div>
 
-        <transition-fade>
-            <menu-context class="menu-context" v-if="contextMenuActive" :event="contextMenuEvent!"
-                @close="contextMenuClose" data-test="input-image-context">
-                <div @click="pasteEvent" data-test="input-image-context-paste">{{t('BUTTON.INPUT')}}</div>
-            </menu-context>
-        </transition-fade>
+        <label for="input-file" class="input-file">
+            <div class="icon" />
+            <p>Choose a file...</p>
+            <input type="file" id="input-file" ref="input" accept="image/*,video/*" @input="fileInput($event)"
+                data-test="input-file" />
+        </label>
     </div>
 </template>
 
@@ -22,21 +20,12 @@ import {
     watch,
     PropType,
 } from "vue";
-
-import MenuContext from "@/components/MenuContext.vue";
-import TransitionFade from "@/components/TransitionFade.vue";
-
-import useClipboard from "@/composables/clipboard";
 import useImageRendering from "@/composables/image-rendering";
 import useContextMenu from "@/composables/context-menu";
 
 import { useI18n } from "vue-i18n";
 
 export default defineComponent({
-    components: {
-        MenuContext,
-        TransitionFade,
-    },
     props: {
         tabindex: {
             type: Number,
@@ -46,20 +35,22 @@ export default defineComponent({
             type: Boolean,
             defalut: true,
         },
-        blob: {
-            type: Object as PropType<Blob | FileSystemFileHandle>,
+        fileData: {
+            type: Object as PropType<File | FileSystemFileHandle>,
         },
     },
 
-    emits: ["paste"],
+    emits: {
+        paste: (data: File) => true
+    },
 
     setup(props, { emit }) {
-        const imageField = ref<HTMLElement | null>(null);
-        const image = ref<HTMLImageElement | null>(null);
+        const imageField = ref<HTMLElement>();
+        const image = ref<HTMLImageElement>();
+        const input = ref<HTMLInputElement>();
         const imageActive = ref(false);
         const { t } = useI18n();
 
-        const { readFromClipboard } = useClipboard();
         const { renderImage } = useImageRendering();
         const {
             contextMenuActive,
@@ -68,29 +59,13 @@ export default defineComponent({
             contextMenuClose,
         } = useContextMenu();
 
-        let blobObjectUrl: string;
-
-        //Чтение первого изображения из буфера обмена
-        async function pasteEvent() {
-            contextMenuClose();
-            if (props.active) {
-                const item: any = await readFromClipboard();
-                const type = item[0].types.find((t: any) => t.includes("image"));
-                if (type) {
-                    const b = await item[0].getType(type);
-                    emit("paste", b);
-                }
-            }
-        }
-
         //Реагирование на изменение blob
         //Перерисовка изображения.
         watch(
-            () => props.blob,
+            () => props.fileData,
             (newData) => {
-                URL.revokeObjectURL(blobObjectUrl);
-                renderImage(image.value!, props.blob);
-                if (props.blob != undefined) {
+                renderImage(image.value!, props.fileData);
+                if (props.fileData != undefined) {
                     imageActive.value = true;
                 } else {
                     imageActive.value = false;
@@ -100,8 +75,8 @@ export default defineComponent({
 
         //Инициализация.
         onMounted(() => {
-            if (props.blob) {
-                renderImage(image.value!, props.blob);
+            if (props.fileData) {
+                renderImage(image.value!, props.fileData);
                 imageActive.value = true;
             }
         });
@@ -110,11 +85,20 @@ export default defineComponent({
             URL.revokeObjectURL(image.value!.src);
         });
 
+
+        function fileInput(e: Event) {
+            if (input.value!.files?.length == 1) {
+                const file = input.value!.files[0];
+                emit("paste", file);
+            }
+        }
+
         return {
             imageField,
             image,
+            input,
             imageActive,
-            pasteEvent,
+            fileInput,
 
             contextMenuActive,
             contextMenuOpen,
@@ -131,6 +115,66 @@ export default defineComponent({
     line-height: 0;
     @include z-depth();
     @include focus();
+
+    .input-file {
+        line-height: normal;
+        font-size: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: $color-dark-1;
+        border: thin solid $color-border-dark-1;
+        color: $color-text-second;
+        padding: 5px 7px 5px 7px;
+
+        p {
+            margin: 0px;
+        }
+
+        .icon {
+            position: relative;
+            height: 2rem;
+            width: 2rem;
+            margin-right: 10px;
+
+            &::before {
+                position: absolute;
+                top: -50%;
+                content: '';
+                display: block;
+                height: inherit;
+                width: inherit;
+                background-color: $color-text-main;
+                clip-path: polygon(15% 70%, 50% 50%, 85% 70%, 60% 70%, 60% 100%, 40% 100%, 40% 70%);
+            }
+
+            &::after {
+                position: absolute;
+                bottom: 12%;
+                content: '';
+                display: block;
+                height: inherit;
+                width: inherit;
+                background-color: $color-text-main;
+                clip-path: polygon(92% 71%, 78% 50%, 86% 50%, 100% 71%, 92% 100%, 8% 100%, 0 71%, 14% 50%, 22% 50%, 8% 71%, 24% 71%, 33% 87%, 67% 87%, 76% 71%);
+            }
+        }
+
+        &:hover {
+            background-color: $color-dark-3;
+            border: thin solid $color-border-dark-3;
+            cursor: pointer;
+        }
+
+        input {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+    }
 
     .message {
         min-width: 150px;
