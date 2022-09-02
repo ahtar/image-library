@@ -6,6 +6,6 @@ describe("CardNewBig.vue", () => {
     it("Рендерится", () => {
         const wrapper = mount(CardNewBig);
 
-        expect(wrapper.exists()).toBe(true);
+        expect(wrapper.find('[data-test="card-new-big"]').exists()).toBe(true);
     });
 });

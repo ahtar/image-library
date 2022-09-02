@@ -1,14 +1,17 @@
 <template>
     <div class="viewer-image-wrapper" @mouseup="moveEnd" @mousemove="move" ref="imageWrapper">
-        <img alt="Image" ref="img" @wheel="scale" @mousedown="moveStart" />
+        <image-vue :data="imgData" alt="Image" @wheel="scale" @mousedown="moveStart"/>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, onUpdated, PropType, ref } from "vue";
-import useRerenderImage from "@/composables/image-rendering";
+import ImageVue from "./Image.vue";
 
 export default defineComponent({
+    components: {
+        ImageVue
+    },
     props: {
         image: {
             type: Object as PropType<ImageSingle>,
@@ -16,11 +19,12 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { renderImage } = useRerenderImage();
         //Ref на изображение.
         const img = ref<HTMLImageElement | null>(null);
         //Ref на контейнер изображения.
         const imageWrapper = ref<HTMLElement | null>(null);
+        //Файл с изображением.
+        const imgData = ref<File | FileSystemFileHandle>();
         //Зажата ли кнопка мыши.
         let moving = false;
         //Координата предыдущего движения или клика мыши.
@@ -35,23 +39,12 @@ export default defineComponent({
         };
 
         onMounted(async () => {
-            try {
-                if (img.value != null) {
-                    await renderImage(img.value, await props.image.getImage());
-                }
-            } catch (err) {
-                console.log(err);
-            }
+            img.value = imageWrapper.value!.children[0] as HTMLImageElement;
+            imgData.value = await props.image.getImage();
         });
 
         onUpdated(async () => {
-            try {
-                if (img.value != null) {
-                    await renderImage(img.value, await props.image.getImage());
-                }
-            } catch (err) {
-                console.log(err);
-            }
+            imgData.value = await props.image.getImage();
         });
 
         //Увеличение или уменьшение изображения при прокрутке колеса мыши.
@@ -153,6 +146,7 @@ export default defineComponent({
 
         return {
             img,
+            imgData,
             imageWrapper,
             scale,
             moveStart,

@@ -15,7 +15,7 @@ describe("MenuConfirmOverlay.vue", () => {
         });
     });
 
-    it("компонент рендерится", () => {
+    it("рендерится", () => {
         expect(wrapper.html()).toContain("BUTTON.CONFIRM");
         expect(wrapper.html()).toContain("BUTTON.CANCEL");
     });

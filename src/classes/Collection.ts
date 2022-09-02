@@ -138,16 +138,24 @@ class CollectionOjbect implements Collection {
             }
         }
 
-        this.addImage(buffer);
-        console.timeEnd();
-        this.loaded = true;
-
         //Первоначальная сортировка тегов по убыванию.
         this.tags.sort((a, b) => {
             if (a.count < b.count) return 1;
             if (a.count > b.count) return -1;
             return 0;
         });
+
+        this.addImage(buffer);
+        //Первоначальная сортирвока изображений.
+        this.arr.sort((a, b) => {
+            const dateA = new Date(a.manifest.dateCreated);
+            const dateB = new Date(b.manifest.dateCreated);
+            if(dateA < dateB) return 1;
+            if(dateA > dateB) return -1;
+            return 0;
+        });
+        console.timeEnd();
+        this.loaded = true;
     }
 
     /**
@@ -206,6 +214,9 @@ class CollectionOjbect implements Collection {
      * @param image Blob с изображением.
      */
     async createImage(manifest: ImageSingleData, image: File) {
+        const img = new ImageSingle(manifest, this.handle);
+
+        console.info('Collection:createImage: ', manifest, image);
         const imageDataFolderHandle = await this.handle.getDirectoryHandle(
             "imageData",
             { create: true }
@@ -234,15 +245,14 @@ class CollectionOjbect implements Collection {
             manifest.id + ".json",
             JSON.stringify(manifest)
         );
-        await fs.writeFile(imageFileFolderHandle, manifest.fileUrl, imageBlob);
+        await fs.writeFile(imageFileFolderHandle, img.getUrl().file, imageBlob);
         await fs.writeFile(
             imageThumbnailFolderHandle,
-            manifest.previewFileUrl,
+            img.getUrl().thumbnail,
             thumbnailBlob
         );
 
         //Добавление изображения в коллекцию.
-        const img = new ImageSingle(manifest, this.handle);
         this.addImage(img);
 
         //Добавление тегов в коллекцию.
@@ -334,11 +344,11 @@ class CollectionOjbect implements Collection {
             if ("arr" in image) {
                 for (const imageSingle of image.arr) {
                     promises.push(
-                        imageFileFolderHandle.removeEntry(imageSingle.manifest.fileUrl)
+                        imageFileFolderHandle.removeEntry(imageSingle.getUrl().file)
                     );
                     promises.push(
                         imageThumbnailFolderHandle.removeEntry(
-                            imageSingle.manifest.previewFileUrl
+                            imageSingle.getUrl().thumbnail
                         )
                     );
                 }
@@ -350,10 +360,10 @@ class CollectionOjbect implements Collection {
                     imageDataFolderHandle.removeEntry(image.manifest.id + ".json")
                 );
                 promises.push(
-                    imageFileFolderHandle.removeEntry(image.manifest.fileUrl)
+                    imageFileFolderHandle.removeEntry(image.getUrl().file)
                 );
                 promises.push(
-                    imageThumbnailFolderHandle.removeEntry(image.manifest.previewFileUrl)
+                    imageThumbnailFolderHandle.removeEntry(image.getUrl().thumbnail)
                 );
             }
 
@@ -480,13 +490,13 @@ class CollectionOjbect implements Collection {
                 //Если tempImage.manifest.corrupted == false и fileUrl.includes('.dpx').
                 //То что-то работает не ток как надо, файл будет обычным png, но считаться порченным.
                 //Фикс.
-                if (
+                /*if (
                     !tempImage.manifest.corrupted &&
                     (tempImage.manifest.fileUrl.includes(".dpx") ||
                         tempImage.manifest.previewFileUrl.includes(".tpx"))
                 ) {
                     tempImage.manifest.corrupted = true;
-                }
+                }*/
 
                 //Порча нового blob, если это необходимо.
                 if (tempImage.manifest.corrupted) {
@@ -496,12 +506,12 @@ class CollectionOjbect implements Collection {
 
                 const imageHandle = await fs.writeFile(
                     imageFolderHandle,
-                    tempImage.manifest.fileUrl,
+                    tempImage.getUrl().file,
                     blobImage
                 );
                 const thumbnailHandle = await fs.writeFile(
                     thumbnailFolderHandle,
-                    tempImage.manifest.previewFileUrl,
+                    tempImage.getUrl().thumbnail,
                     blobThumbnail
                 );
 
@@ -575,6 +585,23 @@ class CollectionOjbect implements Collection {
         }
 
         async function __corrupt(image: ImageSingle) {
+            const oldUrl = image.getUrl();
+            /*try {
+                imageBuffer = await (
+                    await (await image.getImage()).getFile()
+                ).arrayBuffer();
+
+                thumbnailBuffer = await (
+                    await (await image.getThumbnail()).getFile()
+                ).arrayBuffer();
+
+            } catch (err) {
+                console.log('image.manifest.corrupted inconsistency');
+                image.manifest.corrupted = corrupt;
+                manifestChanged = true;
+                return;
+            }*/
+
             const imageBuffer = await (
                 await (await image.getImage()).getFile()
             ).arrayBuffer();
@@ -586,9 +613,11 @@ class CollectionOjbect implements Collection {
             const imageCorrupted = await crypto.isCorrupted(imageBuffer);
             const thumbnailCorrupted = await crypto.isCorrupted(thumbnailBuffer);
 
-            //Изображение испорчено.
+            //Превью или изображение испорчены.
             if (imageCorrupted || thumbnailCorrupted) {
                 if (corrupt) {
+                    //Изображения испорчены, но это не указано в manifest файле.
+                    //Исправление manifest файла.
                     if (!image.manifest.corrupted) {
                         image.manifest.corrupted = true;
                         manifestChanged = true;
@@ -596,34 +625,33 @@ class CollectionOjbect implements Collection {
                     return;
                 }
 
-                //Восстановление испорченного изображения
                 image.manifest.corrupted = false;
                 manifestChanged = true;
 
+                //Восстановление изображения.
                 if (imageCorrupted) {
                     const imageNewData = await crypto.recover(imageBuffer);
-                    promises.push(imageFolderHandle.removeEntry(image.manifest.fileUrl));
-                    image.manifest.fileUrl = image.manifest.id + ".png";
+                    promises.push(imageFolderHandle.removeEntry(oldUrl.file));
                     promises.push(
                         fs.writeFile(
                             imageFolderHandle,
-                            image.manifest.fileUrl,
+                            image.getUrl().file,
                             imageNewData
                         )
                     );
                     image.imageHandle = null;
                 }
 
+                //Восстановление превью.
                 if (thumbnailCorrupted) {
                     const thumbnailNewData = await crypto.recover(thumbnailBuffer);
                     promises.push(
-                        thumbnailFolderHandle.removeEntry(image.manifest.previewFileUrl)
+                        thumbnailFolderHandle.removeEntry(oldUrl.thumbnail)
                     );
-                    image.manifest.previewFileUrl = image.manifest.id + ".png";
                     promises.push(
                         fs.writeFile(
                             thumbnailFolderHandle,
-                            image.manifest.previewFileUrl,
+                            image.getUrl().thumbnail,
                             thumbnailNewData
                         )
                     );
@@ -635,34 +663,33 @@ class CollectionOjbect implements Collection {
 
             //Изображение не испорчено
             if (corrupt) {
-                //Порча обычного изображения
                 image.manifest.corrupted = true;
                 manifestChanged = true;
 
+                //Порча изображения.
                 if (!imageCorrupted) {
                     const imageNewData = await crypto.corrupt(imageBuffer);
-                    promises.push(imageFolderHandle.removeEntry(image.manifest.fileUrl));
-                    image.manifest.fileUrl = image.manifest.id + ".dpx";
+                    promises.push(imageFolderHandle.removeEntry(oldUrl.file));
                     promises.push(
                         fs.writeFile(
                             imageFolderHandle,
-                            image.manifest.fileUrl,
+                            image.getUrl().file,
                             imageNewData
                         )
                     );
                     image.imageHandle = null;
                 }
 
+                //Порча превью.
                 if (!thumbnailCorrupted) {
                     const thumbnailNewData = await crypto.corrupt(thumbnailBuffer);
                     promises.push(
-                        thumbnailFolderHandle.removeEntry(image.manifest.previewFileUrl)
+                        thumbnailFolderHandle.removeEntry(oldUrl.thumbnail)
                     );
-                    image.manifest.previewFileUrl = image.manifest.id + ".tpx";
                     promises.push(
                         fs.writeFile(
                             thumbnailFolderHandle,
-                            image.manifest.previewFileUrl,
+                            image.getUrl().thumbnail,
                             thumbnailNewData
                         )
                     );

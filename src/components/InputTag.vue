@@ -1,7 +1,7 @@
 <template>
     <div class="tag-input-wrapper" ref="input">
         <input-text :important="true" :label="t('LABEL.TAGS')" :placeholder="t('PLACEHOLDER.TAGS')" :active="true"
-            class="input-tag" v-model="item" @enterKey="createTag" @quickSuggestion="quickSuggestion"
+            class="input-tag" v-model.trim="item" @enterKey="createTag" @quickSuggestion="quickSuggestion"
             :tabindex="tabindex" />
         <div class="tag-container">
             <div class="container">

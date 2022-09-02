@@ -11,7 +11,7 @@
                         :active="false" :placeholder="t('PLACEHOLDER.ID')" />
                 </div>
                 <input-tags class="section-wrapper" :tags="store.form.tags" :definedTags="definedTags" @add="addTag"
-                    @remove="removeTagHandler" data-test="input-tags" />
+                    @remove="removeTag" data-test="input-tags" />
                 <div class="buttons section-wrapper">
                     <button-small @click="store.clearForm" data-test="form-clear">{{ t('BUTTON.CLEAR') }}</button-small>
                     <button-small @click="store.submitImage" :blocked="saveButtonBlocked" data-test="form-save">
@@ -79,13 +79,14 @@ export default defineComponent({
             return false;
         });
 
-        //Теги прошлого созданного изображения.
+        //Предложенные теги, использованные в создании предыдущего изображения.
         const oldTagsCopy = computed(() => {
             return props.priorTags.filter((t) => !store.form.tags.includes(t.name))
         });
 
         setTagRef(ref(store.form.tags));
 
+        //Вставка изображения.
         async function imagePasteEvent(data: File) {
             store.form.file = data;
             store.urlInputActive = false;
@@ -93,27 +94,15 @@ export default defineComponent({
             setHash(store.form.hash);
         }
 
+        //Добавление тега через окно с прошлыми тегами.
         function reuseOldTag(i: number) {
             addTag(oldTagsCopy.value[i]);
-            oldTagsCopy.value.splice(i, 1);
-        }
-
-        function removeTagHandler(tag: Tag | string, index: number) {
-            removeTag(tag, index);
-
-            //Возвращает удаленный тег в массив с тегами из прошлого изображения.
-            if (typeof tag == "string") {
-                const t = props.priorTags.find((t) => t.name == tag);
-                if (t && !oldTagsCopy.value.includes(t)) {
-                    oldTagsCopy.value.push(t);
-                }
-            }
         }
 
         return {
             store,
             addTag,
-            removeTagHandler,
+            removeTag,
             imagePasteEvent,
             doublicateImages,
             haveDoubles,
@@ -172,6 +161,11 @@ export default defineComponent({
     .buttons {
         display: flex;
         justify-content: space-around;
+        
+        .button-small {
+            flex-grow: 1;
+            margin: 2px;
+        }
     }
 
     .similar-images {

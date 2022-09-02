@@ -3,21 +3,22 @@ import { computed, ref, watch } from "vue";
 
 export default function () {
     const collectionsStore = useCollections();
-    //изображения в текущей коллекции
+
+    //ИЗображения активной коллекции.
     const images = ref(collectionsStore.activeCollection!.arr);
 
-    //хэш проверяемого изображения
+    //Хэш проверяемого изображения.
     const hash = ref<string | null>(null);
 
-    //схожие изображения
+    //Схожие изображения.
     const doublicateImages = ref<Array<ImageSingle>>([]);
 
+    //Есть ли схожие изображения.
     const haveDoubles = computed(() => {
         return doublicateImages.value.length != 0;
     });
-    /**
-     * При изменении хэша получение схожих изображений.
-     */
+
+    //Поиск схожих изображений при изменении хеша.
     watch(
         () => hash.value,
         (newHash) => {
@@ -48,13 +49,19 @@ export default function () {
     );
 
     /**
-     * Устанавливает хэш проверяемого изображения для поиска похожих изображений.
+     * Изменение хеша проверяемого изображения.
      * @param s Хэш строка.
      */
     function setHash(s: string) {
         hash.value = s;
     }
 
+    /**
+     * Сравнение 2 хешей
+     * @param s1 Первый хеш.
+     * @param s2 Второй хеш.
+     * @returns значение от 0 до 1.
+     */
     function hammingDistance(s1: string, s2: string) {
         let counter = 0;
         for (let k = 0; k < s1.length; k++) {

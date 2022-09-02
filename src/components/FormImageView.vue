@@ -4,16 +4,18 @@
             <select-image :set="(image as ImageSet).arr" @change="changeImage" data-test="form-view-select" />
         </div>
         <div class="image-wrapper wrapper">
-            <viewer-image :image="renderedImage!" data-test="form-view-viewer" />
+            <video-player-vue v-if="isVideo" :data="renderedImage"/>
+            <viewer-image :image="renderedImage!" data-test="form-view-viewer" v-else/>
         </div>
     </modal-dark>
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref } from "vue";
+import { computed, defineComponent, onBeforeMount, ref } from "vue";
 import ModalDark from "@/components/ModalDark.vue";
 import SelectImage from "@/components/SelectImage.vue";
-import ViewerImage from "@/components/ViewerImage.vue";
+import ViewerImage from "@/components/ImageViewer.vue";
+import VideoPlayerVue from "./VideoPlayer.vue";
 import { useImageViewStore } from "@/store/forms/form-image-view";
 
 export default defineComponent({
@@ -21,12 +23,17 @@ export default defineComponent({
         ModalDark,
         SelectImage,
         ViewerImage,
+        VideoPlayerVue,
     },
     setup() {
         const store = useImageViewStore();
 
         const img = ref<null | HTMLImageElement>(null);
         const renderedImage = ref<ImageSingle | null>(null);
+        const isVideo = computed(() => {
+            if (!renderedImage.value?.manifest.type) return false;
+            return /video\/\S*/g.test(renderedImage.value.manifest.type);
+        });
 
         onBeforeMount(() => {
             if ("arr" in store.image!) {
@@ -49,6 +56,7 @@ export default defineComponent({
             renderedImage,
             img,
             changeImage,
+            isVideo,
         };
     },
 });

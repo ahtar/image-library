@@ -19,6 +19,10 @@ describe("InputChecbox.vue", () => {
         jest.clearAllMocks();
     });
 
+    it('рендерится', () => {
+        expect(wrapper.find('[class="input-checkbox-wrapper"]').exists()).toBe(true);
+    });
+
     it("label отображается", () => {
         expect(wrapper.text()).toBe("test label");
     });

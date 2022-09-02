@@ -16,9 +16,6 @@ jest.mock("@/classes/ImageSingle");
 jest.mock("@/composables/image-rendering");
 jest.mock("@/composables/clipboard");
 
-globalThis.URL.createObjectURL = jest.fn();
-globalThis.URL.revokeObjectURL = jest.fn();
-
 describe("FormImageEdit.vue", () => {
 
     let wrapper: VueWrapper<any>;
@@ -49,6 +46,10 @@ describe("FormImageEdit.vue", () => {
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    it('рендерится', () => {
+        expect(wrapper.find('[data-test="form-edit-close"]').exists()).toBe(true);
     });
 
     it("изменение изображения отменяется при нажатии за границу формы", async () => {
@@ -127,7 +128,45 @@ describe("FormImageEdit.vue", () => {
         expect((store.image as ImageSingle).manifest.tags.length).toBe(1);
     });
 
-    describe('', () => {
+    it("Новое изображение вставляется", async () => {
+        const store = useImageEditStore();
+        const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
+        jest.spyOn(store, "changeImageFile");
+        
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$forceUpdate();
+
+        const fileUrl = wrapper.find<HTMLImageElement>(
+            '[data-test="form-edit-image"] img'
+        ).element.src;
+
+        expect(fileUrl).not.toBe("");
+
+        await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' }));
+
+        expect(
+            wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
+                .element.src
+        ).not.toBe(fileUrl);
+        expect(store.changeImageFile).toBeCalledTimes(1);
+    });
+
+    it('новое видео вставляется', async () => {
+        const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
+
+        //Изначально отображается изображение
+        expect(wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img').element.src).toBeTruthy();
+        expect(wrapper.find<HTMLVideoElement>('video').exists()).toBeFalsy();
+
+        //Пользователь вставляет видео
+        await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.mp4', { type: 'video/mp4' }));
+
+        //Теперь вместо изображения отображается видео
+        expect(wrapper.find<HTMLSourceElement>('source').element.src).toBeTruthy();
+        expect(wrapper.find<HTMLImageElement>('img').exists()).toBeFalsy();
+    });
+
+    describe('работа с сетом', () => {
         let wrapper: VueWrapper<any>;
         let image: ImageSet;
         let collection: Collection;
@@ -162,6 +201,7 @@ describe("FormImageEdit.vue", () => {
             let imgSrc = wrapper.find<HTMLImageElement>(
                 '[data-test="form-edit-image"] img'
             ).element.src;
+
             let firstTag = wrapper
                 .find<HTMLElement>('[data-test="tag-container"]')
                 .text();
@@ -285,29 +325,6 @@ describe("FormImageEdit.vue", () => {
                 wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
                     .element.src
             ).not.toBe(firstImageSrc);
-        });
-
-        it("Новое изображение вставляется", async () => {
-            const store = useImageEditStore();
-            const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
-            jest.spyOn(store, "changeImageFile");
-            
-            await wrapper.vm.$nextTick();
-            await wrapper.vm.$forceUpdate();
-
-            const fileUrl = wrapper.find<HTMLImageElement>(
-                '[data-test="form-edit-image"] img'
-            ).element.src;
-
-            expect(fileUrl).not.toBe("");
-
-            await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' }));
-
-            expect(
-                wrapper.find<HTMLImageElement>('[data-test="form-edit-image"] img')
-                    .element.src
-            ).not.toBe(fileUrl);
-            expect(store.changeImageFile).toBeCalledTimes(1);
         });
     })
 });

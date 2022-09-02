@@ -6,6 +6,17 @@ import MessageNotification from "@/components/MessageNotification.vue";
 import { useNotificationStore } from "@/store/modals/modal-notification";
 
 describe("MessageNotification.vue", () => {
+
+    it('рендерится', () => {
+        const wrapper = mount(MessageNotification, {
+            global: {
+                plugins: [createTestingPinia({})],
+            },
+        });
+
+        expect(wrapper.find('[class="notification-container"]').exists()).toBe(true);
+    });
+
     it("Оповещения рендерятся", async () => {
         const wrapper = mount(MessageNotification, {
             global: {

@@ -13,6 +13,7 @@
     "BUTTON.SET_SEPARATE": "Отделить изображение от сета",
     "BUTTON.PICK_FOLDER": "Выбрать папку",
     "BUTTON.CREATE_SET": "Создать сет",
+    "BUTTON.INPUT_FILE": "Выбрать файл...",
     "INPUT_IMAGE.MESSAGE": "Вставь изображение",
     "LABEL.NAME": "Название",
     "LABEL.URL": "Ссылка",

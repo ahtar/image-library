@@ -13,9 +13,6 @@ jest.mock("@/composables/clipboard");
 jest.mock("@/modules/jimp.ts");
 jest.mock("@/composables/image-rendering");
 
-globalThis.URL.createObjectURL = jest.fn();
-globalThis.URL.revokeObjectURL = jest.fn();
-
 describe("FormCollectionEdit", () => {
 
     let wrapper: VueWrapper<any>;
@@ -46,6 +43,10 @@ describe("FormCollectionEdit", () => {
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    it('рендерится', () => {
+        expect(wrapper.find('[data-test="collection-edit-wrapper"]').exists()).toBe(true);
     });
 
     it("форма закрывается", async () => {
@@ -105,6 +106,20 @@ describe("FormCollectionEdit", () => {
 
         expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe("");
         expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe(imgSrc);
+    });
+
+    it('видео не вставляется', async () => {
+        const imgSrc = wrapper.find<HTMLImageElement>("img").element.src;
+        const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
+
+        expect(imgSrc).not.toBe("");
+
+        //пользователь загружает файл
+        await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.mp4', { type: 'video/mp4' }));
+
+        //src изображения не меняется
+        expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe("");
+        expect(wrapper.find<HTMLImageElement>("img").element.src).toBe(imgSrc);
     });
 
     it("изменения в коллекции сохраняются", async () => {

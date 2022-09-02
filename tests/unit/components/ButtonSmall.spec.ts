@@ -14,6 +14,10 @@ describe("ButtonSmall.vue", () => {
         });
     });
 
+    it('рендерится', () => {
+        expect(wrapper.find('button').exists()).toBe(true);
+    });
+
     it("Рендерит slot", () => {
         expect(wrapper.text()).toContain("Hello World");
     });

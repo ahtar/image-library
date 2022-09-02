@@ -23,6 +23,10 @@ describe("InputTag.vue", () => {
         jest.clearAllMocks();
     });
 
+    it('рендерится', () => {
+        expect(wrapper.find('[class="tag-input-wrapper"]').exists()).toBe(true);
+    });
+
     it("теги отображаются", async () => {
         for (const tag of wrapper.props().tags) {
             expect(wrapper.html()).toContain(tag);

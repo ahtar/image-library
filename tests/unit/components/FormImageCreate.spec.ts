@@ -13,9 +13,6 @@ jest.mock("@/composables/clipboard");
 jest.mock("@/modules/jimp.ts");
 jest.mock("@/composables/image-rendering");
 
-globalThis.URL.createObjectURL = jest.fn();
-globalThis.URL.revokeObjectURL = jest.fn();
-
 describe("FormImageCreate.vue", () => {
 
     let wrapper: VueWrapper<any>;
@@ -45,6 +42,10 @@ describe("FormImageCreate.vue", () => {
     afterEach(() => {
         jest.clearAllMocks();
     })
+
+    it('рендерится', () => {
+        expect(wrapper.find('[data-test="modal"]').exists()).toBe(true);
+    });
 
     it("Теги Добавляются", async () => {
         const storeImages = useImageCreateStore();
@@ -92,35 +93,22 @@ describe("FormImageCreate.vue", () => {
 
     it("изображение вставляется", async () => {
         const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
-        const storeImages = useImageCreateStore();
-
-        expect(storeImages.form.file).not.toBeDefined();
 
         //пользователь загружает файл
         await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' }));
 
         expect(wrapper.findComponent(InputImage).emitted().paste).toBeDefined();
-        expect(storeImages.form.file).toBeDefined();
+        expect(wrapper.find<HTMLImageElement>('img').element.src).toBeTruthy();
     });
 
-    it("изображение рендерится, если оно вставлено", async () => {
-        const storeImages = useImageCreateStore();
+    it("видео вставляется", async () => {
+        const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
 
-        //изначально img.src Должен быть не задан
-        expect(
-            wrapper.find<HTMLImageElement>('[data-test="input-image"] img').element
-                .src
-        ).toBe("");
+        //пользователь загружает файл
+        await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.mp4', { type: 'video/mp4' }));
 
-        //Вставляем изображение
-        storeImages.form.file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
-        await wrapper.vm.$nextTick();
-
-        //img.src Должен обновиться
-        expect(
-            wrapper.find<HTMLImageElement>('[data-test="input-image"] img').element
-                .src
-        ).not.toBe("");
+        expect(wrapper.findComponent(InputImage).emitted().paste).toBeDefined();
+        expect(wrapper.find<HTMLSourceElement>('source').element.src).toBeTruthy();
     });
 
     it("форма сохраняется, если изображение вставлено", async () => {

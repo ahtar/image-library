@@ -1,11 +1,13 @@
 <template>
     <div class="input-image" ref="imageField" :tabindex="tabindex">
-        <img ref="image" />
-
+        <div class="media-wrapper">
+            <video-player-vue class="video" :data="fileData" v-if="isVideo" />
+            <image-vue :data="imageData" v-else />
+        </div>
         <label for="input-file" class="input-file">
             <div class="icon" />
-            <p>Choose a file...</p>
-            <input type="file" id="input-file" ref="input" accept="image/*,video/*" @input="fileInput($event)"
+            <p>{{ t('BUTTON.INPUT_FILE') }}</p>
+            <input type="file" id="input-file" ref="input" :accept="acceptString" @input="fileInput($event)"
                 data-test="input-file" />
         </label>
     </div>
@@ -14,18 +16,21 @@
 <script lang="ts">
 import {
     defineComponent,
-    onBeforeUnmount,
-    onMounted,
     ref,
-    watch,
     PropType,
+    watchEffect,
+    computed,
 } from "vue";
-import useImageRendering from "@/composables/image-rendering";
-import useContextMenu from "@/composables/context-menu";
+import VideoPlayerVue from "@/components/VideoPlayer.vue";
+import ImageVue from "./Image.vue";
 
 import { useI18n } from "vue-i18n";
 
 export default defineComponent({
+    components: {
+        VideoPlayerVue,
+        ImageVue,
+    },
     props: {
         tabindex: {
             type: Number,
@@ -36,8 +41,17 @@ export default defineComponent({
             defalut: true,
         },
         fileData: {
-            type: Object as PropType<File | FileSystemFileHandle>,
+            type: Object as PropType<File | FileSystemFileHandle | ImageSingle>,
         },
+        acceptImage: {
+            type: Boolean,
+            default: true
+        },
+        acceptVideo: {
+            type: Boolean,
+            default: true
+        }
+
     },
 
     emits: {
@@ -46,64 +60,86 @@ export default defineComponent({
 
     setup(props, { emit }) {
         const imageField = ref<HTMLElement>();
-        const image = ref<HTMLImageElement>();
+        const imageData = ref<File>();
         const input = ref<HTMLInputElement>();
-        const imageActive = ref(false);
+        const isVideo = ref(false);
         const { t } = useI18n();
 
-        const { renderImage } = useImageRendering();
-        const {
-            contextMenuActive,
-            contextMenuEvent,
-            contextMenuOpen,
-            contextMenuClose,
-        } = useContextMenu();
+        const acceptString = computed(() => {
+            const str = [];
+            if(props.acceptImage) str.push('image/*');
+            if(props.acceptVideo) str.push('video/*');
+            return str.join(',');
+        });
 
-        //Реагирование на изменение blob
-        //Перерисовка изображения.
-        watch(
-            () => props.fileData,
-            (newData) => {
-                renderImage(image.value!, props.fileData);
-                if (props.fileData != undefined) {
-                    imageActive.value = true;
-                } else {
-                    imageActive.value = false;
+        watchEffect(async () => {
+            const data = props.fileData;
+
+            //ImageSingle
+            if (data != undefined && 'getImage' in data) {
+                const handle = await data.getImage();
+                const file = await handle.getFile();
+                imageData.value = file;
+
+                if (/video\/\S*/g.test(data.manifest.type)) {
+                    isVideo.value = true;
+                    return;
                 }
+                isVideo.value = false;
+                return;
             }
-        );
 
-        //Инициализация.
-        onMounted(() => {
-            if (props.fileData) {
-                renderImage(image.value!, props.fileData);
-                imageActive.value = true;
+            //FileSystemFileHandle
+            if (data != undefined && 'getFile' in data) {
+                const file = await data.getFile();
+                imageData.value = file;
+
+                if (/video\/\S*/g.test(file.type)) {
+                    isVideo.value = true;
+                    return;
+                }
+                isVideo.value = false;
+                return;
             }
+
+            //File
+            if (data != undefined) {
+                imageData.value = data;
+                if (/video\/\S*/g.test(data.type)) {
+                    isVideo.value = true;
+                    return;
+                }
+                isVideo.value = false;
+                return;
+            }
+
+            //undefined
+            isVideo.value = false;
+            imageData.value = data;
+            return;
         });
 
-        onBeforeUnmount(() => {
-            URL.revokeObjectURL(image.value!.src);
-        });
 
 
         function fileInput(e: Event) {
             if (input.value!.files?.length == 1) {
                 const file = input.value!.files[0];
+
+                //Сброс выбранного файла в input элементе,
+                //чтобы этот же файл можно было выбрать ещё раз
+                input.value!.value = '';
+
                 emit("paste", file);
             }
         }
 
         return {
             imageField,
-            image,
+            imageData,
             input,
-            imageActive,
             fileInput,
-
-            contextMenuActive,
-            contextMenuOpen,
-            contextMenuClose,
-            contextMenuEvent,
+            isVideo,
+            acceptString,
             t
         };
     },
@@ -115,6 +151,11 @@ export default defineComponent({
     line-height: 0;
     @include z-depth();
     @include focus();
+
+    .media-wrapper {
+        display: flex;
+        justify-content: center;
+    }
 
     .input-file {
         line-height: normal;
@@ -200,6 +241,11 @@ export default defineComponent({
 
     & img {
         display: block;
+        max-height: 90vh;
+        max-width: 40vw;
+    }
+
+    .video {
         max-height: 90vh;
         max-width: 40vw;
     }

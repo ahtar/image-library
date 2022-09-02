@@ -17,6 +17,10 @@ describe("MenuContext.vue", () => {
             attachTo: document.body,
         });
     });
+
+    it('рендерится', () => {
+        expect(wrapper.find('[class="context-menu"]').exists()).toBe(true);
+    });
     
     it("slot рендерится", async () => {
         const wrapper = mount(MenuContext, {

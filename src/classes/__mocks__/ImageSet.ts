@@ -5,8 +5,8 @@ const mockClass = jest.fn(() => {
     return {
         manifest: {
             id: (Math.random().toString(36) + "00000000000000000").slice(2, 8),
-            dateCreated: "mock dateCreated",
-            dateEdited: "mock dateEdited",
+            dateCreated: Date(),
+            dateEdited: Date(),
         },
         arr: [
             new ImageSingle({} as any, {} as any),

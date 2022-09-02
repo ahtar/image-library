@@ -17,6 +17,10 @@ describe("ModalDark.vue", () => {
             },
         });
     });
+
+    it('рендерится', () => {
+        expect(wrapper.find('[data-test="modal-dark"]').exists()).toBe(true);
+    });
     
     it("slot рендерится", () => {
         expect(wrapper.html()).toContain("test content");

@@ -1,5 +1,5 @@
 <template>
-    <base-card class="card-image-small">
+    <base-card class="card-image-small" data-test="card-image-small">
         <img ref="imgRef" src="@/assets/Error.png" />
         <div class="set-symbol" v-if="isSet" data-test="card-image-small-set" />
     </base-card>

@@ -36,6 +36,10 @@ describe("FormImageView.vue", () => {
         jest.clearAllMocks();
     });
 
+    it('рендерится', () => {
+        expect(wrapper.find('[data-test="form-view-close"]').exists()).toBe(true);
+    });
+
     it("форма закрывается, если нажать за границу окна", async () => {
         const store = useImageViewStore();
         jest.spyOn(store, "close");

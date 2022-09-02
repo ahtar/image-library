@@ -4,4 +4,5 @@ module.exports = {
     "^.+\\.vue$": "@vue/vue3-jest"
   },
   verbose: false,
+  setupFiles: ['./tests/unit/setup.ts'],
 };

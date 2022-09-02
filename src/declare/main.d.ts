@@ -73,6 +73,10 @@ interface ImageSingle {
     saveState(): void;
     restoreState(): void;
     checkChanges(): boolean;
+    getUrl(): {
+        file: string;
+        thumbnail: string;
+    }
 }
 
 interface ImageSet {
@@ -93,8 +97,8 @@ abstract interface ImageManifest {
 interface ImageSingleData extends ImageManifest {
     hash: string;
     tags: Array<string>;
-    fileUrl: string;
-    previewFileUrl: string;
+    //MIME type файла.
+    type: string;
     description?: string;
     corrupted?: boolean;
 }

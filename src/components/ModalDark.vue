@@ -1,5 +1,5 @@
 <template>
-    <base-modal class="modal-dark" @close="close">
+    <base-modal class="modal-dark" @close="close" data-test="modal-dark">
         <slot />
     </base-modal>
 </template>

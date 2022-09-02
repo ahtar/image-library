@@ -2,8 +2,7 @@ interface Options {
     id: string;
     hash: string;
     tags: string[];
-    fileUrl: string;
-    previewFileUrl: string;
+    type: string;
     dateEdited?: string | undefined;
     dateCreated: string;
     description?: string | undefined;
@@ -23,14 +22,31 @@ class ImageSingleObject implements ImageSingle {
             id: options.id,
             hash: options.hash,
             tags: options.tags,
-            fileUrl: options.fileUrl,
-            previewFileUrl: options.previewFileUrl,
             dateCreated: options.dateCreated,
             description: options.description,
             dateEdited: options.dateEdited,
             corrupted: options.corrupted,
+            type: options.type
         };
         this.collectionHandle = handle;
+    }
+
+    getUrl() {
+        let file = '';
+        let thumbnail = '';
+
+        if (this.manifest.corrupted) {
+            file = this.manifest.id + '.dpx';
+            thumbnail = this.manifest.id + '.tpx';
+        } else {
+            file = this.manifest.id + '.' + this.manifest.type.split('/')[1];
+            thumbnail = this.manifest.id + '.png';
+        }
+
+        return {
+            file,
+            thumbnail
+        }
     }
 
     /**
@@ -40,7 +56,7 @@ class ImageSingleObject implements ImageSingle {
         const folderHandle = await this.collectionHandle.getDirectoryHandle(
             "images"
         );
-        this.imageHandle = await folderHandle.getFileHandle(this.manifest.fileUrl);
+        this.imageHandle = await folderHandle.getFileHandle(this.getUrl().file);
     }
 
     /**
@@ -50,9 +66,7 @@ class ImageSingleObject implements ImageSingle {
         const folderHandle = await this.collectionHandle.getDirectoryHandle(
             "thumbnails"
         );
-        this.thumbnailHandle = await folderHandle.getFileHandle(
-            this.manifest.previewFileUrl
-        );
+        this.thumbnailHandle = await folderHandle.getFileHandle(this.getUrl().thumbnail);
     }
 
     /**

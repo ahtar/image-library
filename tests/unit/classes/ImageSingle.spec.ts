@@ -9,8 +9,7 @@ describe("ImageSingle.ts", () => {
             id: "mock id",
             hash: "mock hash",
             tags: ["mock tag 1", "mock tag 2"],
-            fileUrl: "mock fileUrl",
-            previewFileUrl: "mock previewFileUrl",
+            type: 'image/png',
             dateCreated: "mock dateCreated",
             dateEdited: "mock dateEdited",
             description: "mock description",
@@ -27,8 +26,7 @@ describe("ImageSingle.ts", () => {
             id: "mock id",
             hash: "mock hash",
             tags: ["mock tag 1", "mock tag 2"],
-            fileUrl: "mock fileUrl",
-            previewFileUrl: "mock previewFileUrl",
+            type: 'image/png',
             dateCreated: "mock dateCreated",
             dateEdited: "mock dateEdited",
             description: "mock description",
@@ -38,8 +36,6 @@ describe("ImageSingle.ts", () => {
         expect(image.manifest.id).toBe(options.id);
         expect(image.manifest.hash).toBe(options.hash);
         expect(image.manifest.tags.length).toBe(options.tags.length);
-        expect(image.manifest.fileUrl).toBe(options.fileUrl);
-        expect(image.manifest.previewFileUrl).toBe(options.previewFileUrl);
         expect(image.manifest.dateCreated).toBe(options.dateCreated);
         expect(image.manifest.dateEdited).toBe(options.dateEdited);
         expect(image.manifest.description).toBe(options.description);

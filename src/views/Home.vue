@@ -1,7 +1,7 @@
 <template>
     <div class="home">
         <div class="block">
-            <card-new-big @click="storeCollectionCreate.open" data-test="home-card-new"/>
+            <card-new-big @click="storeCollectionCreate.open" data-test="home-card-new" />
             <router-link :to="link(collection)" v-for="(collection, i) in store.collections" :key="i"
                 @contextmenu="contextMenuOpen(collection, $event)">
                 <card-collection-big :fileHandle="collection.thumbnail" />
@@ -19,8 +19,9 @@
 
     <transition-fade>
         <menu-context :event="contextMenuEvent!" v-if="contextMenuActive" @close="contextMenuClose">
-            <div @click="editCollection">{{t('BUTTON.EDIT')}}</div>
-            <div @click="deleteCollection">{{t('BUTTON.DELETE')}}</div>
+            <div @click="editCollection">{{ t('BUTTON.EDIT') }}</div>
+            <div @click="deleteCollection">{{ t('BUTTON.DELETE') }}</div>
+            <div @click="convert">Конвертировать</div>
         </menu-context>
     </transition-fade>
 </template>
@@ -85,6 +86,28 @@ export default defineComponent({
             });
         }
 
+        function convert() {
+            contextMenuAction<Collection>(async (item) => {
+                /*if (!item.loaded) await item.initLoadCollection();
+
+                for (const imageObject of item.arr) {
+                    const obj: ImageUpdateData = { manifest: true };
+                    if ('arr' in imageObject) {
+                        for(const imageSingle of imageObject.arr) {
+                            imageSingle.manifest.type = 'image/png';
+                        }
+                        await item.updateImage(imageObject, obj);
+                    }
+                    else {
+                        imageObject.manifest.type = 'image/png';
+                        await item.updateImage(imageObject, obj);
+                    }
+                }*/
+
+                console.info('conversion complete!', item);
+            });
+        }
+
         return {
             store,
             storeCollectionCreate,
@@ -97,7 +120,9 @@ export default defineComponent({
             contextMenuActive,
             contextMenuClose,
             contextMenuOpen,
-            t
+            t,
+
+            convert,
         };
     },
 });

@@ -10,10 +10,9 @@ jest.mock("@/classes/ImageSingle");
 jest.mock("@/composables/image-rendering");
 
 describe("SelectImage.vue", () => {
-    /*let wrapper: VueWrapper<any>;
 
-   beforeEach(() => {
-        wrapper = mount(SelectImage, {
+    it('рендерится', () => {
+        const wrapper = mount(SelectImage, {
             global: {
                 plugins: [createTestingPinia({})],
             },
@@ -24,9 +23,10 @@ describe("SelectImage.vue", () => {
                     new ImageSingle({} as any, {} as any),
                 ],
             },
-            attachTo: document.body,
         });
-    });*/
+
+        expect(wrapper.find('[class="select-images"]').exists()).toBe(true);
+    });
     
     it("Полученный сет рендерится", async () => {
         const wrapper = mount(SelectImage, {

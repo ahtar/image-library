@@ -1,5 +1,5 @@
 <template>
-    <base-card class="card-tag-small">
+    <base-card class="card-tag-small" data-test="card-tag-small">
         {{ content }}
     </base-card>
 </template>

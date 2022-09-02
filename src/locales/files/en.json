@@ -13,6 +13,7 @@
     "BUTTON.SET_SEPARATE": "Separate an image from a set",
     "BUTTON.PICK_FOLDER": "Select folder",
     "BUTTON.CREATE_SET": "Create set",
+    "BUTTON.INPUT_FILE": "Choose a File...",
     "INPUT_IMAGE.MESSAGE": "Input image",
     "LABEL.NAME": "Name",
     "LABEL.URL": "Url",

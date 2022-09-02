@@ -1,5 +1,5 @@
 <template>
-    <base-card class="card-new-big" tabindex="0" />
+    <base-card class="card-new-big" tabindex="0" data-test="card-new-big"/>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";

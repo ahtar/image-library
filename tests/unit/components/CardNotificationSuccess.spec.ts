@@ -13,6 +13,10 @@ describe("CardNotificationSuccess.vue", () => {
         });
     })
 
+    it('рендерится', () => {
+        expect(wrapper.find('[class="wrapper"]').exists()).toBe(true);
+    });
+
     it("рендерит текст, полученный из  props.message", () => {
         expect(wrapper.html()).toContain("Hello World");
     });

@@ -20,7 +20,7 @@
         </div>
 
         <div class="image-wrapper wrapper">
-            <input-image :active="true" :fileData="data.file!" @paste="imagePasteEvent" data-test="collection-edit-image" />
+            <input-image :active="true" :acceptVideo="false" :fileData="data.file!" @paste="imagePasteEvent" data-test="collection-edit-image" />
         </div>
     </modal-dark>
 </template>
@@ -54,6 +54,7 @@ export default defineComponent({
         });
 
         async function imagePasteEvent(data: File) {
+            if(!data.type.includes('image')) return;
             store.form.file = data;
         }
 
@@ -97,6 +98,11 @@ export default defineComponent({
         flex-direction: row;
         width: 96%;
         justify-content: space-around;
+
+        .button-small {
+            flex-grow: 1;
+            margin: 2px;
+        }
     }
 }
 

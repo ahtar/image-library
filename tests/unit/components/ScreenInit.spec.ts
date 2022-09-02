@@ -8,6 +8,20 @@ import { useInitStore } from "@/store/modals/modal-init";
 jest.mock("@/modules/file-system");
 
 describe("ScreenInit.vue", () => {
+    it('рендерится', () => {
+        const pinia = createTestingPinia();
+        const store = useInitStore();
+        (store.checkCompatibility as any) = true;
+
+        const wrapper = mount(ScreenInit, {
+            global: {
+                plugins: [pinia],
+            },
+        });
+
+        expect(wrapper.find('[data-test="screen-init"]').exists()).toBe(true);
+    });
+
     it("Компонент активен, если браузер поддерживает функционал.", () => {
         const pinia = createTestingPinia();
         const store = useInitStore();

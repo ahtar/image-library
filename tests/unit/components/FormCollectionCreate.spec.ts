@@ -12,9 +12,6 @@ import { useCollectionCreateStore } from "@/store/forms/form-collection-create";
 jest.mock("@/composables/clipboard");
 jest.mock("@/composables/image-rendering");
 
-globalThis.URL.createObjectURL = jest.fn();
-globalThis.URL.revokeObjectURL = jest.fn();
-
 describe("FormCollectionCreate.vue", () => {
     let wrapper: VueWrapper<any>;
 
@@ -28,6 +25,10 @@ describe("FormCollectionCreate.vue", () => {
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    it('рендерится', () => {
+        expect(wrapper.find('[data-test="collection-create-wrapper"]').exists()).toBe(true);
     });
 
     it("название коллекции вводится", () => {
@@ -131,7 +132,7 @@ describe("FormCollectionCreate.vue", () => {
         expect(store.form.options.corrupted).toBe(true);
     });
 
-    it("файл загружается", async () => {
+    it("изображение вставляется", async () => {
         const img = wrapper.find<HTMLImageElement>("img").element;
         const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
 
@@ -143,6 +144,20 @@ describe("FormCollectionCreate.vue", () => {
 
         //src изображения меняется с пустой строки, следовательно это изображение отрисовано
         expect(img!.src).not.toBe("");
+    });
+
+    it('видео не вставляется', async () => {
+        const img = wrapper.find<HTMLImageElement>("img").element;
+        const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
+
+        //src изображения это пустая строка, следовательно изображение не отрисовано
+        expect(img!.src).toBe("");
+
+        //пользователь загружает файл
+        await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.mp4', { type: 'video/mp4' }));
+
+        //src изображения не меняется с пустой строки, следовательно это изображение не отрисовано
+        expect(img!.src).toBe("");
     });
 
     describe('коллекция не сохраняется', () => {

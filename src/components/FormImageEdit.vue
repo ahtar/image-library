@@ -11,20 +11,20 @@
                 <div class="wrapper-section button-section">
                     <button-small v-if="store.isSet" class="button" @click="separateImage"
                         data-test="form-edit-remove-image">{{ t('BUTTON.SET_SEPARATE') }}</button-small>
-                    <button-small @click="store.updateImage" data-test="form-edit-save">{{ t('BUTTON.SAVE') }}
+                    <button-small class="button" @click="store.updateImage" data-test="form-edit-save">{{ t('BUTTON.SAVE') }}
                     </button-small>
                 </div>
             </div>
         </div>
         <div class="image-wrapper wrapper">
-            <input-image class="image-edit" :active="true" :fileData="fielHandle" @paste="pasteHandler"
+            <input-image class="image-edit" :active="true" :fileData="fileHandle" @paste="pasteHandler"
                 data-test="form-edit-image" />
         </div>
     </modal-dark>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onBeforeMount, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import InputTags from "@/components/InputTag.vue";
@@ -55,7 +55,7 @@ export default defineComponent({
         const { t } = useI18n();
 
         const image = ref<any>(store.image);
-        const fielHandle = ref<FileSystemFileHandle | File>();
+        const fileHandle = ref<FileSystemFileHandle | File | ImageSingle>();
 
         //Текущее активное изображение.
         //Все изменения происходят на нем.
@@ -66,7 +66,7 @@ export default defineComponent({
 
         //Ссылка на активное изображение.
         const fileUrl = computed(() => {
-            return activeImage.value?.manifest.fileUrl || "";
+            return activeImage.value?.getUrl()?.file || "";
         });
 
         //Теги активного изображения.
@@ -83,9 +83,21 @@ export default defineComponent({
                     activeImage.value = image.value;
                 }
                 setTagRef(ref(activeImage.value!.manifest.tags));
-                fielHandle.value = await activeImage.value?.getImage();
+                fileHandle.value = activeImage.value;
             }
         });
+
+        /*onBeforeMount(() => {
+            if (image.value != null) {
+                if ("arr" in image.value) {
+                    activeImage.value = image.value.arr[0];
+                } else {
+                    activeImage.value = image.value;
+                }
+                setTagRef(ref(activeImage.value!.manifest.tags));
+                fileHandle.value = activeImage.value;
+            }
+        });*/
 
         //Смена активного изображения.
         async function changeActiveImage(image: ImageSingle, index: number) {
@@ -93,7 +105,13 @@ export default defineComponent({
                 activeImageIndex.value = index;
                 activeImage.value = image;
                 setTagRef(ref(activeImage.value.manifest.tags));
-                fielHandle.value = await activeImage.value?.getImage();
+
+                //Если файл был заменен, то отобразить замененный файл
+                if(store.imageFileChanges[image.manifest.id]) {
+                    fileHandle.value = store.imageFileChanges[image.manifest.id];
+                } else {
+                    fileHandle.value = image;
+                }
             }
         }
 
@@ -122,13 +140,13 @@ export default defineComponent({
 
         async function pasteHandler(data: File) {
             store.changeImageFile(activeImage.value!, data);
-            fielHandle.value = data;
+            fileHandle.value = data;
         }
 
         return {
             store,
             image,
-            fielHandle,
+            fileHandle,
             activeImage,
             changeActiveImage,
             fileUrl,
@@ -173,6 +191,11 @@ export default defineComponent({
         display: flex;
         flex-direction: row;
         justify-content: space-around;
+
+        .button {
+            flex-grow: 1;
+            margin: 2px;
+        }
     }
 }
 

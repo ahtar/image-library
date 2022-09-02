@@ -26,6 +26,10 @@ describe("InputText.vue", () => {
         jest.clearAllMocks();
     });
 
+    it('рендерится', () => {
+        expect(wrapper.find('[class="input-wrapper"]').exists()).toBe(true);
+    });
+
     it("label отображается", () => {
         expect(wrapper.html()).toContain("test label");
     });

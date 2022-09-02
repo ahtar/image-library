@@ -1,13 +1,12 @@
 const mockClass = jest.fn(() => {
+    const id = (Math.random().toString(36) + "00000000000000000").slice(2, 8)
     return {
         manifest: {
-            id: (Math.random().toString(36) + "00000000000000000").slice(2, 8),
+            id: id,
             hash: "mock hash",
             tags: ["mock tag 1", "mock tag 2"],
-            fileUrl: "mock fileUrl",
-            previewFileUrl: "mock previewFileUrl",
-            dateCreated: "mock dateCreated",
-            dateEdited: "mock dateEdited",
+            dateCreated: Date(),
+            dateEdited: Date(),
             description: "mock description",
         },
         collectionHandle: {
@@ -35,9 +34,11 @@ const mockClass = jest.fn(() => {
             requestPermission: jest.fn(),
             getFile: jest.fn(() => {
                 return {
-                    type: "testType",
+                    type: 'image/png',
+                    name: id + '.png',
                     arrayBuffer: jest.fn(),
                 };
+                //return new File(['(⌐□_□)'], id + '.png', { type: 'image/png' })
             }),
             createWritable: jest.fn(),
             isFile: true,
@@ -52,6 +53,7 @@ const mockClass = jest.fn(() => {
             getFile: jest.fn(() => {
                 return {
                     type: "testType",
+                    name: id,
                     arrayBuffer: jest.fn(),
                 };
             }),
@@ -70,6 +72,12 @@ const mockClass = jest.fn(() => {
         saveState: jest.fn(),
         restoreState: jest.fn(),
         checkChanges: jest.fn(),
+        getUrl: jest.fn(() => {
+            return {
+                file: 'file',
+                thumbnail: 'thumbnail'
+            }
+        }),
     };
 });
 

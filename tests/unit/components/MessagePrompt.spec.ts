@@ -28,6 +28,10 @@ describe("MessagePrompt.vue", () => {
     afterEach(() => {
         jest.clearAllMocks();
     });
+
+    it('рендерится', () => {
+        expect(wrapper.find('[data-test="message-prompt"]').exists()).toBe(true);
+    });
     
     it("сообщение оповещения отображается", () => {
         expect(wrapper.html()).toContain("test message");

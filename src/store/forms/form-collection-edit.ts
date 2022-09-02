@@ -12,7 +12,7 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
                 name: "",
                 theme: "" as string | undefined,
                 description: "" as string | undefined,
-                file: null as File | null,
+                file: undefined as File | undefined,
                 options: {
                     corrupted: false,
                 },

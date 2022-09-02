@@ -18,6 +18,10 @@ describe("Sidebar.vue", () => {
         });
     });
 
+    it('рендерится', () => {
+        expect(wrapper.find('[class="sidebar"]').exists()).toBe(true);
+    });
+
     it("slot рендерится", async () => {
         expect(wrapper.html()).toContain("Test slot content");
     });

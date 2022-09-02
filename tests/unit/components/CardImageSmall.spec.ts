@@ -19,6 +19,10 @@ describe("CardImageSmall.vue", () => {
         });
     })
 
+    it('рендерится', () => {
+        expect(wrapper.find('[data-test="card-image-small"]').exists()).toBe(true);
+    });
+
     it("изображение рендерится", async () => {
         expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe("");
     });

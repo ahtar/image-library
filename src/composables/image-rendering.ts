@@ -6,26 +6,43 @@ import crypto from "@/modules/crypto";
  * @param file src изображения.
  */
 async function renderImage(
-    image: HTMLImageElement,
-    file: FileSystemFileHandle | string | Blob | undefined
+    image: HTMLImageElement | undefined,
+    file: FileSystemFileHandle | string | Blob | File | undefined
 ) {
-
-    if (typeof file == 'undefined') {
-        image.src = "";
+    if(typeof image == 'undefined' || image === null) {
         return;
     }
 
+    if (typeof file == 'undefined') {
+        if(image.src) image.src = "";
+        return;
+    }
+
+    //string
     if (typeof file == 'string') {
         image.src = file;
         return;
     }
 
+    //File
+    if ('lastModified' in file) {
+        if (file.name.includes(".dpx") || file.name.includes(".tpx")) {
+            const arrayBuffer = await file.arrayBuffer();
+            image.src = URL.createObjectURL(await crypto.recover(arrayBuffer));
+            return;
+        }
+        image.src = URL.createObjectURL(file);
+        return;
+    }
+
+    //blob
     if (file instanceof Blob) {
         image.src = URL.createObjectURL(file);
         return;
     }
 
-    if (file.name.includes(".dpx") || file.name.includes(".tpx")) {
+    //FileSystemFileHandle
+    if(file.name.includes(".dpx") || file.name.includes(".tpx")) {
         const arrayBuffer = await (await file.getFile()).arrayBuffer();
         image.src = URL.createObjectURL(await crypto.recover(arrayBuffer));
         return;

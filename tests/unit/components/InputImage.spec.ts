@@ -8,9 +8,6 @@ jest.mock("@/composables/clipboard");
 jest.mock("@/modules/jimp.ts");
 jest.mock("@/composables/image-rendering");
 
-globalThis.URL.createObjectURL = jest.fn();
-globalThis.URL.revokeObjectURL = jest.fn();
-
 describe("InputImage.vue", () => {
     let wrapper: VueWrapper<any>;
 
@@ -30,6 +27,32 @@ describe("InputImage.vue", () => {
         jest.clearAllMocks();
     });
 
+    it('рендерится', () => {
+        expect(wrapper.find('[class="input-image"]').exists()).toBe(true);
+    });
+
+    describe('accept', () => {
+        it('изначально принимает и изображения, и видео', () => {
+            expect(wrapper.find<HTMLInputElement>('input').element.accept).toBe('image/*,video/*');
+        });
+
+        it('при props.acceptImage = false, не принимает изображения', async () => {
+            await wrapper.setProps({
+                acceptImage: false
+            })
+
+            expect(wrapper.find<HTMLInputElement>('input').element.accept).toBe('video/*');
+        });
+
+        it('при props.acceptVideo = false, не принимает видео', async () => {
+            await wrapper.setProps({
+                acceptVideo: false
+            })
+
+            expect(wrapper.find<HTMLInputElement>('input').element.accept).toBe('image/*');
+        });
+    });
+
     it("Файл вставляется", async () => {
         const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
 
@@ -38,12 +61,14 @@ describe("InputImage.vue", () => {
         expect(wrapper.emitted().paste).toBeDefined();
     });
 
+
+
     it("Файл рендерится", async () => {
         await wrapper.setProps({ fileData: new File([new Blob()], 'programmatically_created.png') });
         expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe("");
     });
 
     it("компонент ожидает файл", async () => {
-        expect(wrapper.html()).toContain("Choose a file...");
+        expect(wrapper.html()).toContain("BUTTON.INPUT_FILE");
     });
 });
