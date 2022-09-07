@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper" @click="close">
+    <div class="card-notification-error" data-test="card-notification-error" @click="close">
         <div class="error"></div>
         <div class="notification">
             <div class="title">{{ t('NOTIFICATION.TITLE.ERROR') }}</div>
@@ -33,17 +33,15 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.wrapper {
+.card-notification-error {
     display: flex;
-    background-color: $color-dark-4;
     font-size: 1.5rem;
     min-width: 17vw;
-    border-radius: 8px;
     overflow: hidden;
     min-height: 5vh;
     margin: 5px;
     color: $color-text-main;
-    @include z-depth(2);
+    @include material(4);
 
     .error {
         background-color: $color-error;
@@ -51,9 +49,8 @@ export default defineComponent({
     }
 
     .notification {
-        display: flex;
-        flex-direction: column;
         flex-grow: 1;
+        @include flex-column();
 
         .title {
             color: $color-error;

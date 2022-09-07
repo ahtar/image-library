@@ -4,11 +4,11 @@
             <select-image id="select-image" :set="image.arr" @change="changeActiveImage" v-if="store.isSet"
                 :draggable="true" @dragSort="dragSort" data-test="form-edit-select" />
             <div class="form-image-edit-wrapper">
-                <input-text class="wrapper-section" v-model="fileUrl" :label="t('LABEL.URL')" :important="true"
+                <input-text class="section" v-model="fileUrl" :label="t('LABEL.URL')" :important="true"
                     :active="false" />
-                <input-tags class="wrapper-section" :tags="computedTags" :definedTags="definedTags" @add="addTag"
+                <input-tags class="section" :tags="computedTags" :definedTags="definedTags" @add="addTag"
                     @remove="removeTag" data-test="input-tags" />
-                <div class="wrapper-section button-section">
+                <div class="section section-button">
                     <button-small v-if="store.isSet" class="button" @click="separateImage"
                         data-test="form-edit-remove-image">{{ t('BUTTON.SET_SEPARATE') }}</button-small>
                     <button-small class="button" @click="store.updateImage" data-test="form-edit-save">{{ t('BUTTON.SAVE') }}
@@ -164,33 +164,18 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.modal-dark {
-    justify-content: center;
-}
-
 .form-image-edit-wrapper {
     margin-left: 1vw;
-    background-color: $color-dark-1;
-    border: thin solid $color-border-dark-1;
-    border-radius: $radius-big;
-    @include z-depth();
-    display: flex;
-    flex-direction: column;
     width: 30vw;
+    @include material(1);
+    @include flex-column();
 
     .section {
-        display: flex;
-        align-items: center;
-    }
-
-    .wrapper-section {
         margin: max(7px, 2%);
     }
 
-    .button-section {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
+    .section-button {
+        @include flex-space-around();
 
         .button {
             flex-grow: 1;
@@ -201,18 +186,14 @@ export default defineComponent({
 
 .form-wrapper {
     margin-left: 3vw;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
     width: 45%;
+    @include flex-center-vertical();
 }
 
 .image-wrapper {
     margin-right: 3vw;
     flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include flex-center();
 }
 
 .image-edit {

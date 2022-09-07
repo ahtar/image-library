@@ -1,0 +1,68 @@
+//основные цвета
+$color-dark-0: #141e29;
+$color-dark-1: #16222e;
+$color-dark-2: #1a2835;
+$color-dark-3: #1e2f41;
+$color-dark-4: #223344;
+$color-dark-5: #27394a;
+$color-dark-6: #395670;
+
+//основные цвета outline
+$color-outline-dark: #497cac;
+$color-outline-dark-2: #ac4949;
+
+//основные цвета border
+$color-border-dark-1: #172635;
+$color-border-dark-2: #1a3042;
+$color-border-dark-3: #24384d;
+$color-border-dark-4: #26394b;
+$color-border-dark-5: #304961;
+$color-border-dark-6: #3b5e7c;
+
+//основные цвета текста
+$color-text-main: #cdccdb;
+$color-text-second: #617380;
+
+$color-success: #4eca73;
+$color-error: #c25344;
+
+$color-shadow: #000000a6;
+
+//размер больших карт
+$card-height-big: 200px;
+$card-width-big: 160px;
+
+//размер маленьких карт
+$card-height-small: 200px;
+$card-width-small: 160px;
+
+$padding-big: 5px;
+$padding-small: 3px;
+
+$margin-big: 5px;
+$margin-mall: 3px;
+
+//$radius-big: 5px;
+$radius-big: 0;
+
+// Font-Size
+$base-font-size: 1rem;
+
+// Line-Height
+$base-line-height: 1.5;
+$header-line-height: 1.25;
+
+// Breakpoints
+$bp-small: 48em; // 768px
+$bp-medium: 64em; // 1024px
+$bp-large: 85.375em; // 1366px
+$bp-xlarge: 120em; // 1920px
+$bp-xxlarge: 160em; // 2560px
+
+// Media Queries
+$mq-small: "(min-width: #{$bp-small})";
+$mq-medium: "(min-width: #{$bp-medium})";
+$mq-large: "(min-width: #{$bp-large})";
+$mq-xlarge: "(min-width: #{$bp-xlarge})";
+$mq-xxlarge: "(min-width: #{$bp-xxlarge})";
+$mq-retina: "(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)";

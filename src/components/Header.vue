@@ -40,9 +40,8 @@ export default defineComponent({
     height: 4vh;
     background-color: $color-dark-1;
     outline: thin solid $color-border-dark-1;
-    display: flex;
-    align-items: center;
     justify-content: flex-end;
+    @include flex-center-vertical();
 
     .section {
         margin-right: 20px;

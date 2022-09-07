@@ -36,10 +36,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .notification-container {
-    display: flex;
-    flex-direction: column;
     position: absolute;
     top: 10px;
     right: 10px;
+    @include flex-column();
 }
 </style>

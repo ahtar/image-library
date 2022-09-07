@@ -6,17 +6,14 @@
 
 <style lang="scss" scoped>
 .base-card {
-    background-color: $color-dark-4;
-    border: thin solid $color-border-dark-4;
     color: $color-text-main;
     font-size: 0;
-    @include z-depth(2);
+    @include material(4);
     @include z-depth-transition();
 
     &:hover {
-        background-color: $color-dark-5;
-        border-color: $color-border-dark-5;
         cursor: pointer;
+        @include material(5);
         @include z-depth-focus();
     }
 }

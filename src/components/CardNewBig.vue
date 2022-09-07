@@ -17,9 +17,7 @@ export default defineComponent({
 .card-new-big {
     width: $card-width-big;
     height: $card-height-big;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center();
 
     &::after {
         content: "+";

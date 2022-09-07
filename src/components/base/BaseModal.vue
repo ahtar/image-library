@@ -31,7 +31,6 @@ export default defineComponent({
     left: 0;
     width: 100vw;
     height: 100vh;
-    @include flex-center;
-    flex-wrap: nowrap;
+    @include flex-center();
 }
 </style>

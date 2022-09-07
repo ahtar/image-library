@@ -55,16 +55,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .input-checkbox-wrapper {
-    display: flex;
     position: relative;
     padding: 2px 5px 2px 5px;
-    flex-direction: row;
-    align-items: center;
-    background-color: $color-dark-2;
-    border: thin solid $color-border-dark-2;
-    border-radius: $radius-big;
     color: $color-text-second;
-    @include z-depth(2);
+    @include material(2);
+    @include flex-center-vertical();
 
     .input-checkbox {
         margin: 0;
@@ -80,7 +75,7 @@ export default defineComponent({
         @include focus();
 
         &::before {
-            content: "";
+            @include pseudo();
             clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
             width: 0.7rem;
             height: 0.7rem;

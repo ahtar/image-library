@@ -131,16 +131,11 @@ export default defineComponent({
 <style lang="scss" scoped>
 .home {
     padding-top: 15vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center();
 }
 
 .block {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row;
     flex-wrap: wrap;
+    @include flex-center();
 }
 </style>

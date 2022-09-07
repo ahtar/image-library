@@ -75,14 +75,11 @@ export default defineComponent({
     height: 100vh;
     width: 10vw;
     padding: 25px 2vw 0 1.5vw;
-    background-color: $color-dark-1;
-    border-right: thin solid $color-border-dark-1;
     transform: translateX(-100%) translateX(+1.5vw);
     transition: 0.35s ease-in;
-    @include z-depth(4);
-    display: flex;
-    flex-direction: column;
     align-items: center;
+    @include flex-column();
+    @include material(1, 4);
 
     ::v-slotted(div) {
         margin-top: 25px;

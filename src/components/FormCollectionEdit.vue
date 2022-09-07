@@ -1,18 +1,18 @@
 <template>
     <modal-dark @close="store.close" data-test="modal">
         <div class="content-wrapper" data-test="collection-edit-wrapper">
-            <input-text class="wrapper-section" :label="t('LABEL.NAME')" :placeholder="t('PLACEHOLDER.NAME')"
+            <input-text class="section" :label="t('LABEL.NAME')" :placeholder="t('PLACEHOLDER.NAME')"
                 :important="true" v-model="data.name" data-test="collection-edit-name" />
-            <input-text class="wrapper-section" :label="t('LABEL.THEME')" :placeholder="t('PLACEHOLDER.THEME')"
+            <input-text class="section" :label="t('LABEL.THEME')" :placeholder="t('PLACEHOLDER.THEME')"
                 v-model="data.theme" data-test="collection-edit-theme" />
-            <input-text class="wrapper-section input-description" :label="t('LABEL.DESC')"
+            <input-text class="section input-description" :label="t('LABEL.DESC')"
                 :placeholder="t('PLACEHOLDER.DESC')" v-model="data.description" :textarea="true"
                 data-test="collection-edit-description" />
-            <div class="wrapper-section section-checkbox">
+            <div class="section section-checkbox">
                 <input-checkbox v-model="store.form.options.corrupted" :label="t('LABEL.CORR')"
                     data-test="collection-edit-corrupted" />
             </div>
-            <div class="wrapper-section button-container">
+            <div class="section section-button">
                 <button-small @click="store.save" :blocked="!buttonSaveActive" data-test="collection-edit-save">
                     {{ t('BUTTON.SAVE') }}
                 </button-small>
@@ -74,18 +74,14 @@ export default defineComponent({
     width: 30vw;
     height: fit-content;
     margin-left: 10vw;
-    background-color: $color-dark-1;
-    border: thin solid $color-border-dark-1;
-    border-radius: $radius-big;
-    @include z-depth();
-    display: flex;
-    flex-direction: column;
+    @include material(1);
+    @include flex-column();
 
     .input-description {
         height: 20vh;
     }
 
-    .wrapper-section {
+    .section {
         margin: max(7px, 2%);
     }
 
@@ -93,11 +89,9 @@ export default defineComponent({
         display: flex;
     }
 
-    .button-container {
-        display: flex;
-        flex-direction: row;
+    .section-button {
         width: 96%;
-        justify-content: space-around;
+        @include flex-space-around();
 
         .button-small {
             flex-grow: 1;
@@ -109,9 +103,7 @@ export default defineComponent({
 .image-wrapper {
     margin-right: 3vw;
     flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include flex-center();
 }
 
 .button-small {

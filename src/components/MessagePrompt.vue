@@ -39,10 +39,8 @@ export default defineComponent({
 .prompt-wrapper {
     color: $color-text-main;
     font-size: 1.5rem;
-    background-color: $color-dark-2;
-    border: thin solid $color-border-dark-2;
     padding: 15px;
-    @include z-depth(2);
+    @include material(2);
 
     .button-box {
         display: flex;

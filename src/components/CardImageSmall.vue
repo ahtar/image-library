@@ -105,14 +105,9 @@ export default defineComponent({
     margin: 10px;
 
     img {
-        max-width: 150px;
-        max-height: 250px;
-        height: 190px;
-        width: 140px;
-        -webkit-user-drag: none;
-        -khtml-user-drag: none;
-        -moz-user-drag: none;
-        -o-user-drag: none;
+        max-width: $card-width-small;
+        max-height: $card-height-small;
+        @include drag-off();
     }
 
     .set-symbol {

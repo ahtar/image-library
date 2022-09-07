@@ -97,16 +97,15 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .select-images {
-    @include flex;
-    @include scroll;
+    flex-wrap: wrap;
     max-height: 80vh;
     min-width: fit-content;
     overflow-y: auto;
     overflow-x: hidden;
     flex-wrap: nowrap;
-    flex-direction: column;
-    background-color: $color-dark-2;
-    border-right: thin solid $color-border-dark-2;
+    @include scroll();
+    @include flex-column();
+    @include material(2);
 
     .base-card {
         margin: 5px;

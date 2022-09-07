@@ -160,13 +160,10 @@ export default defineComponent({
     .input-file {
         line-height: normal;
         font-size: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: $color-dark-1;
-        border: thin solid $color-border-dark-1;
         color: $color-text-second;
         padding: 5px 7px 5px 7px;
+        @include flex-center();
+        @include material(1);
 
         p {
             margin: 0px;
@@ -179,10 +176,8 @@ export default defineComponent({
             margin-right: 10px;
 
             &::before {
-                position: absolute;
+                @include pseudo();
                 top: -50%;
-                content: '';
-                display: block;
                 height: inherit;
                 width: inherit;
                 background-color: $color-text-main;
@@ -190,10 +185,8 @@ export default defineComponent({
             }
 
             &::after {
-                position: absolute;
+                @include pseudo();
                 bottom: 12%;
-                content: '';
-                display: block;
                 height: inherit;
                 width: inherit;
                 background-color: $color-text-main;
@@ -202,8 +195,7 @@ export default defineComponent({
         }
 
         &:hover {
-            background-color: $color-dark-3;
-            border: thin solid $color-border-dark-3;
+            @include material(3);
             cursor: pointer;
         }
 
@@ -215,28 +207,6 @@ export default defineComponent({
             position: absolute;
             z-index: -1;
         }
-    }
-
-    .message {
-        min-width: 150px;
-        min-height: 150px;
-        padding: 20px;
-        background-color: $color-dark-1;
-        border: thin solid $color-border-dark-1;
-        border-radius: $radius-big;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: $color-text-second;
-        font-size: 1.5rem;
-
-        &:hover {
-            cursor: default;
-        }
-    }
-
-    .menu-context {
-        line-height: normal;
     }
 
     & img {

@@ -387,13 +387,17 @@ export default defineComponent({
     height: 100%;
     flex-grow: 1;
     overflow-y: auto;
-    @include flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
     @include scroll;
 
     .content {
         margin: 3vh 4vw 3vh 3vw;
         flex-grow: 1;
-        @include flex-center;
+        display: flex;
+        flex-wrap: wrap;
         justify-content: flex-start;
         align-items: center;
         align-content: flex-start;

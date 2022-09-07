@@ -1,17 +1,20 @@
 
 //https://github.com/vuejs/vue/issues/6385#issuecomment-1024312396
 const tooltip = () => {
+    //символы для сохранения данных в элементе
     const tooltip = Symbol();
     const timerHandle = Symbol();
     const enterCallback = Symbol();
     const leaveCallback = Symbol();
     const rendered = Symbol();
 
+    //смена стиля отображения tooltip элемента
     function changeStyle(el: any, binding: any) {
         const tooltipRect = el[tooltip].getBoundingClientRect();
         const targetRect = el.getBoundingClientRect();
 
-        //default вверхний правый угол
+        //Если никакой модификатор не указан, то tooltip отображается
+        //в верхнем правом углу относительно el
         _top();
         _right();
 
@@ -27,8 +30,15 @@ const tooltip = () => {
         //низ
         if (binding.modifiers?.bottom) _bottom();
 
-        //автоопределение
+        //автоопределение положения tooltip
         if (binding.modifiers?.auto) _auto();
+
+        /**
+         * --left - отступ указателя от левой стороный toolip
+         * --path - path для придания указателю нужной формы
+         * --bottom-outer отступ внутреннего слоя указателя от нижней границы tooltip
+         * --bottom-inner отступ внешнего слоя указателя от нижней границы tooltip
+         */
 
         function _left() {
             el[tooltip].style.setProperty('--left', tooltipRect.width - 17 + 'px');
@@ -70,6 +80,14 @@ const tooltip = () => {
 
     return {
         mounted: (el: any, binding: any) => {
+            /**
+             * создается новый родительский div, который добавляется к родителю el.
+             * el удаляется из прежнего родительского элемента и добавляется в новый созданный div.
+             * при наведении на el в div добавляется tooltip элемент, положение которого относительно 
+             * el зависит от модификатора директивы.
+             * при отведении курсора с el из div удаляется вставленный tooltip элемент.
+             */
+
             //parent
             const parent = document.createElement('div');
             parent.style.position = 'relative';
@@ -89,7 +107,6 @@ const tooltip = () => {
 
             //mouseenter callback
             el[enterCallback] = () => {
-
                 el[timerHandle] = setTimeout(() => {
                     el[rendered] = true;
                     parent.appendChild(el[tooltip]);

@@ -16,8 +16,9 @@ async function getHash(image: File) {
 async function resize(data: Blob | File, max = { x: 160, y: 200 }) {
 
     if ('name' in data) {
+        //video
         if (/video\/\S*/g.test(data.type)) {
-            const frame = await _getVideoFrame(data);
+            const frame = await _getVideoFrame(data, 2);
             const image = await (await Jimp()).default.read(await frame.arrayBuffer());
 
             if (image.bitmap.width > image.bitmap.height) {

@@ -6,18 +6,18 @@
                 <card-tag-small v-for="(tag, i) in oldTagsCopy" :key="i" :tag="tag" @click="reuseOldTag(i)" />
             </div>
             <div class="form-image-create" data-test="form-create-wrapper">
-                <div class="section-wrapper">
+                <div class="section">
                     <input-text v-model="store.form.fileUrl" :label="t('LABEL.ID')" :important="true"
                         :active="false" :placeholder="t('PLACEHOLDER.ID')" />
                 </div>
-                <input-tags class="section-wrapper" :tags="store.form.tags" :definedTags="definedTags" @add="addTag"
+                <input-tags class="section" :tags="store.form.tags" :definedTags="definedTags" @add="addTag"
                     @remove="removeTag" data-test="input-tags" />
-                <div class="buttons section-wrapper">
+                <div class="section-button section">
                     <button-small @click="store.clearForm" data-test="form-clear">{{ t('BUTTON.CLEAR') }}</button-small>
                     <button-small @click="store.submitImage" :blocked="saveButtonBlocked" data-test="form-save">
                         {{ t('BUTTON.SAVE') }}</button-small>
                 </div>
-                <div class="similar-images section-wrapper" v-if="haveDoubles">
+                <div class="similar-images section" v-if="haveDoubles">
                     <card-image-small v-for="image in doublicateImages" :image="image" :key="image.manifest.id"
                         class="image-card" />
                 </div>
@@ -118,9 +118,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .form-image-create-wrapper {
     margin-left: 5vw;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    @include flex-center-vertical();
 }
 
 .margin-big {
@@ -130,12 +128,9 @@ export default defineComponent({
 .prior-tag-wrapper {
     width: 7vw;
     max-height: 60vh;
-    background-color: $color-dark-1;
-    border: thin solid $color-border-dark-1;
-    border-radius: $radius-big;
     padding: 12px;
     overflow-y: auto;
-    @include z-depth();
+    @include material(1);
     @include scroll();
 
     .card-tag-small {
@@ -145,22 +140,17 @@ export default defineComponent({
 }
 
 .form-image-create {
-    background-color: $color-dark-1;
-    border: thin solid $color-border-dark-1;
-    border-radius: $radius-big;
-    @include z-depth();
-    display: flex;
-    flex-direction: column;
     margin-left: 1vw;
     width: 30vw;
+    @include material(1);
+    @include flex-column();
 
-    .section-wrapper {
+    .section {
         margin: max(7px, 2%);
     }
 
-    .buttons {
-        display: flex;
-        justify-content: space-around;
+    .section-button {
+        @include flex-space-around();
         
         .button-small {
             flex-grow: 1;
@@ -169,13 +159,10 @@ export default defineComponent({
     }
 
     .similar-images {
-        display: flex;
         overflow-x: auto;
-        align-items: center;
-        border: thin solid $color-border-dark-2;
-        background-color: $color-dark-2;
-        @include z-depth();
+        @include material(2);
         @include scroll();
+        @include flex-center-vertical();
 
         .card-image-small {
             height: auto;
@@ -190,8 +177,6 @@ export default defineComponent({
 .image-wrapper {
     margin-right: 3vw;
     flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include flex-center();
 }
 </style>

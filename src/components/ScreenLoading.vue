@@ -24,8 +24,6 @@ export default defineComponent({
     width: 100%;
     height: 100%;
     background-color: $color-dark-1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center();
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper" @click="close">
+    <div class="card-notification-big" data-test="card-notification-big" @click="close">
         <div class="success" v-if="status"></div>
         <div class="error" v-else></div>
         <div class="notification">{{ message }}</div>
@@ -32,18 +32,15 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.wrapper {
+.card-notification-big {
     display: flex;
-    background-color: #597087;
-    border: thin solid $color-border-dark-4;
+    overflow: hidden;
+    color: $color-text-main;
     font-size: 1.5rem;
     min-width: 20vw;
-    border-radius: 8px;
-    overflow: hidden;
     min-height: 5vh;
     margin: 5px;
-    color: $color-text-main;
-    @include z-depth(2);
+    @include material(4);
 
     .success {
         background-color: rgb(78, 202, 115);
@@ -56,9 +53,7 @@ export default defineComponent({
     }
 
     .notification {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        @include flex-center();
         flex-grow: 1;
     }
 

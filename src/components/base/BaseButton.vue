@@ -23,8 +23,8 @@ export default defineComponent({
                 return 1;
             }),
             classList() {
-                if (props.blocked) return "btn-blc";
-                return "btn";
+                if (props.blocked) return "button-blocked";
+                return "button";
             },
         };
     },
@@ -32,27 +32,23 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.btn {
-    background-color: $color-dark-3;
+.button {
     color: $color-text-second;
-    border: thin solid $color-border-dark-3;
     position: relative;
     font-size: 1rem;
-    @include z-depth(2);
+    @include material(3);
     @include z-depth-transition();
 
     &:hover {
         cursor: pointer;
         color: $color-text-main;
-        background-color: $color-dark-4;
-        border: thin solid $color-border-dark-4;
+        @include material(4);
     }
 
     &:focus {
         color: $color-text-main;
-        background-color: $color-dark-4;
-        border: thin solid $color-border-dark-4;
         outline: 2px solid $color-outline-dark;
+        @include material(4);
         @include focus();
     }
 }
@@ -71,12 +67,11 @@ export default defineComponent({
     }
 }
 
-.btn-blc {
-    background-color: $color-dark-3;
+.button-blocked {
     color: $color-text-second;
-    border: thin solid $color-border-dark-3;
     position: relative;
     font-size: 1rem;
+    @include material(3);
     @include z-depth(2);
     @include z-depth-transition();
 }

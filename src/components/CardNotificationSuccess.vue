@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper" @click="close">
+    <div class="card-notification-success" data-test="card-notification-success" @click="close">
         <div class="success"></div>
         <div class="notification">
             <div class="title">{{t('NOTIFICATION.TITLE.SUCCESS')}}</div>
@@ -33,17 +33,15 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.wrapper {
+.card-notification-success {
     display: flex;
-    background-color: $color-dark-4;
     font-size: 1.5rem;
     min-width: 20vw;
-    border-radius: 8px;
     overflow: hidden;
     min-height: 5vh;
     margin: 5px;
     color: $color-text-main;
-    @include z-depth(2);
+    @include material(4);
 
     .success {
         background-color: $color-success;
@@ -51,9 +49,8 @@ export default defineComponent({
     }
 
     .notification {
-        display: flex;
-        flex-direction: column;
         flex-grow: 1;
+        @include flex-column();
 
         .title {
             color: $color-success;

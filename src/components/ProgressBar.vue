@@ -31,15 +31,11 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 .progress-bar-wrapper {
-    background-color: $color-dark-1;
-    border: thin solid $color-border-dark-1;
-    border-radius: $radius-big;
-    @include z-depth();
-    display: flex;
-    flex-direction: column;
     color: $color-text-main;
     font-size: 1.4rem;
     padding: 7px;
+    @include material(1);
+    @include flex-column();
 
     .progress-bar {
         width: 30vw;

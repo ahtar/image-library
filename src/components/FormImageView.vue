@@ -65,9 +65,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .select-wrapper {
     margin-left: 1vw;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    @include flex-center-vertical();
 }
 
 .image-wrapper {
@@ -78,8 +76,6 @@ export default defineComponent({
     max-height: 95vh;
     overflow: hidden;
     flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include flex-center();
 }
 </style>

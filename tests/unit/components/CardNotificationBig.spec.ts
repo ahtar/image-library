@@ -14,7 +14,7 @@ describe("CardNotificationBig.vue", () => {
     });
 
     it('рендерится', () => {
-        expect(wrapper.find('[class="wrapper"]').exists()).toBe(true);
+        expect(wrapper.find('[data-test="card-notification-big"]').exists()).toBe(true);
     });
 
     it("рендерит текст, полученный из  props.message", () => {

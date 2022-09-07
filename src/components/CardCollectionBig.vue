@@ -1,5 +1,5 @@
 <template>
-    <base-card class="collection-card-big" data-test="collection-card-big">
+    <base-card class="card-collection-big" data-test="collection-card-big">
         <img ref="imgRef" />
     </base-card>
 </template>
@@ -42,7 +42,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.collection-card-big {
+.card-collection-big {
     position: relative;
     margin: 10px;
 

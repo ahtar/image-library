@@ -1,38 +1,51 @@
 <template>
-    <div class="input-wrapper" :class="{ 'input-wrapper-textarea': textarea }">
+    <div class="input-wrapper" :class="{ 'input-wrapper-textarea': textarea, 'input-focused': focused }">
         <div class="label" :class="{ important: important, 'label-textarea': textarea }" v-if="labelActive"
             data-test="input-text-label">
             {{ label }}
         </div>
         <div class="input-textarea" v-if="textarea">
-            <textarea :placeholder="placeholder" :value="modelValue" @input="input" />
+            <textarea :placeholder="placeholder" :value="modelValue" @input="input" @focus="focus" @blur="unfocus" />
         </div>
         <div class="input-text" v-else>
             <input type="text" class="focusable" :placeholder="placeholder" :value="modelValue" @input="input"
                 @keydown.down="quickSuggestion" :disabled="active != true" :tabindex="tabIndex"
-                @keypress.enter="enterKeypress" />
+                @keypress.enter="enterKeypress" @focus="focus" @blur="unfocus" />
         </div>
         <div class="wrapper-disabled" v-if="!active" data-test="input-test-disabled" />
     </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, ref } from "vue";
 
 export default defineComponent({
     props: {
+        /**
+         * Описание поля
+         */
         label: {
             type: String,
         },
+
+        /**
+         * Имеет ли поле важное значение
+         */
         important: {
             type: Boolean,
             default: false,
         },
+
         placeholder: {
             type: String,
             default: "",
         },
+
         modelValue: String,
+
+        /**
+         * Активно ли поле
+         */
         active: {
             type: Boolean,
             default: true,
@@ -41,6 +54,10 @@ export default defineComponent({
             type: Number,
             default: 0,
         },
+
+        /**
+         * Является ли поле textarea
+         */
         textarea: {
             type: Boolean,
             default: false,
@@ -50,6 +67,8 @@ export default defineComponent({
     emits: ["update:modelValue", "enterKey", "quickSuggestion"],
 
     setup(props, { emit }) {
+        const focused = ref(false);
+
         const tabIndex = computed(() => {
             if (props.active == true) {
                 return props.tabindex;
@@ -75,12 +94,23 @@ export default defineComponent({
             emit("quickSuggestion");
         }
 
+        function focus() {
+            focused.value = true;
+        }
+
+        function unfocus() {
+            focused.value = false;
+        }
+
         return {
             labelActive,
             input,
             enterKeypress,
             quickSuggestion,
             tabIndex,
+            focus,
+            unfocus,
+            focused
         };
     },
 });
@@ -89,30 +119,27 @@ export default defineComponent({
 <style lang="scss" scoped>
 .input-wrapper {
     position: relative;
-    border-radius: $radius-big;
     overflow: hidden;
-    background-color: $color-dark-2;
-    border: thin solid $color-border-dark-2;
     height: 2rem;
-    @include z-depth(2);
-    @include flex;
     flex-wrap: nowrap;
+    align-items: stretch;
+    display: flex;
+    @include material(2);
 
     .input-text {
-        padding: $padding-big;
-        width: 98%;
+        flex-grow: 1;
+        display: flex;
 
         input {
             outline: none;
             border: none;
-            height: 95%;
-            width: 100%;
             font-size: 1rem;
             color: $color-text-main;
+            height: 100%;
+            flex-grow: 1;
             background-color: transparent;
-            @include focus();
 
-            &::placeholder {
+            @include input-placeholder {
                 color: $color-text-second;
             }
         }
@@ -131,10 +158,9 @@ export default defineComponent({
             color: $color-text-main;
             background-color: transparent;
             resize: none;
-            @include focus();
             @include scroll();
 
-            &::placeholder {
+            @include input-placeholder {
                 color: $color-text-second;
             }
         }
@@ -162,6 +188,11 @@ export default defineComponent({
         height: 100%;
         background-color: $color-shadow;
     }
+}
+
+.input-focused {
+    outline: 1px solid $color-outline-dark;
+    @include z-depth-focus();
 }
 
 .input-wrapper-textarea {

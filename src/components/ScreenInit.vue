@@ -56,9 +56,7 @@ export default defineComponent({
 .init-wrapper {
     padding: 30px;
     max-width: 40vw;
-    background-color: $color-dark-1;
-    border: thin solid $color-border-dark-1;
-    @include z-depth();
+    @include material(1);
 
     .message {
         color: $color-text-main;

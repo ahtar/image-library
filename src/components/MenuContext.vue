@@ -71,10 +71,9 @@ export default defineComponent({
     min-width: 100px;
     position: fixed;
     position: absolute;
-    display: flex;
-    flex-direction: column;
     border: thin solid $color-border-dark-4;
     @include z-depth();
+    @include flex-column();
 }
 
 ::v-slotted(div) {
@@ -84,7 +83,7 @@ export default defineComponent({
     padding: 8px 0 8px 0;
     background-color: $color-dark-4;
     border-bottom: thin solid $color-border-dark-5;
-    color: $text-main;
+    color: $color-text-main;
     cursor: pointer;
 
     &:last-child {

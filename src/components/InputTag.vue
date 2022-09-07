@@ -186,14 +186,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .tag-input-wrapper {
-    background-color: $color-dark-2;
-    border: thin solid $color-border-dark-2;
     height: 40vh;
-    border-radius: $radius-big;
+    max-width: 100%;
     position: relative;
-    display: flex;
-    flex-direction: column;
-    @include z-depth(2);
+    @include material(2);
+    @include flex-column();
 
     .card-tag-small {
         margin: 7px;
@@ -229,12 +226,11 @@ export default defineComponent({
         max-width: 150px;
         max-height: 50vh;
         overflow-y: auto;
-        background-color: $section-color;
-        border: thin solid $section-border-color;
         border-radius: 5px;
-        @include box-shadow;
-        @include flex-start;
-        @include scroll;
+        flex-wrap: wrap;
+        @include flex-center();
+        @include material(1);
+        @include scroll();
     }
 }
 </style>

@@ -33,10 +33,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .set-wrapper {
-    @include flex-center;
+    flex-wrap: wrap;
     position: fixed;
     bottom: 3vh;
     right: 3vw;
+    @include flex-center();
 }
 
 .button {
