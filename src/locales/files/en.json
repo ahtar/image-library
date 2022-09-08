@@ -46,5 +46,11 @@
     "PROMPT.COLL_CORR_CONVERT_IMAGES": "This collection will become corrupted. Convert images?",
     "PROMPT.COLL_NORMAL_CONVERT_IMAGES": "This collection will become normal. Convert images?",
     "PROMPT.DELETE_COLLECTION": "Delete collection?",
-    "PROMPT.DELETE_IMAGE": "Delete image?"
+    "PROMPT.DELETE_IMAGE": "Delete image?",
+    "TOOLTIP.NEW_COLLECTION": "Create a new image collection",
+    "TOOLTIP.CORRUPTED": "Make images in the collection corrupted.\n\nExtra data will be inserted into each image, making it impossible to view them in any other way.\n\nThis option affects performance.\nThis is not encryption, a knowledgeable person will be able to recover these images.",
+    "TOOLTIP.NEW_IMAGE": "Create a new image",
+    "TOOLTIP.NEW_SET": "Create a new image set",
+    "TOOLTIP.SEPARATE_IMAGE": "The image will be separated from the set and become a standalone image",
+    "TOOLTIP.SAVE_IMAGE_CHANGES": "All changes in the current image will be saved"
 }

@@ -70,7 +70,8 @@ const tooltip = () => {
         function _auto() {
             const tooltipRect: DOMRect = el[tooltip].getBoundingClientRect();
 
-            const topOffScreen = tooltipRect.top <= 0;
+            //4vh от верхнего края экрана
+            const topOffScreen = tooltipRect.top <= window.innerHeight * 0.04;
             const rightOffScreen = tooltipRect.right >= (window.innerWidth || document.documentElement.clientWidth);
 
             if (topOffScreen) _bottom();
@@ -129,6 +130,9 @@ const tooltip = () => {
             el.removeEventListener('mouseenter', el[enterCallback]);
             el.removeEventListener('mouseleave', el[leaveCallback]);
         },
+        beforeUpdate: (el: any, binding: any) => {
+            el[tooltip].innerHTML = `<p>${binding.value}</p>`;
+        }
     }
 }
 

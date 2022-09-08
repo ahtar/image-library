@@ -9,7 +9,7 @@
                 :label="t('LABEL.DESC')" :placeholder="t('PLACEHOLDER.DESC')" :textarea="true"
                 data-test="collection-create-description" />
             <div class="section section-checkbox">
-                <input-checkbox v-model="store.form.options.corrupted" :label="t('LABEL.CORR')"
+                <input-checkbox v-model="store.form.options.corrupted" :label="t('LABEL.CORR')" v-tooltip.auto="t('TOOLTIP.CORRUPTED')"
                     data-test="collection-create-corrupted" />
             </div>
             <div class="section-button section">

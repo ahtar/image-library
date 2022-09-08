@@ -140,8 +140,11 @@ body {
     border: thin solid $color-border-dark-5;
     color: $color-text-main;
     padding: 5px 7px 5px 7px;
-    width: 100px;
+    width: max-content;
+    max-width: 50vw;
     transition: opacity 0.5s;
+    white-space: pre-line;
+    text-align: left;
     --left: 4px;
     --bottom-outer: -10px;
     --bottom-inner: -12px;

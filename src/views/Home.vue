@@ -1,7 +1,7 @@
 <template>
     <div class="home">
         <div class="block">
-            <card-new-big @click="storeCollectionCreate.open" data-test="home-card-new" />
+            <card-new-big @click="storeCollectionCreate.open" data-test="home-card-new" v-tooltip.auto="t('TOOLTIP.NEW_COLLECTION')" />
             <router-link :to="link(collection)" v-for="(collection, i) in store.collections" :key="i"
                 @contextmenu="contextMenuOpen(collection, $event)">
                 <card-collection-big :fileHandle="collection.thumbnail" />
@@ -21,7 +21,6 @@
         <menu-context :event="contextMenuEvent!" v-if="contextMenuActive" @close="contextMenuClose">
             <div @click="editCollection">{{ t('BUTTON.EDIT') }}</div>
             <div @click="deleteCollection">{{ t('BUTTON.DELETE') }}</div>
-            <div @click="convert">Конвертировать</div>
         </menu-context>
     </transition-fade>
 </template>

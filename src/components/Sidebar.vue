@@ -81,12 +81,8 @@ export default defineComponent({
     @include flex-column();
     @include material(1, 4);
 
-    ::v-slotted(div) {
-        margin-top: 25px;
-    }
-
-    ::v-slotted(button) {
-        margin-top: 25px;
+    ::v-slotted(*) {
+        margin-bottom: 25px;
     }
 }
 </style>

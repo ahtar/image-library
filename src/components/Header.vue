@@ -41,6 +41,7 @@ export default defineComponent({
     background-color: $color-dark-1;
     outline: thin solid $color-border-dark-1;
     justify-content: flex-end;
+    position: relative;
     @include flex-center-vertical();
 
     .section {

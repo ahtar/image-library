@@ -9,9 +9,10 @@
                 <input-tags class="section" :tags="computedTags" :definedTags="definedTags" @add="addTag"
                     @remove="removeTag" data-test="input-tags" />
                 <div class="section section-button">
-                    <button-small v-if="store.isSet" class="button" @click="separateImage"
+                    <button-small v-if="store.isSet" class="button" @click="separateImage" v-tooltip.auto="t('TOOLTIP.SEPARATE_IMAGE')"
                         data-test="form-edit-remove-image">{{ t('BUTTON.SET_SEPARATE') }}</button-small>
-                    <button-small class="button" @click="store.updateImage" data-test="form-edit-save">{{ t('BUTTON.SAVE') }}
+                    <button-small class="button" @click="store.updateImage" 
+                        data-test="form-edit-save" v-tooltip.auto="t('TOOLTIP.SAVE_IMAGE_CHANGES')">{{ t('BUTTON.SAVE') }}
                     </button-small>
                 </div>
             </div>

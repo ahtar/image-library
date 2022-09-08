@@ -2,6 +2,16 @@
 node_modules
 /dist
 
+# Firebase files
+.firebase
+/.firebaserc
+/firebase.json
+
+# Dev server self-signed SSL certificate
+/ca.crt
+/ca.key
+/cert.crt
+/cert.key
 
 # local env files
 .env.local
