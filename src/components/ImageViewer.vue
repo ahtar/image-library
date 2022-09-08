@@ -1,5 +1,5 @@
 <template>
-    <div class="image-wrapper" @mouseup="moveEnd" @mousemove="move" ref="imageWrapper">
+    <div class="image-viewer-wrapper wrapper" @mouseup="moveEnd" @mousemove="move" ref="imageWrapper">
         <image-vue :data="imgData" alt="Image" @wheel="scale" @mousedown="moveStart"/>
     </div>
 </template>
@@ -158,7 +158,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.image-wrapper {
+.image-viewer-wrapper {
     max-height: inherit;
     max-width: inherit;
 
