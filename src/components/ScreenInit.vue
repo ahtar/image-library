@@ -1,16 +1,15 @@
 <template>
     <modal-dark data-test="screen-init">
         <div class="init-wrapper" v-if="compatibility">
-            <p class="message">
-                {{ t('INIT_SCREEN.MESSAGE') }}
-            </p>
+            <p>{{ t('INIT_SCREEN.MESSAGE') }}</p>
             <button-small @click="requestFolderAccess()">
                 {{ t('BUTTON.PICK_FOLDER') }}</button-small>
         </div>
         <div class="init-wrapper" v-else>
-            <p class="message">
-                {{ t('INIT_SCREEN.BROWSER_INCOMPATIBLE') }}
-            </p>
+            <h3>{{t('INIT_SCREEN.BROWSER_INCOMPATIBLE')}}</h3>
+            <p>{{t('INIT_SCREEN.INCOMPATIBILITY_DESCRIPTION')}}</p>
+            <p>{{t('INIT_SCREEN.SUPPORTED_BROWSERS')}}</p>
+            <img src="@/assets/Incompatible.svg" class="icon"/>
         </div>
     </modal-dark>
 </template>
@@ -54,13 +53,24 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .init-wrapper {
-    padding: 30px;
+    padding: 10px;
     max-width: 40vw;
+    color: $color-text-main;
+    font-size: 1.5rem;
+    white-space: pre-line;
+    flex-direction: column;
     @include material(1);
+    @include flex-center();
 
-    .message {
-        color: $color-text-main;
-        font-size: 1.5rem;
+    @media (max-width: #{$bp-small}) {
+        width: 100%;
+        height: 100%;
+        max-width: none;
+    }
+
+    .icon {
+        width: 20%;
+        margin: 10%;
     }
 }
 </style>

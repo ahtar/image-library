@@ -1,5 +1,7 @@
 {
-    "INIT_SCREEN.BROWSER_INCOMPATIBLE": "Данный браузер не поддерживает функционал сайта",
+    "INIT_SCREEN.BROWSER_INCOMPATIBLE": "Ваш браузер не поддерживается.",
+    "INIT_SCREEN.INCOMPATIBILITY_DESCRIPTION": "Это приложение использует File System Access API, который не поддерживается этим браузером.",
+    "INIT_SCREEN.SUPPORTED_BROWSERS": "Поддерживаемы браузеры:\nChrome 86+\nSafari 15.2+\nEdge 86+\nOpera 72+\n Другие chromium браузеры.",
     "INIT_SCREEN.MESSAGE": "Выберите папку с уже существующими коллекциями, либо новую пустую папку",
     "BUTTON.SAVE": "Сохранить",
     "BUTTON.CONFIRM": "Подтвердить",

@@ -1,5 +1,7 @@
 {
-    "INIT_SCREEN.BROWSER_INCOMPATIBLE": "Your browser is not currently supported. Supported browsers include Chrome, Safari, Opera and most browsers based on Chromium",
+    "INIT_SCREEN.BROWSER_INCOMPATIBLE": "Your browser is not supported.",
+    "INIT_SCREEN.INCOMPATIBILITY_DESCRIPTION": "This application uses the File System Access API, which is not supported by this browser.",
+    "INIT_SCREEN.SUPPORTED_BROWSERS": "Supported browsers:\nChrome 86+\nSafari 15.2+\nEdge 86+\nOpera 72+\n Other chromium based browsers",
     "INIT_SCREEN.MESSAGE": "Select a folder with existing collections, or a new empty folder",
     "BUTTON.SAVE": "Save",
     "BUTTON.CONFIRM": "Confirm",
