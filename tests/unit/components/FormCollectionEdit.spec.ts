@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { createTestingPinia } from "@pinia/testing";
 
 import FormCollectionEdit from "@/components/FormCollectionEdit.vue";
+import tooltip from '@/directives/v-tooltip'
 import { useCollectionEditStore } from "@/store/forms/form-collection-edit";
 import { usePromptStore } from "@/store/modals/modal-prompt";
 
@@ -36,6 +37,9 @@ describe("FormCollectionEdit", () => {
                         },
                     }),
                 ],
+                directives: {
+                    tooltip: tooltip()
+                }
             },
             attachTo: document.body,
         });
@@ -173,6 +177,9 @@ describe("FormCollectionEdit", () => {
                             stubActions: false,
                         }),
                     ],
+                    directives: {
+                        tooltip: tooltip()
+                    }
                 },
             });
 

@@ -6,6 +6,7 @@ import { createTestingPinia } from "@pinia/testing";
 import FormCollectionCreate from "@/components/FormCollectionCreate.vue";
 import InputImage from "@/components/InputImage.vue";
 import ModalDark from "@/components/ModalDark.vue";
+import tooltip from '@/directives/v-tooltip'
 
 import { useCollectionCreateStore } from "@/store/forms/form-collection-create";
 
@@ -19,6 +20,9 @@ describe("FormCollectionCreate.vue", () => {
         wrapper = mount(FormCollectionCreate, {
             global: {
                 plugins: [createTestingPinia()],
+                directives: {
+                    tooltip: tooltip()
+                }
             },
         });
     })
@@ -168,6 +172,9 @@ describe("FormCollectionCreate.vue", () => {
             wrapper = mount(FormCollectionCreate, {
                 global: {
                     plugins: [createTestingPinia()],
+                    directives: {
+                        tooltip: tooltip()
+                    }
                 },
             });
 

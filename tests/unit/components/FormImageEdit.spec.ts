@@ -7,6 +7,7 @@ import Collection from "@/classes/Collection";
 import ImageSet from "@/classes/ImageSet";
 import ImageSingle from "@/classes/ImageSingle";
 import SelectImage from "@/components/SelectImage.vue";
+import tooltip from '@/directives/v-tooltip'
 
 import { useImageEditStore } from "@/store/forms/form-image-edit";
 
@@ -39,6 +40,9 @@ describe("FormImageEdit.vue", () => {
                         },
                     }),
                 ],
+                directives: {
+                    tooltip: tooltip()
+                }
             },
             attachTo: document.body,
         });
@@ -189,6 +193,9 @@ describe("FormImageEdit.vue", () => {
                             },
                         }),
                     ],
+                    directives: {
+                        tooltip: tooltip()
+                    }
                 },
                 attachTo: document.body,
             });
