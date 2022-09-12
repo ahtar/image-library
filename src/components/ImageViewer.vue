@@ -1,6 +1,6 @@
 <template>
     <div class="image-viewer-wrapper wrapper" @mouseup="moveEnd" @mousemove="move" ref="imageWrapper">
-        <image-vue :data="imgData" alt="Image" @wheel="scale" @mousedown="moveStart"/>
+        <image-vue id="viewed-image" :data="imgData" alt="Image" @wheel="scale" @mousedown="moveStart" />
     </div>
 </template>
 
@@ -166,6 +166,7 @@ export default defineComponent({
         max-height: inherit;
         max-width: inherit;
         -webkit-user-drag: none;
+        transition: transform 0.3s ease-out;
     }
 }
 </style>
