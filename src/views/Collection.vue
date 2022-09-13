@@ -5,11 +5,12 @@
                 <button-small>{{ t('BUTTON.BACK') }}</button-small>
             </router-link>
             <input-tag :tags="tags" @add="addTag" @remove="removeTag" :definedTags="definedTags" />
-            <button-small @click="startSetCreation" v-tooltip.auto="t('TOOLTIP.NEW_SET')">{{ t('BUTTON.CREATE_SET') }}</button-small>
+            <button-small @click="startSetCreation" v-tooltip.auto="t('TOOLTIP.NEW_SET')">{{ t('BUTTON.CREATE_SET') }}
+            </button-small>
         </sidebar>
         <div class="content-wrapper" ref="container">
             <div class="content" v-if="loaded">
-                <card-new-big @click="storeImageCreate.open()" v-tooltip.auto="t('TOOLTIP.NEW_IMAGE')"/>
+                <card-new-big @click="storeImageCreate.open()" v-tooltip.auto="t('TOOLTIP.NEW_IMAGE')" />
                 <transition-fade-group :items="filteredImages" v-slot="slotProps">
                     <card-image-small :image="slotProps.item" @click="imageHandler(slotProps.item, $event)"
                         @contextmenu="contextMenuOpen(slotProps.item, $event)" />
@@ -48,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from "vue";
+import { defineComponent, onMounted, ref, watch, computed, reactive } from "vue";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 
@@ -65,6 +66,7 @@ import useContextMenu from "@/composables/context-menu";
 import useClipboard from "@/composables/clipboard";
 import useQuery from "@/composables/query";
 import useImageDisplay from "@/composables/imagesDisplay";
+import { useHead } from "@vueuse/head"
 
 import Sidebar from "@/components/Sidebar.vue";
 import TransitionFade from "@/components/TransitionFade.vue";
@@ -81,7 +83,6 @@ import MenuContext from "@/components/MenuContext.vue";
 import ScreenLoading from "@/components/ScreenLoading.vue";
 import ButtonSmall from "@/components/ButtonSmall.vue";
 import ScrollBar from "@/components/ScrollBar.vue";
-import { computed } from "@vue/reactivity";
 
 export default defineComponent({
     components: {
@@ -147,12 +148,17 @@ export default defineComponent({
         setTagRef(tags);
         setDisplayableImages(filteredImages as any);
 
+        useHead({
+            title: computed(() => route.params.name + ' — Image Library')
+        });
+
         /**
          * Работа с коллекцией и параметрами роутера.
          */
 
         //Инициализация.
         onMounted(async () => {
+
             //Получение тегов из query параметров
             const query = getQuery();
             if (query.tags) {

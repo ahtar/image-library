@@ -12,6 +12,7 @@
     "deploy": "firebase deploy"
   },
   "dependencies": {
+    "@vueuse/head": "^0.7.10",
     "core-js": "^3.6.5",
     "idb-keyval": "^6.1.0",
     "jimp": "^0.16.1",

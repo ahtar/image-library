@@ -40,6 +40,8 @@ import { useCollections } from "@/store/collections";
 import { useCollectionCreateStore } from "@/store/forms/form-collection-create";
 import { usePromptStore } from "@/store/modals/modal-prompt";
 import { useCollectionEditStore } from "@/store/forms/form-collection-edit";
+
+import { useHead } from "@vueuse/head"
 import useContextMenu from "@/composables/context-menu";
 
 export default defineComponent({
@@ -66,6 +68,10 @@ export default defineComponent({
             contextMenuAction,
         } = useContextMenu();
 
+        useHead({
+            title: 'Home — Image Library'
+        });
+
         function link(collection: Collection) {
             return "/collections/" + collection.manifest.name;
         }
@@ -85,28 +91,6 @@ export default defineComponent({
             });
         }
 
-        function convert() {
-            contextMenuAction<Collection>(async (item) => {
-                /*if (!item.loaded) await item.initLoadCollection();
-
-                for (const imageObject of item.arr) {
-                    const obj: ImageUpdateData = { manifest: true };
-                    if ('arr' in imageObject) {
-                        for(const imageSingle of imageObject.arr) {
-                            imageSingle.manifest.type = 'image/png';
-                        }
-                        await item.updateImage(imageObject, obj);
-                    }
-                    else {
-                        imageObject.manifest.type = 'image/png';
-                        await item.updateImage(imageObject, obj);
-                    }
-                }*/
-
-                console.info('conversion complete!', item);
-            });
-        }
-
         return {
             store,
             storeCollectionCreate,
@@ -120,8 +104,6 @@ export default defineComponent({
             contextMenuClose,
             contextMenuOpen,
             t,
-
-            convert,
         };
     },
 });
