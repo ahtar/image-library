@@ -5,7 +5,7 @@
         </div>
         <div class="image-wrapper wrapper">
             <video-player-vue v-if="isVideo" :data="renderedImage" />
-            <div class="image-wrapper-w" v-else>
+            <div class="image-wrapper-w wrapper" v-else>
                 <viewer-image :image="renderedImage!" data-test="form-view-viewer" />
                 <button-small class="button-rotate" @click="rotateImage()">
                     <img src="@/assets/rotate.svg" alt="rotate">
