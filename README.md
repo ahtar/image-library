@@ -1,4 +1,4 @@
-# image-library-pwa
+# image-library
 
 ## Project setup
 ```
