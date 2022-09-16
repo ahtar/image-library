@@ -1,3 +1,5 @@
+type FileSystemDirectoryHandle = import('@types/wicg-file-system-access').FileSystemDirectoryHandle;
+
 interface Window {
     showDirectoryPicker: FileSystemDirectoryReader;
 }
@@ -76,7 +78,7 @@ interface ImageSingle {
     getUrl(): {
         file: string;
         thumbnail: string;
-    }
+    };
 }
 
 interface ImageSet {
