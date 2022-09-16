@@ -19,8 +19,18 @@ if (process.env.NODE_ENV === "production") {
         updatefound() {
             console.log("New content is downloading.");
         },
-        updated() {
+        updated(registration) {
             console.log("New content is available; please refresh.");
+            //dev.to/drbragg/handling-service-worker-updates-in-your-vue-pwa-1pip
+
+            /**
+             * при получении нового ServiceWorkerRegistration объекта
+             * отправить событие swUpdated с этим ServiceWorkerRegistration
+             * для последующей активации нового serviceWorker
+             */
+            document.dispatchEvent(
+                new CustomEvent('swUpdated', { detail: registration })
+            )
         },
         offline() {
             console.log(

@@ -32,6 +32,8 @@ import { useProgressBarStore } from "@/store/modals/modal-progress-bar";
 import { useInitStore } from "@/store/modals/modal-init";
 import { useCollections } from "@/store/collections";
 
+import useSwUpdate from '@/composables/swUpdate'
+
 import fs from "@/modules/file-system";
 
 export default defineComponent({
@@ -49,6 +51,9 @@ export default defineComponent({
         const storeInit = useInitStore();
         const storeCollections = useCollections();
         const { checkMainFolderAccess, initLoadCollections } = fs;
+        const { listenForSwUpdate } = useSwUpdate();
+
+        listenForSwUpdate();
 
         onMounted(async () => {
             //console.clear();
