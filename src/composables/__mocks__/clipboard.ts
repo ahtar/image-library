@@ -3,8 +3,8 @@ export default jest.fn(() => {
         readFromClipboard: jest.fn(() => {
             return [
                 {
-                    types: ["image"],
-                    presentationStyle: "unspecified",
+                    types: ['image'],
+                    presentationStyle: 'unspecified',
                     getType: jest.fn(() => new Blob()),
                 },
             ];

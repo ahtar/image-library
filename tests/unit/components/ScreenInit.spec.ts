@@ -1,13 +1,13 @@
-import { mount } from "@vue/test-utils";
-import userEvent from "@testing-library/user-event";
-import { createTestingPinia } from "@pinia/testing";
+import { mount } from '@vue/test-utils';
+import userEvent from '@testing-library/user-event';
+import { createTestingPinia } from '@pinia/testing';
 
-import ScreenInit from "@/components/ScreenInit.vue";
-import { useInitStore } from "@/store/modals/modal-init";
+import ScreenInit from '@/components/ScreenInit.vue';
+import { useInitStore } from '@/store/modals/modal-init';
 
-jest.mock("@/modules/file-system");
+jest.mock('@/modules/file-system');
 
-describe("ScreenInit.vue", () => {
+describe('ScreenInit.vue', () => {
     it('рендерится', () => {
         const pinia = createTestingPinia();
         const store = useInitStore();
@@ -22,7 +22,7 @@ describe("ScreenInit.vue", () => {
         expect(wrapper.find('[data-test="screen-init"]').exists()).toBe(true);
     });
 
-    it("Компонент активен, если браузер поддерживает функционал.", () => {
+    it('Компонент активен, если браузер поддерживает функционал.', () => {
         const pinia = createTestingPinia();
         const store = useInitStore();
         (store.checkCompatibility as any) = true;
@@ -36,7 +36,7 @@ describe("ScreenInit.vue", () => {
         expect(wrapper.html()).toContain('INIT_SCREEN.MESSAGE');
     });
 
-    it("Компонент не активен, если браузер не поддерживает функционал.", () => {
+    it('Компонент не активен, если браузер не поддерживает функционал.', () => {
         const pinia = createTestingPinia();
         const store = useInitStore();
         (store.checkCompatibility as any) = false;
@@ -47,10 +47,10 @@ describe("ScreenInit.vue", () => {
             },
         });
 
-        expect(wrapper.html()).toContain("INIT_SCREEN.BROWSER_INCOMPATIBLE");
+        expect(wrapper.html()).toContain('INIT_SCREEN.BROWSER_INCOMPATIBLE');
     });
 
-    it("коллекции загружаются", async () => {
+    it('коллекции загружаются', async () => {
         const pinia = createTestingPinia();
         const store = useInitStore();
         (store.checkCompatibility as any) = true;
@@ -63,7 +63,7 @@ describe("ScreenInit.vue", () => {
 
         await wrapper.vm.$forceUpdate();
 
-        await userEvent.click(wrapper.find("button").element);
+        await userEvent.click(wrapper.find('button').element);
 
         expect(wrapper.emitted().data).toBeDefined();
     });

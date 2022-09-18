@@ -1,10 +1,10 @@
-jest.mock("@/classes/ImageSingle");
-import ImageSingle from "@/classes/ImageSingle";
+jest.mock('@/classes/ImageSingle');
+import ImageSingle from '@/classes/ImageSingle';
 
 const mockClass = jest.fn(() => {
     return {
         manifest: {
-            id: (Math.random().toString(36) + "00000000000000000").slice(2, 8),
+            id: (Math.random().toString(36) + '00000000000000000').slice(2, 8),
             dateCreated: Date(),
             dateEdited: Date(),
         },

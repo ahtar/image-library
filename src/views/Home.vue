@@ -1,9 +1,17 @@
 <template>
     <div class="home">
         <div class="block">
-            <card-new-big @click="storeCollectionCreate.open" data-test="home-card-new" v-tooltip.auto="t('TOOLTIP.NEW_COLLECTION')" />
-            <router-link :to="link(collection)" v-for="(collection, i) in store.collections" :key="i"
-                @contextmenu="contextMenuOpen(collection, $event)">
+            <card-new-big
+                @click="storeCollectionCreate.open"
+                data-test="home-card-new"
+                v-tooltip.auto="t('TOOLTIP.NEW_COLLECTION')"
+            />
+            <router-link
+                :to="link(collection)"
+                v-for="(collection, i) in store.collections"
+                :key="i"
+                @contextmenu="contextMenuOpen(collection, $event)"
+            >
                 <card-collection-big :fileHandle="collection.thumbnail" />
             </router-link>
         </div>
@@ -18,7 +26,11 @@
     </transition-fade>
 
     <transition-fade>
-        <menu-context :event="contextMenuEvent!" v-if="contextMenuActive" @close="contextMenuClose">
+        <menu-context
+            :event="contextMenuEvent!"
+            v-if="contextMenuActive"
+            @close="contextMenuClose"
+        >
             <div @click="editCollection">{{ t('BUTTON.EDIT') }}</div>
             <div @click="deleteCollection">{{ t('BUTTON.DELETE') }}</div>
         </menu-context>
@@ -26,23 +38,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { useI18n } from "vue-i18n";
+import { defineComponent } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import CardCollectionBig from "@/components/CardCollectionBig.vue";
-import CardNewBig from "@/components/CardNewBig.vue";
-import TransitionFade from "@/components/TransitionFade.vue";
-import FormCollectionCreate from "@/components/formCollectionCreate.vue";
-import FormCollectionEdit from "@/components/FormCollectionEdit.vue";
-import MenuContext from "@/components/MenuContext.vue";
+import CardCollectionBig from '@/components/CardCollectionBig.vue';
+import CardNewBig from '@/components/CardNewBig.vue';
+import TransitionFade from '@/components/TransitionFade.vue';
+import FormCollectionCreate from '@/components/formCollectionCreate.vue';
+import FormCollectionEdit from '@/components/FormCollectionEdit.vue';
+import MenuContext from '@/components/MenuContext.vue';
 
-import { useCollections } from "@/store/collections";
-import { useCollectionCreateStore } from "@/store/forms/form-collection-create";
-import { usePromptStore } from "@/store/modals/modal-prompt";
-import { useCollectionEditStore } from "@/store/forms/form-collection-edit";
+import { useCollections } from '@/store/collections';
+import { useCollectionCreateStore } from '@/store/forms/form-collection-create';
+import { usePromptStore } from '@/store/modals/modal-prompt';
+import { useCollectionEditStore } from '@/store/forms/form-collection-edit';
 
-import { useHead } from "@vueuse/head"
-import useContextMenu from "@/composables/context-menu";
+import { useHead } from '@vueuse/head';
+import useContextMenu from '@/composables/context-menu';
 
 export default defineComponent({
     components: {
@@ -69,11 +81,11 @@ export default defineComponent({
         } = useContextMenu();
 
         useHead({
-            title: 'Home — Image Library'
+            title: 'Home — Image Library',
         });
 
         function link(collection: Collection) {
-            return "/collections/" + collection.manifest.name;
+            return '/collections/' + collection.manifest.name;
         }
 
         function editCollection() {
@@ -84,7 +96,9 @@ export default defineComponent({
 
         function deleteCollection() {
             contextMenuAction<Collection>(async (item) => {
-                const answer = await storePrompt.showPrompt(t('PROMPT.DELETE_COLLECTION'));
+                const answer = await storePrompt.showPrompt(
+                    t('PROMPT.DELETE_COLLECTION')
+                );
                 if (answer) {
                     store.deleteCollection(item);
                 }

@@ -3,9 +3,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref } from 'vue';
 export default defineComponent({
-    emits: ["update"],
+    emits: ['update'],
     setup(props, { emit }) {
         const observerRef = ref<Element | null>(null);
         let observer: IntersectionObserver;
@@ -18,7 +18,7 @@ export default defineComponent({
         });
 
         function callback(event: IntersectionObserverEntry[]) {
-            emit("update", event[0].isIntersecting == true);
+            emit('update', event[0].isIntersecting == true);
         }
 
         function checkIntersection() {

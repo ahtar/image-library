@@ -14,11 +14,11 @@ import {
     PropType,
     ref,
     computed,
-} from "vue";
+} from 'vue';
 
-import BaseCard from "@/components/base/BaseCard.vue";
+import BaseCard from '@/components/base/BaseCard.vue';
 
-import useImageRendering from "@/composables/image-rendering";
+import useImageRendering from '@/composables/image-rendering';
 
 export default defineComponent({
     props: {
@@ -36,26 +36,27 @@ export default defineComponent({
         const imgRef = ref<null | HTMLImageElement>(null);
 
         const isSet = computed(() => {
-            return "arr" in props.image;
+            return 'arr' in props.image;
         });
 
-        let cachedId = "";
+        let cachedId = '';
 
         //Прорисовка изображения при mounted.
         onMounted(async () => {
+            if (!imgRef.value) return;
             try {
                 let file: FileSystemFileHandle;
-                if ("arr" in props.image) {
+                if ('arr' in props.image) {
                     cachedId = props.image.arr[0].manifest.id;
                     file = await props.image.arr[0].getThumbnail();
                 } else {
                     cachedId = props.image.manifest.id;
                     file = await props.image.getThumbnail();
                 }
-                imgRef.value!.style.width = "auto";
-                imgRef.value!.style.height = "auto";
-                releaseImage(imgRef.value!);
-                await renderImage(imgRef.value!, file);
+                imgRef.value.style.width = 'auto';
+                imgRef.value.style.height = 'auto';
+                releaseImage(imgRef.value);
+                await renderImage(imgRef.value, file);
             } catch (err) {
                 console.log(err);
             }
@@ -63,11 +64,12 @@ export default defineComponent({
 
         //Прорисовка изображения при updated.
         onUpdated(async () => {
+            if (!imgRef.value) return;
             try {
-                let id = "";
+                let id = '';
                 let file: FileSystemFileHandle;
 
-                if ("arr" in props.image) {
+                if ('arr' in props.image) {
                     id = props.image.arr[0].manifest.id;
                     file = await props.image.arr[0].getThumbnail();
                 } else {
@@ -76,10 +78,10 @@ export default defineComponent({
                 }
 
                 if (cachedId != id) {
-                    releaseImage(imgRef.value!);
-                    renderImage(imgRef.value!, file);
-                    imgRef.value!.style.width = "auto";
-                    imgRef.value!.style.height = "auto";
+                    releaseImage(imgRef.value);
+                    renderImage(imgRef.value, file);
+                    imgRef.value.style.width = 'auto';
+                    imgRef.value.style.height = 'auto';
                     cachedId = id;
                 }
             } catch (err) {
@@ -88,7 +90,8 @@ export default defineComponent({
         });
 
         onBeforeUnmount(() => {
-            releaseImage(imgRef.value!);
+            if (!imgRef.value) return;
+            releaseImage(imgRef.value);
         });
 
         return {

@@ -3,20 +3,24 @@
         <div class="prompt-wrapper" data-test="message-prompt">
             {{ store.message }}
             <div class="button-box">
-                <button-small @click="store.close">{{t('BUTTON.CANCEL')}}</button-small>
-                <button-small @click="store.confirm">{{t('BUTTON.CONFIRM')}}</button-small>
+                <button-small @click="store.close">{{
+                    t('BUTTON.CANCEL')
+                }}</button-small>
+                <button-small @click="store.confirm">{{
+                    t('BUTTON.CONFIRM')
+                }}</button-small>
             </div>
         </div>
     </modal-dark>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { useI18n } from 'vue-i18n'
-import { usePromptStore } from "@/store/modals/modal-prompt";
+import { defineComponent } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { usePromptStore } from '@/store/modals/modal-prompt';
 
-import ModalDark from "@/components/ModalDark.vue";
-import ButtonSmall from "@/components/ButtonSmall.vue";
+import ModalDark from '@/components/ModalDark.vue';
+import ButtonSmall from '@/components/ButtonSmall.vue';
 
 export default defineComponent({
     components: {
@@ -25,11 +29,11 @@ export default defineComponent({
     },
     setup() {
         const store = usePromptStore();
-         const { t } = useI18n() 
+        const { t } = useI18n();
 
         return {
             store,
-            t
+            t,
         };
     },
 });

@@ -1,5 +1,9 @@
 <template>
-    <div class="card-notification-error" data-test="card-notification-error" @click="close">
+    <div
+        class="card-notification-error"
+        data-test="card-notification-error"
+        @click="close"
+    >
         <div class="error"></div>
         <div class="notification">
             <div class="title">{{ t('NOTIFICATION.TITLE.ERROR') }}</div>
@@ -9,8 +13,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { useI18n } from "vue-i18n";
+import { defineComponent } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     props: {
@@ -19,14 +23,14 @@ export default defineComponent({
             required: true,
         },
     },
-    emits: ["close"],
+    emits: ['close'],
     setup(props, { emit }) {
         const { t } = useI18n();
         return {
             close() {
-                emit("close");
+                emit('close');
             },
-            t
+            t,
         };
     },
 });

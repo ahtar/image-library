@@ -1,10 +1,10 @@
-jest.mock("@/classes/Collection");
+jest.mock('@/classes/Collection');
 
-import CollectionOjbect from "@/classes/Collection";
+import CollectionOjbect from '@/classes/Collection';
 
 const handle = {
-    kind: "directory",
-    name: "mocked name",
+    kind: 'directory',
+    name: 'mocked name',
     isSameEntry: jest.fn(),
     queryPermission: jest.fn(),
     requestPermission: jest.fn(),
@@ -23,7 +23,7 @@ const handle = {
 export default {
     checkMainFolderAccess: jest.fn(() => true),
     requestMainFolderAccess: jest.fn(),
-    loadFile: jest.fn(() => new File([], "mock name")),
+    loadFile: jest.fn(() => new File([], 'mock name')),
     writeFile: jest.fn(),
     initLoadCollections: jest.fn(() => [
         new CollectionOjbect({} as any, {} as any, {} as any),

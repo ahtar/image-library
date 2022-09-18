@@ -2,7 +2,7 @@ function arrayChangePosition<T>(
     arr: Array<T>,
     fromIndex: number,
     toIndex: number
-) {
+): T[] {
     const copy = [...arr];
     const element = copy[fromIndex];
     copy.splice(fromIndex, 1);

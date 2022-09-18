@@ -1,4 +1,5 @@
-type FileSystemDirectoryHandle = import('@types/wicg-file-system-access').FileSystemDirectoryHandle;
+type FileSystemDirectoryHandle =
+    import('@types/wicg-file-system-access').FileSystemDirectoryHandle;
 
 interface Window {
     showDirectoryPicker: FileSystemDirectoryReader;
@@ -68,8 +69,8 @@ interface ImageSingle {
     collectionHandle: FileSystemDirectoryHandle;
     imageHandle: FileSystemFileHandle | null;
     thumbnailHandle: FileSystemFileHandle | null;
-    loadImage(): Promise<void>;
-    loadThumbnail(): Promise<void>;
+    loadImage(): Promise<FileSystemFileHandle>;
+    loadThumbnail(): Promise<FileSystemFileHandle>;
     getImage(): Promise<FileSystemFileHandle>;
     getThumbnail(): Promise<FileSystemFileHandle>;
     saveState(): void;
@@ -111,15 +112,28 @@ interface ImageSetSavedData extends ImageSetData {
     set: Array<ImageSingleData>;
 }
 
+interface ImageSetRestoredData {
+    manifest: ImageSetData;
+    arrOrder: Array[string];
+}
+
 interface Tag {
-    type?: TagGype;
+    type?: TagType;
     name: string;
     description?: string;
     count: number;
 }
 
-interface TagGype {
+interface TagType {
     typeName: string;
     description?: string;
     colorCode?: string;
 }
+
+interface NotificationMessage {
+    message: string;
+    status: boolean;
+    id: number;
+}
+
+type ContextMenuItem = Collection | ImageSingle | ImageSet;

@@ -5,17 +5,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-    emits: ["close"],
+    emits: ['close'],
 
     setup(props, { emit }) {
         return {
             close(event: MouseEvent) {
-                const classList = (event.target as Element).classList.value.split(" ");
-                if (classList.includes("base-modal") || classList.includes("wrapper")) {
-                    emit("close");
+                const classList = (
+                    event.target as Element
+                ).classList.value.split(' ');
+                if (
+                    classList.includes('base-modal') ||
+                    classList.includes('wrapper')
+                ) {
+                    emit('close');
                 }
             },
         };

@@ -1,16 +1,15 @@
-import { mount, VueWrapper } from "@vue/test-utils";
-import userEvent from "@testing-library/user-event";
-import { createTestingPinia } from "@pinia/testing";
+import { mount, VueWrapper } from '@vue/test-utils';
+import userEvent from '@testing-library/user-event';
+import { createTestingPinia } from '@pinia/testing';
 
-import SelectImage from "@/components/SelectImage.vue";
-import ImageSingle from "@/classes/ImageSingle";
+import SelectImage from '@/components/SelectImage.vue';
+import ImageSingle from '@/classes/ImageSingle';
 
-jest.mock("@/classes/ImageSet");
-jest.mock("@/classes/ImageSingle");
-jest.mock("@/composables/image-rendering");
+jest.mock('@/classes/ImageSet');
+jest.mock('@/classes/ImageSingle');
+jest.mock('@/composables/image-rendering');
 
-describe("SelectImage.vue", () => {
-
+describe('SelectImage.vue', () => {
     it('рендерится', () => {
         const wrapper = mount(SelectImage, {
             global: {
@@ -27,8 +26,8 @@ describe("SelectImage.vue", () => {
 
         expect(wrapper.find('[class="select-images"]').exists()).toBe(true);
     });
-    
-    it("Полученный сет рендерится", async () => {
+
+    it('Полученный сет рендерится', async () => {
         const wrapper = mount(SelectImage, {
             global: {
                 plugins: [createTestingPinia({})],
@@ -44,13 +43,13 @@ describe("SelectImage.vue", () => {
         await wrapper.vm.$nextTick();
 
         //в документе должно быть 3 изображения, src не должен быть пустым
-        expect(wrapper.findAll("img").length).toBe(3);
-        for (const img of wrapper.findAll("img")) {
-            expect(img.element.src).not.toBe("");
+        expect(wrapper.findAll('img').length).toBe(3);
+        for (const img of wrapper.findAll('img')) {
+            expect(img.element.src).not.toBe('');
         }
     });
 
-    it("emit change при смене изображения", async () => {
+    it('emit change при смене изображения', async () => {
         const wrapper = mount(SelectImage, {
             global: {
                 plugins: [createTestingPinia({})],
@@ -67,7 +66,7 @@ describe("SelectImage.vue", () => {
         await wrapper.vm.$nextTick();
 
         //жмем на второе изображение в сете
-        await userEvent.click(wrapper.findAll("img")[1].element);
+        await userEvent.click(wrapper.findAll('img')[1].element);
 
         const event = wrapper.emitted().change;
 
@@ -81,7 +80,7 @@ describe("SelectImage.vue", () => {
     /**
      * тест перестает работать, если раскоментировать beforeEach
      */
-    it("при смене на то же самое изображение, событие change не отправляется", async () => {
+    it('при смене на то же самое изображение, событие change не отправляется', async () => {
         const wrapper = mount(SelectImage, {
             global: {
                 plugins: [createTestingPinia({})],
@@ -98,7 +97,7 @@ describe("SelectImage.vue", () => {
         await wrapper.vm.$nextTick();
 
         //жмем на первое изображение в сете, оно и является активным
-        await userEvent.click(wrapper.findAll("img")[0].element);
+        await userEvent.click(wrapper.findAll('img')[0].element);
 
         //событие change не должно быть отправлено
         expect(wrapper.emitted().change).not.toBeDefined();

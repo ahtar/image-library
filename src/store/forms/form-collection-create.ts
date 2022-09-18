@@ -1,25 +1,25 @@
-import { useCollections } from "@/store/collections";
-import { useNotificationStore } from "@/store/modals/modal-notification";
-import { defineStore } from "pinia";
-import Collection from "@/classes/Collection";
-import jimp from "@/modules/jimp";
-import fs from "@/modules/file-system";
+import { useCollections } from '@/store/collections';
+import { useNotificationStore } from '@/store/modals/modal-notification';
+import { defineStore } from 'pinia';
+import Collection from '@/classes/Collection';
+import jimp from '@/modules/jimp';
+import fs from '@/modules/file-system';
 
-import i18n from "@/locales/i18n";
+import i18n from '@/locales/i18n';
 
 /**
  * Надо будет обновить, подправить
  */
-export const useCollectionCreateStore = defineStore("collectionCreate", {
+export const useCollectionCreateStore = defineStore('collectionCreate', {
     state: () => {
         return {
             visible: false,
             urlInputActive: true,
             imageInputActive: true,
             form: {
-                name: "",
-                description: "",
-                theme: "",
+                name: '',
+                description: '',
+                theme: '',
                 file: undefined as File | undefined,
                 options: {
                     corrupted: false,
@@ -42,9 +42,9 @@ export const useCollectionCreateStore = defineStore("collectionCreate", {
         },
 
         clearForm() {
-            this.form.name = "";
-            this.form.description = "";
-            this.form.theme = "";
+            this.form.name = '';
+            this.form.description = '';
+            this.form.theme = '';
             this.form.file = undefined;
             this.form.options.corrupted = false;
         },
@@ -53,6 +53,7 @@ export const useCollectionCreateStore = defineStore("collectionCreate", {
          * Создание новой Коллекции на основе введеных пользователем данных.
          */
         async createCollection() {
+            if (!this.form.file) return;
             const { getHandle, writeFile } = fs;
             const store = useCollections();
             const storeNotifications = useNotificationStore();
@@ -62,7 +63,9 @@ export const useCollectionCreateStore = defineStore("collectionCreate", {
             try {
                 await handle.getDirectoryHandle(this.form.name);
                 storeNotifications.notify(
-                    i18n.global.t('NOTIFICATION.MESSAGE.COLLECTION_ALREADY_EXISTS'),
+                    i18n.global.t(
+                        'NOTIFICATION.MESSAGE.COLLECTION_ALREADY_EXISTS'
+                    ),
                     false
                 );
             } catch (err) {
@@ -74,31 +77,33 @@ export const useCollectionCreateStore = defineStore("collectionCreate", {
                     );
                     const manifest: CollectionManifest = {
                         name: this.form.name,
-                        theme: this.form.theme || "",
-                        description: this.form.description || "",
+                        theme: this.form.theme || '',
+                        description: this.form.description || '',
                         created: Date(),
                         lastModified: Date(),
                         options: {
                             corrupted: this.form.options.corrupted,
                         },
                     };
-                    const thumbnail = await jimp.resize(this.form.file!);
+                    const thumbnail = await jimp.resize(this.form.file);
 
-                    await collectionHandle.getDirectoryHandle("imageData", {
+                    await collectionHandle.getDirectoryHandle('imageData', {
                         create: true,
                     });
-                    await collectionHandle.getDirectoryHandle("images", { create: true });
-                    await collectionHandle.getDirectoryHandle("thumbnails", {
+                    await collectionHandle.getDirectoryHandle('images', {
+                        create: true,
+                    });
+                    await collectionHandle.getDirectoryHandle('thumbnails', {
                         create: true,
                     });
                     await writeFile(
                         collectionHandle,
-                        "manifest.json",
+                        'manifest.json',
                         JSON.stringify(manifest)
                     );
                     const thumbnailHandle = await writeFile(
                         collectionHandle,
-                        "thumbnail.png",
+                        'thumbnail.png',
                         thumbnail
                     );
 
@@ -112,9 +117,14 @@ export const useCollectionCreateStore = defineStore("collectionCreate", {
                     this.clearForm();
                     this.close();
 
-                    storeNotifications.notify(i18n.global.t('NOTIFICATION.MESSAGE.COLLECTION_CREATED'));
+                    storeNotifications.notify(
+                        i18n.global.t('NOTIFICATION.MESSAGE.COLLECTION_CREATED')
+                    );
                 } else {
-                    storeNotifications.notify(i18n.global.t('NOTIFICATION.MESSAGE.ERROR'), false);
+                    storeNotifications.notify(
+                        i18n.global.t('NOTIFICATION.MESSAGE.ERROR'),
+                        false
+                    );
                     console.log(error);
                 }
             }

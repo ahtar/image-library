@@ -1,8 +1,8 @@
-import { mount, VueWrapper } from "@vue/test-utils";
-import ImageViewer from '@/components/ImageViewer.vue'
+import { mount, VueWrapper } from '@vue/test-utils';
+import ImageViewer from '@/components/ImageViewer.vue';
 
-import ImageSingle from '@/classes/ImageSingle'
-jest.mock("@/classes/ImageSingle");
+import ImageSingle from '@/classes/ImageSingle';
+jest.mock('@/classes/ImageSingle');
 
 describe('ImageViewer.vue', () => {
     let wrapper: VueWrapper<any>;
@@ -10,7 +10,7 @@ describe('ImageViewer.vue', () => {
     beforeEach(() => {
         wrapper = mount(ImageViewer, {
             props: {
-                image: new ImageSingle({} as any, {} as any)
+                image: new ImageSingle({} as any, {} as any),
             },
         });
     });

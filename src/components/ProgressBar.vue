@@ -1,19 +1,23 @@
 <template>
     <modal-dark>
         <div class="progress-bar-wrapper">
-            <base-progress-bar class="progress-bar" :value="store.value" :max="store.max" />
+            <base-progress-bar
+                class="progress-bar"
+                :value="store.value"
+                :max="store.max"
+            />
             <p>({{ store.value }}/{{ store.max }})</p>
         </div>
     </modal-dark>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
-import ModalDark from "@/components/ModalDark.vue";
-import BaseProgressBar from "@/components/base/BaseProgressBar.vue";
+import ModalDark from '@/components/ModalDark.vue';
+import BaseProgressBar from '@/components/base/BaseProgressBar.vue';
 
-import { useProgressBarStore } from "@/store/modals/modal-progress-bar";
+import { useProgressBarStore } from '@/store/modals/modal-progress-bar';
 
 export default defineComponent({
     components: {
@@ -21,8 +25,9 @@ export default defineComponent({
         BaseProgressBar,
     },
 
-    setup(props, { emit }) {
+    setup() {
         const store = useProgressBarStore();
+
         return {
             store,
         };

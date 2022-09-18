@@ -1,10 +1,10 @@
 <template>
-    <base-card class="card-new-big" tabindex="0" data-test="card-new-big"/>
+    <base-card class="card-new-big" tabindex="0" data-test="card-new-big" />
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
-import BaseCard from "@/components/base/BaseCard.vue";
+import BaseCard from '@/components/base/BaseCard.vue';
 
 export default defineComponent({
     components: {
@@ -20,7 +20,7 @@ export default defineComponent({
     @include flex-center();
 
     &::after {
-        content: "+";
+        content: '+';
         font-size: 6rem;
         color: $color-text-second;
     }

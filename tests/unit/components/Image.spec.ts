@@ -1,18 +1,16 @@
-import { mount, VueWrapper } from "@vue/test-utils";
+import { mount, VueWrapper } from '@vue/test-utils';
 
-import Image from '@/components/Image.vue'
+import Image from '@/components/Image.vue';
 
-import ImageSingle from '@/classes/ImageSingle'
-jest.mock("@/classes/ImageSingle");
+import ImageSingle from '@/classes/ImageSingle';
+jest.mock('@/classes/ImageSingle');
 
 describe('Image.vue', () => {
     let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Image, {
-            props: {
-
-            },
+            props: {},
         });
     });
 
@@ -30,7 +28,7 @@ describe('Image.vue', () => {
         expect(img.src).toBeFalsy();
 
         await wrapper.setProps({
-            data: new Blob()
+            data: new Blob(),
         });
 
         expect(img.src).not.toBeFalsy();
@@ -42,7 +40,9 @@ describe('Image.vue', () => {
         expect(img.src).toBeFalsy();
 
         await wrapper.setProps({
-            data: new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' })
+            data: new File(['(⌐□_□)'], 'chucknorris.png', {
+                type: 'image/png',
+            }),
         });
 
         expect(img.src).not.toBeFalsy();
@@ -55,7 +55,7 @@ describe('Image.vue', () => {
         expect(img.src).toBeFalsy();
 
         await wrapper.setProps({
-            data: await image.getImage()
+            data: await image.getImage(),
         });
 
         expect(img.src).not.toBeFalsy();

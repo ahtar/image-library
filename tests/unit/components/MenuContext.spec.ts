@@ -1,9 +1,9 @@
-import { mount, VueWrapper } from "@vue/test-utils";
-import { createTestingPinia } from "@pinia/testing";
+import { mount, VueWrapper } from '@vue/test-utils';
+import { createTestingPinia } from '@pinia/testing';
 
-import MenuContext from "@/components/MenuContext.vue";
+import MenuContext from '@/components/MenuContext.vue';
 
-describe("MenuContext.vue", () => {
+describe('MenuContext.vue', () => {
     let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
@@ -12,7 +12,7 @@ describe("MenuContext.vue", () => {
                 plugins: [createTestingPinia({})],
             },
             props: {
-                event: new MouseEvent("click"),
+                event: new MouseEvent('click'),
             },
             attachTo: document.body,
         });
@@ -21,32 +21,32 @@ describe("MenuContext.vue", () => {
     it('рендерится', () => {
         expect(wrapper.find('[class="context-menu"]').exists()).toBe(true);
     });
-    
-    it("slot рендерится", async () => {
+
+    it('slot рендерится', async () => {
         const wrapper = mount(MenuContext, {
             global: {
                 plugins: [createTestingPinia({})],
             },
             slots: {
-                default: "<div>Test child</div>",
+                default: '<div>Test child</div>',
             },
             props: {
-                event: new MouseEvent("click"),
+                event: new MouseEvent('click'),
             },
         });
-        expect(wrapper.html()).toContain("Test child");
+        expect(wrapper.html()).toContain('Test child');
     });
 
-    it("если slot не указан, то рендерится fallback контент", () => {
-        expect(wrapper.html()).toContain("test 1");
+    it('если slot не указан, то рендерится fallback контент', () => {
+        expect(wrapper.html()).toContain('test 1');
     });
 
-    it("закрывается при потере фокуса", async () => {
+    it('закрывается при потере фокуса', async () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.element).toBe(document.activeElement);
 
-        await wrapper.trigger("blur");
+        await wrapper.trigger('blur');
 
         expect(wrapper.emitted().close).toBeDefined();
     });

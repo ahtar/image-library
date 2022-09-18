@@ -1,9 +1,9 @@
-import { useCollections } from "@/store/collections";
-import { useNotificationStore } from "@/store/modals/modal-notification";
-import { defineStore } from "pinia";
-import i18n from "@/locales/i18n";
+import { useCollections } from '@/store/collections';
+import { useNotificationStore } from '@/store/modals/modal-notification';
+import { defineStore } from 'pinia';
+import i18n from '@/locales/i18n';
 
-export const useImageEditStore = defineStore("imageEdit", {
+export const useImageEditStore = defineStore('imageEdit', {
     state: () => {
         return {
             storeCollections: useCollections(),
@@ -16,7 +16,7 @@ export const useImageEditStore = defineStore("imageEdit", {
     getters: {
         isSet: (state) => {
             if (state.image) {
-                if ("arr" in state.image) return true;
+                if ('arr' in state.image) return true;
             }
             return false;
         },
@@ -52,12 +52,13 @@ export const useImageEditStore = defineStore("imageEdit", {
         },
 
         async updateImage() {
+            if (!this.image) return;
             const storeNotifications = useNotificationStore();
 
             const obj: ImageUpdateData = {};
 
             if (this.imageSeparate.length > 0)
-                obj.separate = this.imageSeparate as any;
+                obj.separate = this.imageSeparate;
             if (Object.keys(this.imageFileChanges).length > 0)
                 obj.imageData = this.imageFileChanges;
             if (this.image?.checkChanges()) obj.manifest = true;
@@ -65,7 +66,7 @@ export const useImageEditStore = defineStore("imageEdit", {
             this.close();
             try {
                 await this.storeCollections.activeCollection?.updateImage(
-                    this.image as any,
+                    this.image,
                     obj
                 );
                 storeNotifications.notify(

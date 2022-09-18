@@ -3,7 +3,7 @@ const cache: { [key: string]: Array<FileSystemFileHandle> } = {};
 
 //Mocked FileSystemDirectoryHandle.
 class DirectoryHandle implements FileSystemDirectoryHandle {
-    kind: "directory" = "directory";
+    kind: 'directory' = 'directory';
     name: string;
     isFile: false = false;
     isDirectory: true = true;
@@ -13,7 +13,8 @@ class DirectoryHandle implements FileSystemDirectoryHandle {
     requestPermission = jest.fn();
     constructor(name?: string) {
         this.name =
-            name || (Math.random().toString(36) + "00000000000000000").slice(2, 8);
+            name ||
+            (Math.random().toString(36) + '00000000000000000').slice(2, 8);
     }
 
     async getDirectory(name: string): Promise<FileSystemDirectoryHandle> {
@@ -42,7 +43,7 @@ class DirectoryHandle implements FileSystemDirectoryHandle {
 
     async removeEntry(name: string) {
         const itemId = cache[this.name]?.findIndex((item) => item.name == name);
-        if (itemId == -1) throw new Error("File not found");
+        if (itemId == -1) throw new Error('File not found');
         cache[this.name].splice(itemId, 1);
     }
 
@@ -241,7 +242,7 @@ class DirectoryHandle implements FileSystemDirectoryHandle {
 
 //Mocked FileSystemFileHandle.
 class FileHandle implements FileSystemFileHandle {
-    kind: "file" = "file";
+    kind: 'file' = 'file';
     isFile: true = true;
     isDirectory: false = false;
     name: string;
@@ -251,16 +252,16 @@ class FileHandle implements FileSystemFileHandle {
     constructor(name?: string) {
         this.name =
             name ||
-            (Math.random().toString(36) + "00000000000000000").slice(2, 8) + ".png";
+            (Math.random().toString(36) + '00000000000000000').slice(2, 8) +
+                '.png';
     }
 
     async getFile(): Promise<File> {
-        const content = (Math.random().toString(36) + "00000000000000000").slice(
-            2,
-            8
-        );
+        const content = (
+            Math.random().toString(36) + '00000000000000000'
+        ).slice(2, 8);
         const name = this.name;
-        const file = new File([content], name, { type: "text/plain" });
+        const file = new File([content], name, { type: 'text/plain' });
         return file;
     }
 

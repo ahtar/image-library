@@ -1,14 +1,14 @@
 const n = 700;
 
-const patterns = [
+/*const patterns = [
     {
         n: 700,
         falseDataOne: [255, 255, 50, 50],
         falseDataTwo: [255, 110, 1, 1, 5, 10, 255],
     },
-];
+];*/
 
-function concatTypedArrays(data: Uint8Array[]) {
+function concatTypedArrays(data: Uint8Array[]): Uint8Array {
     const length = data.reduce((val, arr) => (val = val + arr.length), 0);
     const temp = new Uint8Array(length);
     let offset = 0;
@@ -21,22 +21,14 @@ function concatTypedArrays(data: Uint8Array[]) {
     return temp;
 }
 
-function encrypt() {
-    console.log("temp");
-}
-
-function decrypt() {
-    console.log("temp");
-}
-
 /**
  * Контролируемая порча файла.
  * Вставляет случайные данные в определенное место в файле, делая его "порченным".
  */
-async function corrupt(data: Blob | ArrayBuffer) {
+async function corrupt(data: Blob | ArrayBuffer): Promise<Blob> {
     let arrayBuffer: ArrayBuffer;
 
-    if ("arrayBuffer" in data) {
+    if ('arrayBuffer' in data) {
         arrayBuffer = await data.arrayBuffer();
     } else {
         arrayBuffer = data;
@@ -60,10 +52,10 @@ async function corrupt(data: Blob | ArrayBuffer) {
 /**
  * Восстанавливает испорченный файл.
  */
-async function recover(data: Blob | ArrayBuffer) {
+async function recover(data: Blob | ArrayBuffer): Promise<Blob> {
     let arrayBuffer: ArrayBuffer;
 
-    if ("arrayBuffer" in data) {
+    if ('arrayBuffer' in data) {
         arrayBuffer = await data.arrayBuffer();
     } else {
         arrayBuffer = data;
@@ -77,10 +69,10 @@ async function recover(data: Blob | ArrayBuffer) {
     return new Blob([mergedArray.buffer]);
 }
 
-async function isCorrupted(data: Blob | ArrayBuffer) {
+async function isCorrupted(data: Blob | ArrayBuffer): Promise<boolean> {
     let arrayBuffer: ArrayBuffer;
 
-    if ("arrayBuffer" in data) {
+    if ('arrayBuffer' in data) {
         arrayBuffer = await data.arrayBuffer();
     } else {
         arrayBuffer = data;
@@ -98,8 +90,6 @@ async function isCorrupted(data: Blob | ArrayBuffer) {
 }
 
 export default {
-    encrypt,
-    decrypt,
     corrupt,
     recover,
     isCorrupted,

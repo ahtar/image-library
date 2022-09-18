@@ -5,9 +5,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
-import Spinner from "@/components/Spinner.vue";
+import Spinner from '@/components/Spinner.vue';
 
 export default defineComponent({
     components: {

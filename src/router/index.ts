@@ -1,20 +1,22 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 
 const routes: Array<RouteRecordRaw> = [
     {
-        path: "/",
-        name: "Home",
+        path: '/',
+        name: 'Home',
         component: () => {
-            return import(/* webpackChunkName: "home" */ "../views/Home.vue")
+            return import(/* webpackChunkName: "home" */ '../views/Home.vue');
         },
     },
 
     {
-        path: "/collections/:name",
-        name: "Collection",
+        path: '/collections/:name',
+        name: 'Collection',
         component: () => {
-            return import(/* webpackChunkName: "collection" */ "../views/Collection.vue")
-        }
+            return import(
+                /* webpackChunkName: "collection" */ '../views/Collection.vue'
+            );
+        },
     },
 ];
 

@@ -1,5 +1,5 @@
 <template>
-    <header-vue/>
+    <header-vue />
     <div class="content">
         <router-view />
     </div>
@@ -18,23 +18,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
+import { defineComponent, onMounted } from 'vue';
 
-import HeaderVue from "@/components/Header.vue";
-import MessagePrompt from "@/components/MessagePrompt.vue";
-import MessageNotification from "@/components/MessageNotification.vue";
-import TransitionFade from "@/components/TransitionFade.vue";
-import ScreenInit from "@/components/ScreenInit.vue";
-import ProgressBar from "@/components/ProgressBar.vue";
+import HeaderVue from '@/components/Header.vue';
+import MessagePrompt from '@/components/MessagePrompt.vue';
+import MessageNotification from '@/components/MessageNotification.vue';
+import TransitionFade from '@/components/TransitionFade.vue';
+import ScreenInit from '@/components/ScreenInit.vue';
+import ProgressBar from '@/components/ProgressBar.vue';
 
-import { usePromptStore } from "@/store/modals/modal-prompt";
-import { useProgressBarStore } from "@/store/modals/modal-progress-bar";
-import { useInitStore } from "@/store/modals/modal-init";
-import { useCollections } from "@/store/collections";
+//import { useModalStore } from '@/store/modals/store';
+import { usePromptStore } from '@/store/modals/modal-prompt';
+import { useProgressBarStore } from '@/store/modals/modal-progress-bar';
+import { useInitStore } from '@/store/modals/modal-init';
+import { useCollections } from '@/store/collections';
 
-import useSwUpdate from '@/composables/swUpdate'
-
-import fs from "@/modules/file-system";
+import useSwUpdate from '@/composables/swUpdate';
 
 export default defineComponent({
     components: {
@@ -46,27 +45,27 @@ export default defineComponent({
         ProgressBar,
     },
     setup() {
+        //const storeModal = useModalStore();
         const storePrompt = usePromptStore();
         const storeProgressBar = useProgressBarStore();
         const storeInit = useInitStore();
         const storeCollections = useCollections();
-        const { checkMainFolderAccess, initLoadCollections } = fs;
         const { listenForSwUpdate } = useSwUpdate();
 
         listenForSwUpdate();
 
         onMounted(async () => {
-            //console.clear();
-
             //Проверка, загруженны ли коллекции, если не загружены, то запросить доступ к коллекциям.
             if (!storeCollections.collectionsInitialized) {
-                const status = await checkMainFolderAccess();
+                /*const status = await checkMainFolderAccess();
                 if (!status) {
                     storeInit.show();
                 } else {
                     const data = await initLoadCollections();
                     storeCollections.addCollection(data);
-                }
+                }*/
+
+                storeInit.show();
             }
         });
 
@@ -156,10 +155,8 @@ body {
     --path: polygon(100% 0, 50% 100%, 0 0);
     @include z-depth();
 
-    
-
     &::before {
-        content: "";
+        content: '';
         display: inline-block;
         position: absolute;
         background-color: $color-border-dark-5;
@@ -171,7 +168,7 @@ body {
     }
 
     &::after {
-        content: "";
+        content: '';
         display: inline-block;
         position: absolute;
         background-color: $color-dark-5;

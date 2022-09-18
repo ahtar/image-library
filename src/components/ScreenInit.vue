@@ -3,39 +3,40 @@
         <div class="init-wrapper" v-if="compatibility">
             <p>{{ t('INIT_SCREEN.MESSAGE') }}</p>
             <button-small @click="requestFolderAccess()">
-                {{ t('BUTTON.PICK_FOLDER') }}</button-small>
+                {{ t('BUTTON.PICK_FOLDER') }}</button-small
+            >
         </div>
         <div class="init-wrapper" v-else>
-            <h3>{{t('INIT_SCREEN.BROWSER_INCOMPATIBLE')}}</h3>
-            <p>{{t('INIT_SCREEN.INCOMPATIBILITY_DESCRIPTION')}}</p>
-            <p>{{t('INIT_SCREEN.SUPPORTED_BROWSERS')}}</p>
-            <img src="@/assets/Incompatible.svg" class="icon"/>
+            <h3>{{ t('INIT_SCREEN.BROWSER_INCOMPATIBLE') }}</h3>
+            <p>{{ t('INIT_SCREEN.INCOMPATIBILITY_DESCRIPTION') }}</p>
+            <p>{{ t('INIT_SCREEN.SUPPORTED_BROWSERS') }}</p>
+            <img src="@/assets/Incompatible.svg" class="icon" />
         </div>
     </modal-dark>
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref } from "vue";
-import { useI18n } from 'vue-i18n'
+import { defineComponent, onBeforeMount, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import { useInitStore } from "@/store/modals/modal-init";
+import { useInitStore } from '@/store/modals/modal-init';
 
-import ModalDark from "@/components/ModalDark.vue";
-import ButtonSmall from "@/components/ButtonSmall.vue";
+import ModalDark from '@/components/ModalDark.vue';
+import ButtonSmall from '@/components/ButtonSmall.vue';
 
 export default defineComponent({
     components: {
         ModalDark,
         ButtonSmall,
     },
-    emits: ["data"],
+    emits: ['data'],
     setup(props, { emit }) {
         const store = useInitStore();
         const compatibility = ref(true);
         const { t } = useI18n();
 
         async function requestFolderAccess() {
-            emit("data", await store.requestFolderAccess());
+            emit('data', await store.requestFolderAccess());
         }
 
         onBeforeMount(() => {

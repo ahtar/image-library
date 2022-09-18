@@ -1,14 +1,19 @@
 <template>
-    <div class="sidebar" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" ref="sidebar">
+    <div
+        class="sidebar"
+        @mouseenter="onMouseEnter"
+        @mouseleave="onMouseLeave"
+        ref="sidebar"
+    >
         <slot></slot>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref } from 'vue';
 
 export default defineComponent({
-    emits: ["unfocus"],
+    emits: ['unfocus'],
     setup(props, { emit }) {
         const sidebar = ref<HTMLElement | null>(null);
 
@@ -17,8 +22,9 @@ export default defineComponent({
          */
         const elements: Array<HTMLElement> = [];
         onMounted(() => {
+            if (!sidebar.value) return;
             elements.push(
-                ...sidebar.value!.querySelectorAll<HTMLElement>(".focusable")
+                ...sidebar.value.querySelectorAll<HTMLElement>('.focusable')
             );
             disable();
         });
@@ -42,25 +48,28 @@ export default defineComponent({
             });
         }
 
+        function onMouseEnter() {
+            if (sidebar.value != null) {
+                enable();
+                sidebar.value.style.transform = 'translate(0, 0)';
+                sidebar.value.style.transition = '0.35s ease-out';
+            }
+        }
+
+        function onMouseLeave() {
+            if (sidebar.value != null) {
+                disable();
+                sidebar.value.style.transform =
+                    'translateX(-100%) translateX(+1.5vw)';
+                sidebar.value.style.transition = '0.35s ease-in';
+
+                emit('unfocus');
+            }
+        }
+
         return {
-            onMouseEnter() {
-                if (sidebar.value != null) {
-                    enable();
-                    sidebar.value.style.transform = "translate(0, 0)";
-                    sidebar.value.style.transition = "0.35s ease-out";
-                }
-            },
-            onMouseLeave() {
-                if (sidebar.value != null) {
-                    disable();
-                    sidebar.value.style.transform =
-                        "translateX(-100%) translateX(+1.5vw)";
-                    sidebar.value.style.transition = "0.35s ease-in";
-
-                    emit("unfocus");
-                }
-            },
-
+            onMouseEnter,
+            onMouseLeave,
             sidebar,
             blur,
         };

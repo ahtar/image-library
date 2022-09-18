@@ -1,5 +1,11 @@
 <template>
-    <div class="context-menu" @blur="closeContext" ref="menu" tabindex="0" @contextmenu.prevent>
+    <div
+        class="context-menu"
+        @blur="closeContext"
+        ref="menu"
+        tabindex="0"
+        @contextmenu.prevent
+    >
         <slot class="option">
             <div class="option">test 1</div>
             <div class="option">test 2</div>
@@ -10,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, nextTick } from "vue";
+import { defineComponent, onMounted, ref, nextTick } from 'vue';
 
 export default defineComponent({
     props: {
@@ -20,33 +26,36 @@ export default defineComponent({
         },
     },
 
-    emits: ["close"],
+    emits: ['close'],
 
     setup(props, { emit }) {
         const menu = ref<HTMLElement | null>(null);
 
         //сфокусироваться на меню
         onMounted(() => {
+            if (!menu.value) return;
             //рассчитать Y координату с учётом границ экрана
             if (
-                props.event.clientY + menu.value!.offsetHeight >
+                props.event.clientY + menu.value.offsetHeight >
                 document.body.clientHeight
             ) {
-                menu.value!.style.top = `${props.event.clientY - menu.value!.offsetHeight
-                    }px`;
+                menu.value.style.top = `${
+                    props.event.clientY - menu.value.offsetHeight
+                }px`;
             } else {
-                menu.value!.style.top = `${props.event.clientY}px`;
+                menu.value.style.top = `${props.event.clientY}px`;
             }
 
             //рассчитать X координату с учётом границ экрана
             if (
-                props.event.clientX + menu.value!.offsetWidth >
+                props.event.clientX + menu.value.offsetWidth >
                 document.body.clientWidth
             ) {
-                menu.value!.style.left = `${props.event.clientX - menu.value!.offsetWidth
-                    }px`;
+                menu.value.style.left = `${
+                    props.event.clientX - menu.value.offsetWidth
+                }px`;
             } else {
-                menu.value!.style.left = `${props.event.clientX}px`;
+                menu.value.style.left = `${props.event.clientX}px`;
             }
 
             //Сфокусироваться на меню.
@@ -58,7 +67,7 @@ export default defineComponent({
         return {
             menu,
             closeContext() {
-                emit("close");
+                emit('close');
             },
             blur,
         };

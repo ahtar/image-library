@@ -1,38 +1,13 @@
-import Collection from "@/classes/Collection";
-import { get, set } from "idb-keyval";
+import Collection from '@/classes/Collection';
 
-import usePermissions from "@/composables/permissions";
-const { verifyPermission } = usePermissions();
-
-let handler: FileSystemDirectoryHandle;
-
-let callback: any;
-
-/**
- * Проверка, есть ли доступ к папке с Коллекциями.
- * @returns status.
- */
-async function checkMainFolderAccess() {
-    const data: FileSystemDirectoryHandle | undefined = await get("entryHandle");
-    if (data == undefined) return false;
-    if (Array.isArray(data) && data.length == 0) return false;
-
-    handler = data;
-
-    return verifyPermission(data);
-}
+let handle: FileSystemDirectoryHandle;
 
 /**
  * Запрос папки с коллекциями.
  */
-async function requestMainFolderAccess() {
-    try {
-        handler = await window.showDirectoryPicker();
-        await set("entryHandle", handler);
-        if (callback) callback();
-    } catch (err) {
-        console.log(err);
-    }
+async function requestMainFolderAccess(): Promise<FileSystemDirectoryHandle> {
+    handle = await window.showDirectoryPicker();
+    return handle;
 }
 
 /**
@@ -40,7 +15,7 @@ async function requestMainFolderAccess() {
  * @param handle FileHandle требуемого файла.
  * @returns Файл.
  */
-async function loadFile(handle: FileSystemFileHandle) {
+async function loadFile(handle: FileSystemFileHandle): Promise<File> {
     const data = await handle.getFile();
     return data;
 }
@@ -56,13 +31,13 @@ async function writeFile(
     handle: FileSystemDirectoryHandle,
     name: string,
     content: FileSystemWriteChunkType
-) {
+): Promise<FileSystemFileHandle> {
     try {
-        const fileHandler = await handle.getFileHandle(name, { create: true });
-        const stream = await fileHandler.createWritable();
+        const filehandle = await handle.getFileHandle(name, { create: true });
+        const stream = await filehandle.createWritable();
         await stream.write(content);
         await stream.close();
-        return fileHandler;
+        return filehandle;
     } catch (err) {
         console.log(err);
         throw err;
@@ -73,12 +48,13 @@ async function writeFile(
  * Получение всех коллекций пользователя.
  * @returns Массив с коллекциями.
  */
-async function initLoadCollections() {
+async function initLoadCollections(): Promise<Collection[]> {
     const arr: Array<Collection> = [];
 
-    if (handler != undefined) {
-        for await (const [key, h] of handler.entries()) {
-            if (h.kind == "directory") {
+    if (handle != undefined) {
+        for await (const [key, h] of handle.entries()) {
+            key;
+            if (h.kind == 'directory') {
                 const collection = await Collection.fromFolderHandle(h);
                 if (collection) arr.push(collection);
             }
@@ -92,12 +68,11 @@ async function initLoadCollections() {
  * Получение DirectoryHandle папки приложения.
  * @returns DirectoryHandle папки приложения.
  */
-function getHandle() {
-    return handler;
+function getHandle(): FileSystemDirectoryHandle {
+    return handle;
 }
 
 export default {
-    checkMainFolderAccess,
     requestMainFolderAccess,
     writeFile,
     loadFile,

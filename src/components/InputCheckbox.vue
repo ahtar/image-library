@@ -1,20 +1,29 @@
 <template>
     <div class="input-checkbox-wrapper">
-        <div class="input-checkbox-label" v-if="label != ''" data-test="input-checkbox-label">
+        <div
+            class="input-checkbox-label"
+            v-if="label != ''"
+            data-test="input-checkbox-label"
+        >
             {{ label }}
         </div>
-        <input class="input-checkbox" type="checkbox" @change="input" ref="checkbox" />
+        <input
+            class="input-checkbox"
+            type="checkbox"
+            @change="input"
+            ref="checkbox"
+        />
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from "vue";
+import { defineComponent, onMounted, ref, watch } from 'vue';
 
 export default defineComponent({
     props: {
         label: {
             type: String,
-            default: "",
+            default: '',
         },
         modelValue: {
             required: true,
@@ -25,19 +34,23 @@ export default defineComponent({
             default: true,
         },
     },
-    emits: ["update:modelValue"],
+    emits: ['update:modelValue'],
     setup(props, { emit }) {
         const checkbox = ref<HTMLInputElement>();
 
         function input(value: Event) {
-            emit("update:modelValue", (value.target as HTMLInputElement).checked);
+            emit(
+                'update:modelValue',
+                (value.target as HTMLInputElement).checked
+            );
         }
 
         //Для случая, когда modelValue изменился каким-либо другим способом.
         watch(
             () => props.modelValue,
             () => {
-                checkbox.value!.checked = props.modelValue;
+                if (!checkbox.value) return;
+                checkbox.value.checked = props.modelValue;
             }
         );
 
@@ -76,7 +89,14 @@ export default defineComponent({
 
         &::before {
             @include pseudo();
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            clip-path: polygon(
+                14% 44%,
+                0 65%,
+                50% 100%,
+                100% 16%,
+                80% 0%,
+                43% 62%
+            );
             width: 0.7rem;
             height: 0.7rem;
             transform: scale(0);

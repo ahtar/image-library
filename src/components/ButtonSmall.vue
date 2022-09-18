@@ -5,8 +5,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import BaseButton from "@/components/base/BaseButton.vue";
+import { defineComponent } from 'vue';
+import BaseButton from '@/components/base/BaseButton.vue';
 
 export default defineComponent({
     props: {
@@ -15,7 +15,7 @@ export default defineComponent({
             type: Boolean,
         },
     },
-    emits: ["click"],
+    emits: ['click'],
 
     components: {
         BaseButton,
@@ -24,7 +24,7 @@ export default defineComponent({
         return {
             click() {
                 if (!props.blocked) {
-                    emit("click");
+                    emit('click');
                 }
             },
         };

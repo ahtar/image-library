@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import { useNotificationStore } from "@/store/modals/modal-notification";
-import i18n from "@/locales/i18n";
+import { defineStore } from 'pinia';
+import { useNotificationStore } from '@/store/modals/modal-notification';
+import i18n from '@/locales/i18n';
 
-export const useCollections = defineStore("collections", {
+export const useCollections = defineStore('collections', {
     state: () => {
         return {
             collections: [] as Array<Collection>,
@@ -59,11 +59,18 @@ export const useCollections = defineStore("collections", {
                 if (index != -1) {
                     this.collections.splice(index, 1);
                     await collection.deleteCollection();
-                    storeNotifications.notify(i18n.global.t('NOTIFICATION.MESSAGE.COLLECTION_DELETED'));
+                    storeNotifications.notify(
+                        i18n.global.t('NOTIFICATION.MESSAGE.COLLECTION_DELETED')
+                    );
                 }
             } catch (err) {
                 console.log(err);
-                storeNotifications.notify(i18n.global.t('NOTIFICATION.MESSAGE.COLLECTION_DELETE_ERROR'), false);
+                storeNotifications.notify(
+                    i18n.global.t(
+                        'NOTIFICATION.MESSAGE.COLLECTION_DELETE_ERROR'
+                    ),
+                    false
+                );
             }
         },
     },

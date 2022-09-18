@@ -1,16 +1,27 @@
 <template>
-    <div class="image-viewer-wrapper wrapper" @mouseup="moveEnd" @mousemove="move" ref="imageWrapper">
-        <image-vue id="viewed-image" :data="imgData" alt="Image" @wheel="scale" @mousedown="moveStart" />
+    <div
+        class="image-viewer-wrapper wrapper"
+        @mouseup="moveEnd"
+        @mousemove="move"
+        ref="imageWrapper"
+    >
+        <image-vue
+            id="viewed-image"
+            :data="imgData"
+            alt="Image"
+            @wheel="scale"
+            @mousedown="moveStart"
+        />
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUpdated, PropType, ref } from "vue";
-import ImageVue from "./Image.vue";
+import { defineComponent, onMounted, onUpdated, PropType, ref } from 'vue';
+import ImageVue from './Image.vue';
 
 export default defineComponent({
     components: {
-        ImageVue
+        ImageVue,
     },
     props: {
         image: {
@@ -39,7 +50,8 @@ export default defineComponent({
         };
 
         onMounted(async () => {
-            img.value = imageWrapper.value!.children[0] as HTMLImageElement;
+            if (!imageWrapper.value) return;
+            img.value = imageWrapper.value.children[0] as HTMLImageElement;
             imgData.value = await props.image.getImage();
         });
 
@@ -50,6 +62,7 @@ export default defineComponent({
         //Увеличение или уменьшение изображения при прокрутке колеса мыши.
         //Фокусируется в точку, в которую указывает курсор мыши.
         function scale(event: WheelEvent) {
+            if (!imageWrapper.value) return;
             if (img.value) {
                 //Координаты изображения.
                 const targetRect = (
@@ -68,17 +81,17 @@ export default defineComponent({
                     y: event.pageY,
                 };
 
-                if (img.value.style.maxHeight == "") {
-                    img.value.style.height = img.value.height + "px";
-                    img.value.style.maxHeight = "none";
-                    img.value.style.maxWidth = "none";
+                if (img.value.style.maxHeight == '') {
+                    img.value.style.height = img.value.height + 'px';
+                    img.value.style.maxHeight = 'none';
+                    img.value.style.maxWidth = 'none';
                 }
 
                 //Увеличение/уменьшение изображения.
                 if (event.deltaY < 0) {
-                    img.value.style.height = img.value.height + 50 + "px";
+                    img.value.style.height = img.value.height + 50 + 'px';
                 } else {
-                    img.value.style.height = img.value.height - 50 + "px";
+                    img.value.style.height = img.value.height - 50 + 'px';
                 }
 
                 //Новые координаты изображения.
@@ -114,7 +127,7 @@ export default defineComponent({
                 transform.y -= diff.y;
 
                 //Перемещение изображения на разницу в координатах.
-                imageWrapper.value!.style.transform = `translate(${transform.x}px,${transform.y}px)`;
+                imageWrapper.value.style.transform = `translate(${transform.x}px,${transform.y}px)`;
             }
         }
 
@@ -124,12 +137,13 @@ export default defineComponent({
             moveIndex.y = event.y;
         }
 
-        function moveEnd(event: MouseEvent) {
+        function moveEnd() {
             moving = false;
         }
 
         //Перемещение контейнера с изорбажением.
         function move(event: MouseEvent) {
+            if (!imageWrapper.value) return;
             if (moving) {
                 const x = event.x - moveIndex.x;
                 const y = event.y - moveIndex.y;
@@ -140,7 +154,7 @@ export default defineComponent({
                 transform.x += x;
                 transform.y += y;
 
-                imageWrapper.value!.style.transform = `translate(${transform.x}px,${transform.y}px)`;
+                imageWrapper.value.style.transform = `translate(${transform.x}px,${transform.y}px)`;
             }
         }
 

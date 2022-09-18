@@ -9,7 +9,7 @@ interface Options {
     corrupted?: boolean;
 }
 
-import memento from "@/modules/memento";
+import memento from '@/modules/memento';
 
 class ImageSingleObject implements ImageSingle {
     manifest: ImageSingleData;
@@ -26,12 +26,12 @@ class ImageSingleObject implements ImageSingle {
             description: options.description,
             dateEdited: options.dateEdited,
             corrupted: options.corrupted,
-            type: options.type
+            type: options.type,
         };
         this.collectionHandle = handle;
     }
 
-    getUrl() {
+    getUrl(): { file: string; thumbnail: string } {
         let file = '';
         let thumbnail = '';
 
@@ -45,28 +45,34 @@ class ImageSingleObject implements ImageSingle {
 
         return {
             file,
-            thumbnail
-        }
+            thumbnail,
+        };
     }
 
     /**
      * Инициализация FileHandle на файл изображения из DirectoryHandle коллекции.
      */
-    async loadImage(): Promise<void> {
+    async loadImage(): Promise<FileSystemFileHandle> {
         const folderHandle = await this.collectionHandle.getDirectoryHandle(
-            "images"
+            'images'
         );
         this.imageHandle = await folderHandle.getFileHandle(this.getUrl().file);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return this.imageHandle!;
     }
 
     /**
      * Инициализация FileHandle на превью из DirectoryHandle коллекции.
      */
-    async loadThumbnail(): Promise<void> {
+    async loadThumbnail(): Promise<FileSystemFileHandle> {
         const folderHandle = await this.collectionHandle.getDirectoryHandle(
-            "thumbnails"
+            'thumbnails'
         );
-        this.thumbnailHandle = await folderHandle.getFileHandle(this.getUrl().thumbnail);
+        this.thumbnailHandle = await folderHandle.getFileHandle(
+            this.getUrl().thumbnail
+        );
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return this.thumbnailHandle!;
     }
 
     /**
@@ -74,8 +80,11 @@ class ImageSingleObject implements ImageSingle {
      * @returns FileHandle на файл изображения.
      */
     async getImage(): Promise<FileSystemFileHandle> {
-        if (this.imageHandle == null) await this.loadImage();
-        return this.imageHandle!;
+        if (!this.imageHandle) {
+            const image = await this.loadImage();
+            return image;
+        }
+        return this.imageHandle;
     }
 
     /**
@@ -83,21 +92,24 @@ class ImageSingleObject implements ImageSingle {
      * @returns FileHandle на превью.
      */
     async getThumbnail(): Promise<FileSystemFileHandle> {
-        if (this.thumbnailHandle == null) await this.loadThumbnail();
-        return this.thumbnailHandle!;
+        if (!this.thumbnailHandle) {
+            const thumbnail = await this.loadThumbnail();
+            return thumbnail;
+        }
+        return this.thumbnailHandle;
     }
 
-    saveState() {
+    saveState(): void {
         memento.save(this.manifest, this.manifest.id);
     }
 
-    restoreState() {
+    restoreState(): void {
         const restoredData = memento.restore<ImageSingleData>(this.manifest.id);
         if (restoredData) this.manifest = restoredData;
-        else console.log("restoreState: Error");
+        else console.log('restoreState: Error');
     }
 
-    checkChanges() {
+    checkChanges(): boolean {
         const restoredStringData = memento.getString(this.manifest.id);
         const stringData = JSON.stringify(this.manifest);
 

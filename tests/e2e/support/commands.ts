@@ -26,4 +26,6 @@
 
 import 'cypress-wait-until';
 
-Cypress.Commands.add('getBySel', (selector) => cy.get(`[date-test=${selector}]`));
+Cypress.Commands.add('getBySel', (selector) =>
+    cy.get(`[date-test=${selector}]`)
+);

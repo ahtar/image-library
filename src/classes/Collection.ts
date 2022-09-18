@@ -1,10 +1,10 @@
-import ImageSingle from "@/classes/ImageSingle";
-import ImageSet from "@/classes/ImageSet";
+import ImageSingle from '@/classes/ImageSingle';
+import ImageSet from '@/classes/ImageSet';
 
-import jimp from "@/modules/jimp";
-import crypto from "@/modules/crypto";
+import jimp from '@/modules/jimp';
+import crypto from '@/modules/crypto';
 
-import fs from "@/modules/file-system";
+import fs from '@/modules/file-system';
 
 class CollectionOjbect implements Collection {
     //Данные коллекции.
@@ -27,14 +27,18 @@ class CollectionOjbect implements Collection {
      * @param handle FileSystemDirectoryHandle папки Коллекции.
      * @returns Объект Collection.
      */
-    static async fromFolderHandle(handle: FileSystemDirectoryHandle) {
+    static async fromFolderHandle(
+        handle: FileSystemDirectoryHandle
+    ): Promise<CollectionOjbect | null> {
         try {
             const manifest = JSON.parse(
                 await (
-                    await (await handle.getFileHandle("manifest.json")).getFile()
+                    await (
+                        await handle.getFileHandle('manifest.json')
+                    ).getFile()
                 ).text()
             );
-            const thumbnail = await handle.getFileHandle("thumbnail.png");
+            const thumbnail = await handle.getFileHandle('thumbnail.png');
             const collectionClass = new this(manifest, thumbnail, handle);
             return collectionClass;
         } catch (err) {
@@ -77,9 +81,9 @@ class CollectionOjbect implements Collection {
      * Инициализация Коллекции.
      * Загрузка всех изображений.
      */
-    async initLoadCollection() {
+    async initLoadCollection(): Promise<void> {
         const imageDataFolderHandler = await this.handle.getDirectoryHandle(
-            "imageData"
+            'imageData'
         );
 
         const buffer: Array<ImageSingle | ImageSet> = [];
@@ -88,12 +92,11 @@ class CollectionOjbect implements Collection {
         console.time();
 
         //Получение информации об каждом изображении.
-        for await (const [key, h] of imageDataFolderHandler.entries()) {
+        for await (const [key] of imageDataFolderHandler.entries()) {
             promises.push(
                 (async () => {
-                    const imageDataHandler = await imageDataFolderHandler.getFileHandle(
-                        key
-                    );
+                    const imageDataHandler =
+                        await imageDataFolderHandler.getFileHandle(key);
                     const imageData = JSON.parse(
                         await (await imageDataHandler.getFile()).text()
                     ) as ImageSetSavedData | ImageSingleData;
@@ -106,19 +109,14 @@ class CollectionOjbect implements Collection {
 
         //Создание объекта изображения и его добавление в массив.
         for (const image of images) {
-            if ("set" in image) {
+            if ('set' in image) {
                 const temp = new ImageSet(image);
                 for (const singleImage of image.set) {
                     temp.addImage(new ImageSingle(singleImage, this.handle));
 
                     //теги
                     for (const tag of singleImage.tags) {
-                        //legacy
-                        if (typeof tag == "object") {
-                            this.addTag((tag as any).tagName);
-                        } else {
-                            this.addTag(tag);
-                        }
+                        this.addTag(tag);
                     }
                 }
                 buffer.push(temp);
@@ -128,12 +126,7 @@ class CollectionOjbect implements Collection {
 
                 //теги
                 for (const tag of image.tags) {
-                    //legacy
-                    if (typeof tag == "object") {
-                        this.addTag((tag as any).tagName);
-                    } else {
-                        this.addTag(tag);
-                    }
+                    this.addTag(tag);
                 }
             }
         }
@@ -150,8 +143,8 @@ class CollectionOjbect implements Collection {
         this.arr.sort((a, b) => {
             const dateA = new Date(a.manifest.dateCreated);
             const dateB = new Date(b.manifest.dateCreated);
-            if(dateA < dateB) return 1;
-            if(dateA > dateB) return -1;
+            if (dateA < dateB) return 1;
+            if (dateA > dateB) return -1;
             return 0;
         });
         console.timeEnd();
@@ -162,7 +155,7 @@ class CollectionOjbect implements Collection {
      * Добавление тега в Коллекцию. Если такой тег уже есть, то увеличение счетчика тега.
      * @param tag Название тега.
      */
-    addTag(tag: string) {
+    addTag(tag: string): void {
         const t = this.tags.find((t) => t.name == tag);
 
         if (t) {
@@ -181,7 +174,7 @@ class CollectionOjbect implements Collection {
      * @param name Название тега.
      * @returns Объект тега.
      */
-    getTag(name: string) {
+    getTag(name: string): Tag {
         const t = this.tags.find((t) => t.name == name);
 
         if (t) {
@@ -200,7 +193,7 @@ class CollectionOjbect implements Collection {
      */
     async addImage(
         image: ImageSingle | ImageSet | Array<ImageSingle | ImageSet>
-    ) {
+    ): Promise<void> {
         if (Array.isArray(image)) {
             this.arr.unshift(...image);
         } else {
@@ -213,20 +206,23 @@ class CollectionOjbect implements Collection {
      * @param manifest данные Изображения.
      * @param image Blob с изображением.
      */
-    async createImage(manifest: ImageSingleData, image: File) {
+    async createImage(
+        manifest: ImageSingleData,
+        image: File
+    ): Promise<ImageSingle> {
         const img = new ImageSingle(manifest, this.handle);
 
         console.info('Collection:createImage: ', manifest, image);
         const imageDataFolderHandle = await this.handle.getDirectoryHandle(
-            "imageData",
+            'imageData',
             { create: true }
         );
         const imageFileFolderHandle = await this.handle.getDirectoryHandle(
-            "images",
+            'images',
             { create: true }
         );
         const imageThumbnailFolderHandle = await this.handle.getDirectoryHandle(
-            "thumbnails",
+            'thumbnails',
             { create: true }
         );
 
@@ -242,7 +238,7 @@ class CollectionOjbect implements Collection {
         //Запись файлов.
         await fs.writeFile(
             imageDataFolderHandle,
-            manifest.id + ".json",
+            manifest.id + '.json',
             JSON.stringify(manifest)
         );
         await fs.writeFile(imageFileFolderHandle, img.getUrl().file, imageBlob);
@@ -267,10 +263,10 @@ class CollectionOjbect implements Collection {
      * Создание нового сета Изображений.
      * @param images Массив с Изображениями.
      */
-    async createSet(images: Array<ImageSingle | ImageSet>) {
-        if (images.length == 0) throw new Error("Image set cannot be empty");
+    async createSet(images: Array<ImageSingle | ImageSet>): Promise<void> {
+        if (images.length == 0) throw new Error('Image set cannot be empty');
         const imageDataFolderHandle = await this.handle.getDirectoryHandle(
-            "imageData"
+            'imageData'
         );
 
         //Данные для создания сета.
@@ -285,7 +281,7 @@ class CollectionOjbect implements Collection {
             manifest,
             images
                 .map((image) => {
-                    if ("arr" in image) {
+                    if ('arr' in image) {
                         return image.arr;
                     } else {
                         return image;
@@ -303,18 +299,20 @@ class CollectionOjbect implements Collection {
         };
 
         for (const image of images) {
-            if ("arr" in image) {
+            if ('arr' in image) {
                 savedManifest.set.push(...image.arr.map((i) => i.manifest));
             } else {
                 savedManifest.set.push(image.manifest);
             }
 
-            await imageDataFolderHandle.removeEntry(image.manifest.id + ".json");
+            await imageDataFolderHandle.removeEntry(
+                image.manifest.id + '.json'
+            );
             this.removeImage(image);
         }
         await fs.writeFile(
             imageDataFolderHandle,
-            manifest.id + ".json",
+            manifest.id + '.json',
             JSON.stringify(savedManifest)
         );
     }
@@ -327,24 +325,26 @@ class CollectionOjbect implements Collection {
     async deleteImage(image: ImageSingle | ImageSet): Promise<void> {
         try {
             const imageDataFolderHandle = await this.handle.getDirectoryHandle(
-                "imageData",
+                'imageData',
                 { create: true }
             );
             const imageFileFolderHandle = await this.handle.getDirectoryHandle(
-                "images",
+                'images',
                 { create: true }
             );
-            const imageThumbnailFolderHandle = await this.handle.getDirectoryHandle(
-                "thumbnails",
-                { create: true }
-            );
+            const imageThumbnailFolderHandle =
+                await this.handle.getDirectoryHandle('thumbnails', {
+                    create: true,
+                });
             //let status = false;
             const promises: Promise<void>[] = [];
 
-            if ("arr" in image) {
+            if ('arr' in image) {
                 for (const imageSingle of image.arr) {
                     promises.push(
-                        imageFileFolderHandle.removeEntry(imageSingle.getUrl().file)
+                        imageFileFolderHandle.removeEntry(
+                            imageSingle.getUrl().file
+                        )
                     );
                     promises.push(
                         imageThumbnailFolderHandle.removeEntry(
@@ -353,21 +353,27 @@ class CollectionOjbect implements Collection {
                     );
                 }
                 promises.push(
-                    imageDataFolderHandle.removeEntry(image.manifest.id + ".json")
+                    imageDataFolderHandle.removeEntry(
+                        image.manifest.id + '.json'
+                    )
                 );
             } else {
                 promises.push(
-                    imageDataFolderHandle.removeEntry(image.manifest.id + ".json")
+                    imageDataFolderHandle.removeEntry(
+                        image.manifest.id + '.json'
+                    )
                 );
                 promises.push(
                     imageFileFolderHandle.removeEntry(image.getUrl().file)
                 );
                 promises.push(
-                    imageThumbnailFolderHandle.removeEntry(image.getUrl().thumbnail)
+                    imageThumbnailFolderHandle.removeEntry(
+                        image.getUrl().thumbnail
+                    )
                 );
             }
 
-            const temp = await Promise.allSettled(promises);
+            await Promise.allSettled(promises);
             this.removeImage(image);
         } catch (err) {
             console.log(err);
@@ -380,16 +386,18 @@ class CollectionOjbect implements Collection {
      * При следующем запуске изображение снова окажется в коллекции.
      * @param image Объект изображения.
      */
-    removeImage(image: ImageSingle | ImageSet | ImageSingleData | string) {
-        if (typeof image == "string") {
+    removeImage(
+        image: ImageSingle | ImageSet | ImageSingleData | string
+    ): void {
+        if (typeof image == 'string') {
             const index = this.arr.findIndex((i) => i.manifest.id == image);
             if (index != -1) this.arr.splice(index, 1);
-        } else if ("imageHandle" in image) {
+        } else if ('imageHandle' in image) {
             const index = this.arr.findIndex(
                 (i) => i.manifest.id == image.manifest.id
             );
             if (index != -1) this.arr.splice(index, 1);
-        } else if ("arr" in image) {
+        } else if ('arr' in image) {
             const index = this.arr.findIndex(
                 (i) => i.manifest.id == image.manifest.id
             );
@@ -420,14 +428,14 @@ class CollectionOjbect implements Collection {
         }
 
         //Отделение изображений от сета.
-        if (data?.separate && "arr" in image) {
+        if (data?.separate && 'arr' in image) {
             await this._updateSeparate(image, data.separate);
         }
 
         //Порча изображения.
         if (data?.corrupt) {
             const temp = this.manifest.options?.corrupted;
-            await this._updateCorrupt(image, temp!);
+            await this._updateCorrupt(image, temp);
         }
     }
 
@@ -435,13 +443,15 @@ class CollectionOjbect implements Collection {
      * Обновление manifest файла изображения.
      * @param image Объект изображения.
      */
-    private async _updateManifest(image: ImageSingle | ImageSet) {
+    private async _updateManifest(
+        image: ImageSingle | ImageSet
+    ): Promise<void> {
         const manifestFolderHandle = await this.handle.getDirectoryHandle(
-            "imageData"
+            'imageData'
         );
         let manifest: ImageSingleData | ImageSetSavedData | null = null;
 
-        if ("arr" in image) {
+        if ('arr' in image) {
             manifest = image.manifest as ImageSetSavedData;
             manifest.set = [];
             manifest.set.push(...image.arr.map((i) => i.manifest));
@@ -451,7 +461,7 @@ class CollectionOjbect implements Collection {
 
         await fs.writeFile(
             manifestFolderHandle,
-            manifest.id + ".json",
+            manifest.id + '.json',
             JSON.stringify(manifest)
         );
     }
@@ -464,23 +474,25 @@ class CollectionOjbect implements Collection {
     private async _updateBlob(
         image: ImageSingle | ImageSet,
         data: { [key: string]: Blob }
-    ) {
-        const imageFolderHandle = await this.handle.getDirectoryHandle("images");
+    ): Promise<void> {
+        const imageFolderHandle = await this.handle.getDirectoryHandle(
+            'images'
+        );
         const thumbnailFolderHandle = await this.handle.getDirectoryHandle(
-            "thumbnails"
+            'thumbnails'
         );
 
         for (const key in data) {
             let tempImage: ImageSingle | null = null;
 
             //Получение объекта изображания, к которому относится blob.
-            if ("arr" in image) {
+            if ('arr' in image) {
                 const temp = image.arr.find((i) => i.manifest.id == key);
                 if (temp) tempImage = temp;
-                else throw new Error("Wrong image id");
+                else throw new Error('Wrong image id');
             } else {
                 if (image.manifest.id == key) tempImage = image;
-                else throw new Error("Wrong image id");
+                else throw new Error('Wrong image id');
             }
 
             if (tempImage) {
@@ -526,7 +538,10 @@ class CollectionOjbect implements Collection {
      * @param image Разделяемый сет.
      * @param data Массив с изображениями, которые надо отделить от сета.
      */
-    private async _updateSeparate(image: ImageSet, data: ImageSingle[]) {
+    private async _updateSeparate(
+        image: ImageSet,
+        data: ImageSingle[]
+    ): Promise<void> {
         for (const imageSingle of data) {
             const index = image.arr.findIndex(
                 (i) => i.manifest.id == imageSingle.manifest.id
@@ -561,16 +576,22 @@ class CollectionOjbect implements Collection {
      * @param image Объект изображения.
      * @param corrupt Испортить изображение, или восстановить.
      */
-    private async _updateCorrupt(image: ImageSingle | ImageSet, corrupt = true) {
-        const imageFolderHandle = await this.handle.getDirectoryHandle("images");
+    private async _updateCorrupt(
+        image: ImageSingle | ImageSet,
+        corrupt = true
+    ): Promise<void> {
+        const imageFolderHandle = await this.handle.getDirectoryHandle(
+            'images'
+        );
         const thumbnailFolderHandle = await this.handle.getDirectoryHandle(
-            "thumbnails"
+            'thumbnails'
         );
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const promises: Promise<any>[] = [];
         let manifestChanged = false;
 
-        if ("arr" in image) {
+        if ('arr' in image) {
             for (const imageSingle of image.arr) {
                 await __corrupt(imageSingle);
             }
@@ -586,21 +607,6 @@ class CollectionOjbect implements Collection {
 
         async function __corrupt(image: ImageSingle) {
             const oldUrl = image.getUrl();
-            /*try {
-                imageBuffer = await (
-                    await (await image.getImage()).getFile()
-                ).arrayBuffer();
-
-                thumbnailBuffer = await (
-                    await (await image.getThumbnail()).getFile()
-                ).arrayBuffer();
-
-            } catch (err) {
-                console.log('image.manifest.corrupted inconsistency');
-                image.manifest.corrupted = corrupt;
-                manifestChanged = true;
-                return;
-            }*/
 
             const imageBuffer = await (
                 await (await image.getImage()).getFile()
@@ -611,7 +617,9 @@ class CollectionOjbect implements Collection {
 
             //Проверка изображения и превью на порченность.
             const imageCorrupted = await crypto.isCorrupted(imageBuffer);
-            const thumbnailCorrupted = await crypto.isCorrupted(thumbnailBuffer);
+            const thumbnailCorrupted = await crypto.isCorrupted(
+                thumbnailBuffer
+            );
 
             //Превью или изображение испорчены.
             if (imageCorrupted || thumbnailCorrupted) {
@@ -644,7 +652,9 @@ class CollectionOjbect implements Collection {
 
                 //Восстановление превью.
                 if (thumbnailCorrupted) {
-                    const thumbnailNewData = await crypto.recover(thumbnailBuffer);
+                    const thumbnailNewData = await crypto.recover(
+                        thumbnailBuffer
+                    );
                     promises.push(
                         thumbnailFolderHandle.removeEntry(oldUrl.thumbnail)
                     );
@@ -682,7 +692,9 @@ class CollectionOjbect implements Collection {
 
                 //Порча превью.
                 if (!thumbnailCorrupted) {
-                    const thumbnailNewData = await crypto.corrupt(thumbnailBuffer);
+                    const thumbnailNewData = await crypto.corrupt(
+                        thumbnailBuffer
+                    );
                     promises.push(
                         thumbnailFolderHandle.removeEntry(oldUrl.thumbnail)
                     );
@@ -704,7 +716,7 @@ class CollectionOjbect implements Collection {
     /**
      * Удаление папки с коллекцией.
      */
-    async deleteCollection() {
+    async deleteCollection(): Promise<void> {
         const handle = fs.getHandle();
         await handle.removeEntry(this.manifest.name, { recursive: true });
     }
@@ -717,14 +729,14 @@ class CollectionOjbect implements Collection {
     async updateCollectionManifest(
         manifest: CollectionManifest,
         thumbnail?: Blob
-    ) {
-        fs.writeFile(this.handle, "manifest.json", JSON.stringify(manifest));
+    ): Promise<void> {
+        fs.writeFile(this.handle, 'manifest.json', JSON.stringify(manifest));
         this.manifest = manifest;
 
         if (thumbnail) {
             const handle = await fs.writeFile(
                 this.handle,
-                "thumbnail.png",
+                'thumbnail.png',
                 await jimp.resize(thumbnail)
             );
             this.thumbnail = handle;

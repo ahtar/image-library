@@ -5,11 +5,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUpdated, PropType, ref } from "vue";
+import { defineComponent, onMounted, onUpdated, PropType, ref } from 'vue';
 
-import BaseCard from "@/components/base/BaseCard.vue";
+import BaseCard from '@/components/base/BaseCard.vue';
 
-import useImageRendering from "@/composables/image-rendering";
+import useImageRendering from '@/composables/image-rendering';
 
 export default defineComponent({
     props: {
@@ -27,11 +27,13 @@ export default defineComponent({
         const imgRef = ref<null | HTMLImageElement>(null);
 
         onMounted(() => {
-            renderImage(imgRef.value!, props.fileHandle);
+            if (!imgRef.value) return;
+            renderImage(imgRef.value, props.fileHandle);
         });
 
         onUpdated(() => {
-            renderImage(imgRef.value!, props.fileHandle);
+            if (!imgRef.value) return;
+            renderImage(imgRef.value, props.fileHandle);
         });
 
         return {

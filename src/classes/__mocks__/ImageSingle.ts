@@ -1,17 +1,17 @@
 const mockClass = jest.fn(() => {
-    const id = (Math.random().toString(36) + "00000000000000000").slice(2, 8)
+    const id = (Math.random().toString(36) + '00000000000000000').slice(2, 8);
     return {
         manifest: {
             id: id,
-            hash: "mock hash",
-            tags: ["mock tag 1", "mock tag 2"],
+            hash: 'mock hash',
+            tags: ['mock tag 1', 'mock tag 2'],
             dateCreated: Date(),
             dateEdited: Date(),
-            description: "mock description",
+            description: 'mock description',
         },
         collectionHandle: {
-            kind: "directory",
-            name: "mocked name",
+            kind: 'directory',
+            name: 'mocked name',
             isSameEntry: jest.fn(),
             queryPermission: jest.fn(),
             requestPermission: jest.fn(),
@@ -27,8 +27,8 @@ const mockClass = jest.fn(() => {
             isDirectory: true,
         },
         imageHandle: {
-            kind: "file",
-            name: "mocked name",
+            kind: 'file',
+            name: 'mocked name',
             isSameEntry: jest.fn(),
             queryPermission: jest.fn(),
             requestPermission: jest.fn(),
@@ -45,14 +45,14 @@ const mockClass = jest.fn(() => {
             isDirectory: false,
         },
         thumbnailHandle: {
-            kind: "file",
-            name: "mocked name",
+            kind: 'file',
+            name: 'mocked name',
             isSameEntry: jest.fn(),
             queryPermission: jest.fn(),
             requestPermission: jest.fn(),
             getFile: jest.fn(() => {
                 return {
-                    type: "testType",
+                    type: 'testType',
                     name: id,
                     arrayBuffer: jest.fn(),
                 };
@@ -75,8 +75,8 @@ const mockClass = jest.fn(() => {
         getUrl: jest.fn(() => {
             return {
                 file: 'file',
-                thumbnail: 'thumbnail'
-            }
+                thumbnail: 'thumbnail',
+            };
         }),
     };
 });

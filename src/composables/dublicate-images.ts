@@ -1,17 +1,18 @@
-import { useCollections } from "@/store/collections";
-import { computed, ref, watch } from "vue";
+import { useCollections } from '@/store/collections';
+import { computed, ref, watch } from 'vue';
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function () {
     const collectionsStore = useCollections();
 
     //ИЗображения активной коллекции.
-    const images = ref(collectionsStore.activeCollection!.arr);
+    const images = ref(collectionsStore.activeCollection?.arr);
 
     //Хэш проверяемого изображения.
     const hash = ref<string | null>(null);
 
     //Схожие изображения.
-    const doublicateImages = ref<Array<ImageSingle>>([]);
+    const doublicateImages = ref<Array<ImageSingle | ImageSet>>([]);
 
     //Есть ли схожие изображения.
     const haveDoubles = computed(() => {
@@ -22,14 +23,15 @@ export default function () {
     watch(
         () => hash.value,
         (newHash) => {
-
-            if (newHash == null || newHash == "") {
+            if (newHash == null || newHash == '') {
                 doublicateImages.value = [];
                 return;
             }
 
+            if (!images.value) return [];
+
             const temp = images.value.filter((img) => {
-                if ("arr" in img) {
+                if ('arr' in img) {
                     for (const t of img.arr) {
                         if (hammingDistance(newHash, t.manifest.hash) < 0.25) {
                             return true;
@@ -43,8 +45,8 @@ export default function () {
                 }
                 return false;
             });
-            
-            doublicateImages.value = [...(temp as any as ImageSingle[])];
+
+            doublicateImages.value = [...temp];
         }
     );
 

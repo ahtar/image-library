@@ -5,14 +5,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, watchEffect } from "vue";
-import crypto from "@/modules/crypto";
+import { defineComponent, PropType, ref, watchEffect } from 'vue';
+import crypto from '@/modules/crypto';
 
 export default defineComponent({
     props: {
         data: {
-            type: Object as PropType<Blob | File | FileSystemFileHandle | ImageSingle | null>
-        }
+            type: Object as PropType<
+                Blob | File | FileSystemFileHandle | ImageSingle | null
+            >,
+        },
     },
 
     setup(props) {
@@ -22,6 +24,7 @@ export default defineComponent({
         watchEffect(async () => {
             if (!props.data) return;
             if (!source.value) return;
+            if (!video.value) return;
 
             //ImageSingle
             if ('getImage' in props.data) {
@@ -33,13 +36,15 @@ export default defineComponent({
 
                 if (file.name.includes('dpx')) {
                     const arrayBuffer = await file.arrayBuffer();
-                    source.value!.src = URL.createObjectURL(await crypto.recover(arrayBuffer));
+                    source.value.src = URL.createObjectURL(
+                        await crypto.recover(arrayBuffer)
+                    );
                 } else {
-                    source.value!.src = URL.createObjectURL(file);
+                    source.value.src = URL.createObjectURL(file);
                 }
-                source.value!.type = file.type;
-                video.value!.load();
-                video.value!.play();
+                source.value.type = file.type;
+                video.value.load();
+                video.value.play();
                 return;
             }
 
@@ -52,16 +57,18 @@ export default defineComponent({
 
                 if (file.name.includes('dpx')) {
                     const arrayBuffer = await file.arrayBuffer();
-                    source.value!.src = URL.createObjectURL(await crypto.recover(arrayBuffer));
+                    source.value.src = URL.createObjectURL(
+                        await crypto.recover(arrayBuffer)
+                    );
                 } else {
-                    source.value!.src = URL.createObjectURL(file);
+                    source.value.src = URL.createObjectURL(file);
                 }
 
-                video.value!.pause();
-                source.value!.src = URL.createObjectURL(file);
-                source.value!.type = file.type;
-                video.value!.load();
-                video.value!.play();
+                video.value.pause();
+                source.value.src = URL.createObjectURL(file);
+                source.value.type = file.type;
+                video.value.load();
+                video.value.play();
                 return;
             }
 
@@ -69,19 +76,18 @@ export default defineComponent({
             if (!props.data) return;
             if (!source.value) return;
 
-            video.value!.pause();
-            source.value!.src = URL.createObjectURL(props.data);
-            source.value!.type = props.data.type;
-            video.value!.load();
-            video.value!.play();
+            video.value.pause();
+            source.value.src = URL.createObjectURL(props.data);
+            source.value.type = props.data.type;
+            video.value.load();
+            video.value.play();
         });
-
 
         return {
             source,
-            video
-        }
-    }
+            video,
+        };
+    },
 });
 </script>
 

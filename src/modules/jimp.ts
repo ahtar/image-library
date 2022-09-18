@@ -1,6 +1,6 @@
-const Jimp = () => import(/* webpackChunkName: "jimp" */"jimp/es");
+const Jimp = () => import(/* webpackChunkName: "jimp" */ 'jimp/es');
 
-async function getHash(image: File) {
+async function getHash(image: File): Promise<string> {
     if (/video\/\S*/g.test(image.type)) {
         const frame = await _getVideoFrame(image);
         const buffer = await frame.arrayBuffer();
@@ -12,14 +12,17 @@ async function getHash(image: File) {
     return jimpImage.hash();
 }
 
-
-async function resize(data: Blob | File, max = { x: 160, y: 200 }) {
-
+async function resize(
+    data: Blob | File,
+    max = { x: 160, y: 200 }
+): Promise<File | Blob> {
     if ('name' in data) {
         //video
         if (/video\/\S*/g.test(data.type)) {
             const frame = await _getVideoFrame(data, 2);
-            const image = await (await Jimp()).default.read(await frame.arrayBuffer());
+            const image = await (
+                await Jimp()
+            ).default.read(await frame.arrayBuffer());
 
             if (image.bitmap.width > image.bitmap.height) {
                 await image.resize(max.x, (await Jimp()).default.AUTO);
@@ -30,13 +33,12 @@ async function resize(data: Blob | File, max = { x: 160, y: 200 }) {
             const arrayBuffer = await image.getBufferAsync(image.getMIME());
             const blob = new Blob([(arrayBuffer as Uint8Array).buffer]);
             const file = new File([blob], data.name, {
-                type: 'image/png'
+                type: 'image/png',
             });
 
             return file;
         }
     }
-
 
     const image = await (await Jimp()).default.read(await data.arrayBuffer());
     if (image.bitmap.width > image.bitmap.height) {
@@ -79,6 +81,7 @@ function _getVideoFrame(data: File, frameTimeInSeconds = 0.1): Promise<File> {
             video.remove();
             canvas.remove();
             reject('context 2d undefined.');
+            return;
         }
 
         video.currentTime = frameTimeInSeconds;
@@ -90,7 +93,7 @@ function _getVideoFrame(data: File, frameTimeInSeconds = 0.1): Promise<File> {
         });
 
         video.addEventListener('loadeddata', function () {
-            context!.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
             canvas.toBlob((blob) => {
                 if (!blob) {
@@ -98,10 +101,11 @@ function _getVideoFrame(data: File, frameTimeInSeconds = 0.1): Promise<File> {
                     video.remove();
                     canvas.remove();
                     reject('_getVideoFrame: blob error');
+                    return;
                 }
 
-                const file = new File([blob!], data.name, {
-                    type: 'image/png'
+                const file = new File([blob], data.name, {
+                    type: 'image/png',
                 });
 
                 URL.revokeObjectURL(urlRef);

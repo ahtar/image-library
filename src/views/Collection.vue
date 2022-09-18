@@ -4,18 +4,34 @@
             <router-link to="/">
                 <button-small>{{ t('BUTTON.BACK') }}</button-small>
             </router-link>
-            <input-tag :tags="tags" @add="addTag" @remove="removeTag" :definedTags="definedTags" />
-            <button-small @click="startSetCreation" v-tooltip.auto="t('TOOLTIP.NEW_SET')">{{ t('BUTTON.CREATE_SET') }}
+            <input-tag
+                :tags="tags"
+                @add="addTag"
+                @remove="removeTag"
+                :definedTags="definedTags"
+            />
+            <button-small
+                @click="startSetCreation"
+                v-tooltip.auto="t('TOOLTIP.NEW_SET')"
+                >{{ t('BUTTON.CREATE_SET') }}
             </button-small>
         </sidebar>
         <div class="content-wrapper" ref="container">
             <div class="content" v-if="loaded">
-                <card-new-big @click="storeImageCreate.open()" v-tooltip.auto="t('TOOLTIP.NEW_IMAGE')" />
-                <transition-fade-group :items="filteredImages" v-slot="slotProps">
-                    <card-image-small :image="slotProps.item" @click="imageHandler(slotProps.item, $event)"
-                        @contextmenu="contextMenuOpen(slotProps.item, $event)" />
+                <card-new-big
+                    @click="storeImageCreate.open()"
+                    v-tooltip.auto="t('TOOLTIP.NEW_IMAGE')"
+                />
+                <transition-fade-group
+                    :items="filteredImages"
+                    v-slot="slotProps"
+                >
+                    <card-image-small
+                        :image="slotProps.item"
+                        @click="imageClickHandler(slotProps.item, $event)"
+                        @contextmenu="contextMenuOpen(slotProps.item, $event)"
+                    />
                 </transition-fade-group>
-                <intersection-observer-vue ref="observer" @update="observerHandler" />
             </div>
             <screen-loading v-else />
         </div>
@@ -27,7 +43,11 @@
     </transition-fade>
 
     <transition-fade>
-        <form-image-create :definedTags="definedTags" :priorTags="lastTags" v-if="storeImageCreate.visible" />
+        <form-image-create
+            :definedTags="definedTags"
+            :priorTags="lastTags"
+            v-if="storeImageCreate.visible"
+        />
     </transition-fade>
 
     <transition-fade>
@@ -35,12 +55,19 @@
     </transition-fade>
 
     <transition-fade>
-        <menu-confirm-overlay v-if="imageHandlerState == 'setCreation'" @save="saveSetCreation"
-            @cancel="cancelSetCreation" />
+        <menu-confirm-overlay
+            v-if="imageHandlerState == 'setCreation'"
+            @save="saveSetCreation"
+            @cancel="cancelSetCreation"
+        />
     </transition-fade>
 
     <transition-fade>
-        <menu-context v-if="contextMenuActive" :event="contextMenuEvent!" @close="contextMenuClose">
+        <menu-context
+            v-if="contextMenuActive"
+            :event="contextMenuEvent!"
+            @close="contextMenuClose"
+        >
             <div @click="editImage">{{ t('BUTTON.EDIT') }}</div>
             <div @click="copyImage">{{ t('BUTTON.COPY') }}</div>
             <div @click="deleteImage">{{ t('BUTTON.DELETE') }}</div>
@@ -49,40 +76,38 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch, computed, reactive } from "vue";
-import { useRoute } from "vue-router";
-import { useI18n } from "vue-i18n";
+import { defineComponent, onMounted, ref, watch, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
-import { useCollections } from "@/store/collections";
-import { useImageViewStore } from "@/store/forms/form-image-view";
-import { useImageCreateStore } from "@/store/forms/form-create-image";
-import { useImageEditStore } from "@/store/forms/form-image-edit";
-import { useNotificationStore } from "@/store/modals/modal-notification";
-import { usePromptStore } from "@/store/modals/modal-prompt";
+import { useCollections } from '@/store/collections';
+import { useImageViewStore } from '@/store/forms/form-image-view';
+import { useImageCreateStore } from '@/store/forms/form-create-image';
+import { useImageEditStore } from '@/store/forms/form-image-edit';
+import { useNotificationStore } from '@/store/modals/modal-notification';
+import { usePromptStore } from '@/store/modals/modal-prompt';
 
-import useImages from "@/composables/images";
-import UseTags from "@/composables/tags";
-import useContextMenu from "@/composables/context-menu";
-import useClipboard from "@/composables/clipboard";
-import useQuery from "@/composables/query";
-import useImageDisplay from "@/composables/imagesDisplay";
-import { useHead } from "@vueuse/head"
+import useImages from '@/composables/images';
+import UseTags from '@/composables/tags';
+import useContextMenu from '@/composables/context-menu';
+import useClipboard from '@/composables/clipboard';
+import useQuery from '@/composables/query';
+import { useHead } from '@vueuse/head';
 
-import Sidebar from "@/components/Sidebar.vue";
-import TransitionFade from "@/components/TransitionFade.vue";
-import TransitionFadeGroup from "@/components/TransitionFadeGroup.vue";
-import CardImageSmall from "@/components/CardImageSmall.vue";
-import CardNewBig from "@/components/CardNewBig.vue";
-import FormImageView from "@/components/FormImageView.vue";
-import FormImageCreate from "@/components/FormImageCreate.vue";
-import FormImageEdit from "@/components/FormImageEdit.vue";
-import InputTag from "@/components/InputTag.vue";
-import IntersectionObserverVue from "@/components/IntersectionObserver.vue";
-import MenuConfirmOverlay from "@/components/MenuConfirmOverlay.vue";
-import MenuContext from "@/components/MenuContext.vue";
-import ScreenLoading from "@/components/ScreenLoading.vue";
-import ButtonSmall from "@/components/ButtonSmall.vue";
-import ScrollBar from "@/components/ScrollBar.vue";
+import Sidebar from '@/components/Sidebar.vue';
+import TransitionFade from '@/components/TransitionFade.vue';
+import TransitionFadeGroup from '@/components/TransitionFadeGroup.vue';
+import CardImageSmall from '@/components/CardImageSmall.vue';
+import CardNewBig from '@/components/CardNewBig.vue';
+import FormImageView from '@/components/FormImageView.vue';
+import FormImageCreate from '@/components/FormImageCreate.vue';
+import FormImageEdit from '@/components/FormImageEdit.vue';
+import InputTag from '@/components/InputTag.vue';
+import MenuConfirmOverlay from '@/components/MenuConfirmOverlay.vue';
+import MenuContext from '@/components/MenuContext.vue';
+import ScreenLoading from '@/components/ScreenLoading.vue';
+import ButtonSmall from '@/components/ButtonSmall.vue';
+import ScrollBar from '@/components/ScrollBar.vue';
 
 export default defineComponent({
     components: {
@@ -95,7 +120,6 @@ export default defineComponent({
         FormImageCreate,
         FormImageEdit,
         InputTag,
-        IntersectionObserverVue,
         MenuConfirmOverlay,
         MenuContext,
         ScreenLoading,
@@ -105,8 +129,23 @@ export default defineComponent({
     setup() {
         const { t } = useI18n();
         const route = useRoute();
+        //Просматриваемая коллекция
         let collection = ref<Collection | null>(null);
+        //Загружена ли коллекция
         const loaded = ref(false);
+        const container = ref<HTMLElement | null>(null);
+        const imageHandlerState = ref<'view' | 'setCreation'>('view');
+        //массив с выбранными изображениями для создания нового сета
+        const selectedImages = ref<Array<{ image: ImageSingle; ref: Element }>>(
+            []
+        );
+        //последние используемые теги при создании изображения
+        const lastTags = computed(() => {
+            if (collection.value) {
+                return collection.value.lastTags;
+            }
+            return [];
+        });
 
         const storeCollections = useCollections();
         const storeImageView = useImageViewStore();
@@ -116,13 +155,10 @@ export default defineComponent({
         const storePrompt = usePromptStore();
 
         const { images, filteredImages, setImages, setTagRef } = useImages();
-        const {
-            setDisplayableImages,
-            displayedImages,
-            displayNextImages,
-            resetDisplayedImages,
-        } = useImageDisplay();
-        const { tags, definedTags, addTag, removeTag, tagsOnChange } = UseTags();
+        const { tags, definedTags, addTag, removeTag, tagsOnChange } =
+            UseTags();
+        const { copyToClipboard } = useClipboard();
+        const { arrayToQuery, setQuery, getQuery } = useQuery();
         const {
             contextMenuActive,
             contextMenuEvent,
@@ -130,92 +166,80 @@ export default defineComponent({
             contextMenuClose,
             contextMenuAction,
         } = useContextMenu();
-        const { copyToClipboard } = useClipboard();
-        const { arrayToQuery, setQuery, getQuery } = useQuery();
-
-        const container = ref<HTMLElement | null>(null);
-        const observer = ref<InstanceType<typeof IntersectionObserverVue> | null>(
-            null
-        );
-
-        const lastTags = computed(() => {
-            if (collection.value) {
-                return collection.value.lastTags;
-            }
-            return [];
-        });
 
         setTagRef(tags);
-        setDisplayableImages(filteredImages as any);
-
+        //Изменение названия страницы
         useHead({
-            title: computed(() => route.params.name + ' — Image Library')
+            title: computed(() => route.params.name + ' — Image Library'),
+        });
+        //Обновление query параметров в соответствии с введеными тегами.
+        tagsOnChange(() => {
+            setQuery({
+                tags: arrayToQuery(tags.value),
+            });
         });
 
-        /**
-         * Работа с коллекцией и параметрами роутера.
-         */
-
-        //Инициализация.
         onMounted(async () => {
-
             //Получение тегов из query параметров
             const query = getQuery();
             if (query.tags) {
                 for (const tag of query.tags) {
-                    addTag(tag);
+                    if (tag) addTag(tag);
                 }
             }
-            //Инициализация коллекции, если она ещё не инициализирована и сами коллекции уже получены.
-            const status = await initCollection();
+
+            //Инициализация коллекции
+            const initCollectionStatus = await initCollection();
 
             //Если коллекции ещё не получены (приложение было открыто сразу на какой-либо коллекции, например */collections/CollectionName)
             //то дождаться получения коллекций, и после этого инициализировать коллекцию.
-            if (!status) {
+            if (!initCollectionStatus) {
                 watch(
                     () => [...storeCollections.collections],
                     async () => {
                         await initCollection();
-                        setImages(ref(collection.value!.arr) as any);
+                        if (!collection.value) return;
+                        setImages(ref(collection.value.arr));
                     }
                 );
             } else {
-                //Если коллекция уже инициализирована
-                setImages(ref(collection.value!.arr) as any);
+                if (!collection.value) return;
+                setImages(ref(collection.value.arr));
             }
         });
 
-        //Если коллекция в параметре роутера каким-либо образом изменилась
-        //(например, пользователь сам изменил ссылку */collections/CollectionName => */collections/NewName)
-        //то сделать активной эту коллекцию.
+        //Смена активной коллекции при изменении route.params.name
         watch(
-            () => route.params,
+            () => route.params.name,
             async () => {
+                //изменение статуса загрузки для отображения окна загрузки коллекции
+                loaded.value = false;
                 await initCollection();
-                setImages(ref(collection.value!.arr) as any);
-                resetDisplayedImages();
-                observer.value?.checkIntersection();
+                if (!collection.value) return;
+
+                setImages(ref(collection.value.arr));
             }
         );
 
-        //Инициализация коллекции, полученной из параметров роутера.
         async function initCollection() {
             try {
-                const c = storeCollections.getCollection(route.params.name as string);
-                if (c) {
-                    //Установка коллекции.
-                    collection = ref(c as any);
-                    storeCollections.setActiveCollection(c as any);
+                //Получение новой коллекции
+                const newCollection = storeCollections.getCollection(
+                    route.params.name as string
+                );
+                if (!newCollection) return false;
 
-                    //Инициализация данных коллекции, т. е. загрузка изображений и тегов.
-                    if (!collection.value!.loaded) {
-                        await collection.value!.initLoadCollection();
-                        loaded.value = true;
-                        //observer.value?.checkIntersection();
-                    } else {
-                        loaded.value = true;
-                    }
-                } else return false;
+                //Установка новой коллекции как активной
+                collection.value = newCollection;
+                storeCollections.setActiveCollection(collection.value);
+
+                //Инициализация новой коллекции, если она не инициализированна
+                if (!collection.value.loaded) {
+                    await collection.value.initLoadCollection();
+                    loaded.value = true;
+                    return true;
+                }
+                loaded.value = true;
                 return true;
             } catch (err) {
                 storeNotification.notify(
@@ -226,35 +250,13 @@ export default defineComponent({
             }
         }
 
-        //Обновление query параметров в соответствии с введеными тегами.
-        tagsOnChange(() => {
-            setQuery({
-                tags: arrayToQuery(tags.value),
-            });
-        });
-
-        //Если IntersectionObserver пересекается, то отобразить следующую группу изображений
-        //и затем начать проверку на пересечение ещё раз.
-        function observerHandler(event: boolean) {
-            if (event) {
-                const status = displayNextImages(20);
-                if (status) observer.value?.checkIntersection();
-            }
-        }
-
-        /**
-         * Работа с изображениями
-         */
-        const imageHandlerState = ref("view");
-        let selectedImages: Array<any> = [];
-
-        function imageHandler(img: ImageSingle, event: any) {
+        function imageClickHandler(img: ImageSingle, event: MouseEvent) {
             switch (imageHandlerState.value) {
-                case "view": {
+                case 'view': {
                     viewImage(img);
                     break;
                 }
-                case "setCreation": {
+                case 'setCreation': {
                     selectImageForSet(img, event);
                     break;
                 }
@@ -267,41 +269,43 @@ export default defineComponent({
         }
 
         function startSetCreation() {
-            imageHandlerState.value = "setCreation";
+            imageHandlerState.value = 'setCreation';
         }
 
-        function selectImageForSet(img: ImageSingle, event: any) {
-            const t = event.target.classList.toggle("selected");
-            if (t) {
-                selectedImages.push({ image: img, ref: event.target });
+        function selectImageForSet(img: ImageSingle, event: MouseEvent) {
+            if (!event.target) return;
+            const target = event.target as Element;
+            const toggle = target.classList.toggle('selected');
+            if (toggle) {
+                selectedImages.value.push({ image: img, ref: target });
             } else {
-                let index = selectedImages.findIndex(
+                let index = selectedImages.value.findIndex(
                     (elem) => elem.ref == event.target
                 );
-                selectedImages.splice(index, 1);
+                selectedImages.value.splice(index, 1);
             }
         }
 
         function cancelSetCreation() {
-            imageHandlerState.value = "view";
-            selectedImages.forEach((item) => {
-                item.ref.classList.toggle("selected");
+            imageHandlerState.value = 'view';
+            selectedImages.value.forEach((item) => {
+                item.ref.classList.toggle('selected');
             });
-            selectedImages = [];
+            selectedImages.value.length = 0;
         }
 
         function saveSetCreation() {
-            imageHandlerState.value = "view";
-            selectedImages.forEach((item) => {
-                item.ref.classList.toggle("selected");
+            if (!collection.value) return;
+            imageHandlerState.value = 'view';
+            selectedImages.value.forEach((item) => {
+                item.ref.classList.toggle('selected');
             });
-            collection.value!.createSet(selectedImages.map((i: any) => i.image));
-            selectedImages = [];
+            collection.value.createSet(
+                selectedImages.value.map((i) => i.image)
+            );
+            selectedImages.value.length = 0;
         }
 
-        /**
-         * контекст меню
-         */
         function editImage() {
             contextMenuAction<ImageSingle | ImageSet>((image) => {
                 storeImageEdit.setImage(image);
@@ -312,7 +316,9 @@ export default defineComponent({
         function copyImage() {
             contextMenuAction<ImageSingle | ImageSet>(async (image) => {
                 await copyToClipboard(image);
-                storeNotification.notify(t('NOTIFICATION.MESSAGE.IMAGE_COPIED'));
+                storeNotification.notify(
+                    t('NOTIFICATION.MESSAGE.IMAGE_COPIED')
+                );
             });
         }
 
@@ -321,14 +327,19 @@ export default defineComponent({
                 try {
                     const answer = await storePrompt.showPrompt(
                         t('PROMPT.DELETE_IMAGE'),
-                        "confirmation"
+                        'confirmation'
                     );
                     if (answer && collection.value) {
                         await collection.value.deleteImage(image);
-                        storeNotification.notify(t('NOTIFICATION.MESSAGE.IMAGE_DELETED'));
+                        storeNotification.notify(
+                            t('NOTIFICATION.MESSAGE.IMAGE_DELETED')
+                        );
                     }
                 } catch (err) {
-                    storeNotification.notify(t('NOTIFICATION.MESSAGE.IMAGE_DELETE_ERROR'), false);
+                    storeNotification.notify(
+                        t('NOTIFICATION.MESSAGE.IMAGE_DELETE_ERROR'),
+                        false
+                    );
                     console.log(err);
                 }
             });
@@ -337,7 +348,7 @@ export default defineComponent({
         function scrollToTop() {
             container.value?.scrollTo({
                 top: 0,
-                behavior: "smooth",
+                behavior: 'smooth',
             });
         }
 
@@ -347,15 +358,12 @@ export default defineComponent({
             storeImageEdit,
 
             container,
-            observer,
             scrollToTop,
 
             images,
             filteredImages,
-            displayedImages,
-            observerHandler,
 
-            imageHandler,
+            imageClickHandler,
             imageHandlerState,
             startSetCreation,
             cancelSetCreation,

@@ -2,27 +2,33 @@
     <div class="select" tabindex="0" @blur="blur" @keyup="keypressHandle">
         <div class="selected" @click="view">{{ selected }}</div>
         <div class="options" ref="optionsRef">
-            <div class="option" :class="{ 'option-selected': activeIndex == i }" v-for="(option, i) in data" :key="i"
-                @click="select(option, i)">{{ option[1] }}</div>
+            <div
+                class="option"
+                :class="{ 'option-selected': activeIndex == i }"
+                v-for="(option, i) in data"
+                :key="i"
+                @click="select(option, i)"
+            >
+                {{ option[1] }}
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { computed } from "@vue/reactivity";
-import { defineComponent, ref, PropType, onMounted } from "vue";
+import { computed } from '@vue/reactivity';
+import { defineComponent, ref, PropType, onMounted } from 'vue';
 
 export default defineComponent({
-
     props: {
         data: {
             required: true,
-            type: Array as PropType<Array<[string, string]>>
+            type: Array as PropType<Array<[string, string]>>,
         },
         modelValue: String,
     },
 
-    emits: ["update:modelValue"],
+    emits: ['update:modelValue'],
 
     setup(props, { emit }) {
         let visible = false;
@@ -35,7 +41,9 @@ export default defineComponent({
         });
 
         onMounted(() => {
-            const index = props.data.findIndex((item) => item[0] == props.modelValue);
+            const index = props.data.findIndex(
+                (item) => item[0] == props.modelValue
+            );
 
             if (index != -1) {
                 activeIndex.value = index;
@@ -49,26 +57,32 @@ export default defineComponent({
         }
 
         function view() {
+            if (!optionsRef.value) return;
             if (visible) {
-                optionsRef.value!.style.display = 'none';
+                optionsRef.value.style.display = 'none';
             } else {
-                optionsRef.value!.style.display = 'block';
+                optionsRef.value.style.display = 'block';
             }
 
             visible = !visible;
         }
 
         function blur() {
-            optionsRef.value!.style.display = 'none';
+            if (!optionsRef.value) return;
+            optionsRef.value.style.display = 'none';
             visible = false;
         }
 
         function select(option: [string, string], index: number) {
             view();
             activeIndex.value = index;
-            emit("update:modelValue", option[0]);
+            emit('update:modelValue', option[0]);
         }
 
+        /**
+         * Изменение выбранного элемента из списка элементов
+         * @param direction направление выбора, 1 - следующий элемент, -1 - предыдущий элемент
+         */
         function iterate(direction: number) {
             if (activeIndex.value === undefined) {
                 if (direction == 1) {
@@ -91,7 +105,7 @@ export default defineComponent({
                     }
                 }
             }
-            emit("update:modelValue", props.data[activeIndex.value][0]);
+            emit('update:modelValue', props.data[activeIndex.value][0]);
         }
 
         return {
@@ -105,9 +119,8 @@ export default defineComponent({
             blur,
             select,
             iterate,
-        }
-    }
-
+        };
+    },
 });
 </script>
 

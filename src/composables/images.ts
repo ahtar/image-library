@@ -1,5 +1,6 @@
-import { computed, Ref, ref } from "vue";
+import { computed, Ref, ref } from 'vue';
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function () {
     /**
      * Изображения
@@ -16,23 +17,24 @@ export default function () {
      */
     const filteredImages = computed(() => {
         if (tagsRef.value.length == 0) return images.value;
-        return images.value!.filter((image) => {
-
+        return images.value.filter((image) => {
             /**
              * Проверка каждого изображения в сете на наличие требуемых тегов.
              * Если хотя бы 1 изображение в сете соответствует требованиям,
              * то сет отображается.
              */
-            if ("arr" in image) {
+            if ('arr' in image) {
                 let includes = false;
-                imageLoop:
-                for (const t of image.arr) {
+                imageLoop: for (const t of image.arr) {
                     for (const tag of tagsRef.value) {
                         const a = /!.+/.test(tag);
 
                         //Если тег начинается с ! и изображение содержит этот тег,
                         //то весь сет не подходит под запрос.
-                        if (a && t.manifest.tags.includes(tag.replace("!", ""))) {
+                        if (
+                            a &&
+                            t.manifest.tags.includes(tag.replace('!', ''))
+                        ) {
                             includes = false;
                             break imageLoop;
                         }
@@ -56,7 +58,8 @@ export default function () {
 
                 //Если тег начинается с ! и изображение содержит этот тег,
                 //то изображение не подходит под запрос.
-                if (a && image.manifest.tags.includes(tag.replace("!", ""))) return false;
+                if (a && image.manifest.tags.includes(tag.replace('!', '')))
+                    return false;
 
                 //Если тег не начинается с ! и изображение не содержит этот тег,
                 //то изображение не подходит под запрос.

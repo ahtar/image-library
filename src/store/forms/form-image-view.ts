@@ -1,6 +1,6 @@
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia';
 
-export const useImageViewStore = defineStore("imageView", {
+export const useImageViewStore = defineStore('imageView', {
     state: () => {
         return {
             visible: false,
@@ -10,7 +10,7 @@ export const useImageViewStore = defineStore("imageView", {
     getters: {
         isSet: (state) => {
             if (state.image) {
-                if ("arr" in state.image) return true;
+                if ('arr' in state.image) return true;
             }
             return false;
         },

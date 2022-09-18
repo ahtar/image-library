@@ -1,5 +1,9 @@
 <template>
-    <div class="card-notification-big" data-test="card-notification-big" @click="close">
+    <div
+        class="card-notification-big"
+        data-test="card-notification-big"
+        @click="close"
+    >
         <div class="success" v-if="status"></div>
         <div class="error" v-else></div>
         <div class="notification">{{ message }}</div>
@@ -7,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     props: {
@@ -20,11 +24,11 @@ export default defineComponent({
             default: true,
         },
     },
-    emits: ["close"],
+    emits: ['close'],
     setup(props, { emit }) {
         return {
             close() {
-                emit("close");
+                emit('close');
             },
         };
     },

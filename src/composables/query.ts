@@ -1,20 +1,21 @@
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter, LocationQueryValue } from 'vue-router';
 
 interface Query {
-    [key: string]: any;
+    [key: string]: string[] | string | LocationQueryValue[] | null;
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function () {
     const route = useRoute();
     const router = useRouter();
 
-    function getQuery() {
+    function getQuery(): Query {
         const query = route.query;
-        const obj: any = {};
+        const obj: Query = {};
         for (const a in query) {
             const t = query[a];
-            if (typeof t == "string") {
-                const d = decodeURI(t).split("+");
+            if (typeof t == 'string') {
+                const d = decodeURI(t).split('+');
                 obj[a] = d;
             } else {
                 obj[a] = t;
@@ -24,10 +25,10 @@ export default function () {
         return obj;
     }
 
-    function setQuery(data: Query) {
-        const obj: any = {};
+    function setQuery(data: Query): void {
+        const obj: Query = {};
         for (const a in data) {
-            if (data[a] != null && data[a] != "") obj[a] = data[a];
+            if (data[a] != null && data[a] != '') obj[a] = data[a];
         }
 
         router.replace({
@@ -35,12 +36,12 @@ export default function () {
         });
     }
 
-    function arrayToQuery(arr: Array<string>) {
-        let string = "";
+    function arrayToQuery(arr: Array<string>): string {
+        let string = '';
         for (const item of arr) {
-            string += "+" + item;
+            string += '+' + item;
         }
-        return string.replace("+", "");
+        return string.replace('+', '');
     }
 
     return {

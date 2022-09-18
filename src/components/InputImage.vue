@@ -7,24 +7,24 @@
         <label for="input-file" class="input-file">
             <div class="icon" />
             <p>{{ t('BUTTON.INPUT_FILE') }}</p>
-            <input type="file" id="input-file" ref="input" :accept="acceptString" @input="fileInput($event)"
-                data-test="input-file" />
+            <input
+                type="file"
+                id="input-file"
+                ref="input"
+                :accept="acceptString"
+                @input="fileInput"
+                data-test="input-file"
+            />
         </label>
     </div>
 </template>
 
 <script lang="ts">
-import {
-    defineComponent,
-    ref,
-    PropType,
-    watchEffect,
-    computed,
-} from "vue";
-import VideoPlayerVue from "@/components/VideoPlayer.vue";
-import ImageVue from "./Image.vue";
+import { defineComponent, ref, PropType, watchEffect, computed } from 'vue';
+import VideoPlayerVue from '@/components/VideoPlayer.vue';
+import ImageVue from './Image.vue';
 
-import { useI18n } from "vue-i18n";
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     components: {
@@ -45,17 +45,17 @@ export default defineComponent({
         },
         acceptImage: {
             type: Boolean,
-            default: true
+            default: true,
         },
         acceptVideo: {
             type: Boolean,
-            default: true
-        }
-
+            default: true,
+        },
     },
 
     emits: {
-        paste: (data: File) => true
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        paste: (data: File) => true,
     },
 
     setup(props, { emit }) {
@@ -67,8 +67,8 @@ export default defineComponent({
 
         const acceptString = computed(() => {
             const str = [];
-            if(props.acceptImage) str.push('image/*');
-            if(props.acceptVideo) str.push('video/*');
+            if (props.acceptImage) str.push('image/*');
+            if (props.acceptVideo) str.push('video/*');
             return str.join(',');
         });
 
@@ -119,17 +119,16 @@ export default defineComponent({
             return;
         });
 
-
-
-        function fileInput(e: Event) {
-            if (input.value!.files?.length == 1) {
-                const file = input.value!.files[0];
+        function fileInput() {
+            if (!input.value) return;
+            if (input.value.files?.length == 1) {
+                const file = input.value.files[0];
 
                 //Сброс выбранного файла в input элементе,
                 //чтобы этот же файл можно было выбрать ещё раз
-                input.value!.value = '';
+                input.value.value = '';
 
-                emit("paste", file);
+                emit('paste', file);
             }
         }
 
@@ -140,7 +139,7 @@ export default defineComponent({
             fileInput,
             isVideo,
             acceptString,
-            t
+            t,
         };
     },
 });
@@ -181,7 +180,15 @@ export default defineComponent({
                 height: inherit;
                 width: inherit;
                 background-color: $color-text-main;
-                clip-path: polygon(15% 70%, 50% 50%, 85% 70%, 60% 70%, 60% 100%, 40% 100%, 40% 70%);
+                clip-path: polygon(
+                    15% 70%,
+                    50% 50%,
+                    85% 70%,
+                    60% 70%,
+                    60% 100%,
+                    40% 100%,
+                    40% 70%
+                );
             }
 
             &::after {
@@ -190,7 +197,22 @@ export default defineComponent({
                 height: inherit;
                 width: inherit;
                 background-color: $color-text-main;
-                clip-path: polygon(92% 71%, 78% 50%, 86% 50%, 100% 71%, 92% 100%, 8% 100%, 0 71%, 14% 50%, 22% 50%, 8% 71%, 24% 71%, 33% 87%, 67% 87%, 76% 71%);
+                clip-path: polygon(
+                    92% 71%,
+                    78% 50%,
+                    86% 50%,
+                    100% 71%,
+                    92% 100%,
+                    8% 100%,
+                    0 71%,
+                    14% 50%,
+                    22% 50%,
+                    8% 71%,
+                    24% 71%,
+                    33% 87%,
+                    67% 87%,
+                    76% 71%
+                );
             }
         }
 

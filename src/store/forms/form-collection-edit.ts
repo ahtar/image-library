@@ -1,17 +1,17 @@
-import { defineStore } from "pinia";
-import { useNotificationStore } from "@/store/modals/modal-notification";
-import { usePromptStore } from "@/store/modals/modal-prompt";
-import { useProgressBarStore } from "@/store/modals/modal-progress-bar";
-import i18n from "@/locales/i18n";
+import { defineStore } from 'pinia';
+import { useNotificationStore } from '@/store/modals/modal-notification';
+import { usePromptStore } from '@/store/modals/modal-prompt';
+import { useProgressBarStore } from '@/store/modals/modal-progress-bar';
+import i18n from '@/locales/i18n';
 
-export const useCollectionEditStore = defineStore("collectionEdit", {
+export const useCollectionEditStore = defineStore('collectionEdit', {
     state: () => {
         return {
             visible: false,
             form: {
-                name: "",
-                theme: "" as string | undefined,
-                description: "" as string | undefined,
+                name: '',
+                theme: '' as string | undefined,
+                description: '' as string | undefined,
                 file: undefined as File | undefined,
                 options: {
                     corrupted: false,
@@ -38,10 +38,12 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
 
         //Обновление данных коллекции.
         async save() {
+            if (!this.collection) return;
             const storeNotification = useNotificationStore();
             const storePromt = usePromptStore();
             const storeProgressBar = useProgressBarStore();
-            const oldCorruptedStatus = this.collection!.manifest.options?.corrupted;
+            const oldCorruptedStatus =
+                this.collection.manifest.options?.corrupted;
 
             try {
                 //Обновление manifest коллекции.
@@ -49,7 +51,7 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
                     name: this.form.name,
                     theme: this.form.theme,
                     description: this.form.description,
-                    created: this.collection!.manifest.created,
+                    created: this.collection.manifest.created,
                     lastModified: Date(),
                     options: {
                         corrupted: this.form.options.corrupted || false,
@@ -57,9 +59,9 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
                 };
 
                 //обновление файлов коллекции
-                await this.collection!.updateCollectionManifest(
+                await this.collection.updateCollectionManifest(
                     manifest,
-                    this.form.file!
+                    this.form.file
                 );
 
                 //Конвертация изображений.
@@ -67,7 +69,7 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
                 if (oldCorruptedStatus != this.form.options.corrupted) {
                     if (this.form.options.corrupted)
                         promtAnswer = await storePromt.showPrompt(
-                            i18n.global.t("PROMPT.COLL_CORR_CONVERT_IMAGES")
+                            i18n.global.t('PROMPT.COLL_CORR_CONVERT_IMAGES')
                         );
                     else
                         promtAnswer = await storePromt.showPrompt(
@@ -79,10 +81,12 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
                     if (!this.collection?.loaded) {
                         await this.collection?.initLoadCollection();
                     }
-                    storeProgressBar.init(this.collection!.arr.length);
+                    storeProgressBar.init(this.collection.arr.length);
 
-                    for (const image of this.collection!.arr) {
-                        await this.collection?.updateImage(image as any, { corrupt: true });
+                    for (const image of this.collection.arr) {
+                        await this.collection?.updateImage(image, {
+                            corrupt: true,
+                        });
                         storeProgressBar.increment();
                     }
 
@@ -90,10 +94,17 @@ export const useCollectionEditStore = defineStore("collectionEdit", {
                 }
 
                 this.close();
-                storeNotification.notify(i18n.global.t('NOTIFICATION.MESSAGE.COLLECTION_INFO_UPDATED'));
+                storeNotification.notify(
+                    i18n.global.t(
+                        'NOTIFICATION.MESSAGE.COLLECTION_INFO_UPDATED'
+                    )
+                );
             } catch (err) {
                 console.log(err);
-                storeNotification.notify(i18n.global.t('NOTIFICATION.MESSAGE.ERROR'), false);
+                storeNotification.notify(
+                    i18n.global.t('NOTIFICATION.MESSAGE.ERROR'),
+                    false
+                );
             }
         },
     },

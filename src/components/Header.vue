@@ -1,37 +1,38 @@
 <template>
     <header class="header">
         <div class="section">
-            <select-list :data="langData" v-model="lang"/>
+            <select-list :data="langData" v-model="lang" />
         </div>
     </header>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from "vue";
-import i18n from "@/locales/i18n";
+import { defineComponent, ref, watchEffect } from 'vue';
+import i18n from '@/locales/i18n';
 
-import SelectList from "./SelectList.vue";
+import SelectList from './SelectList.vue';
 
 export default defineComponent({
-
     components: {
-        SelectList
+        SelectList,
     },
 
     setup() {
-        const lang = ref('en');
-        const langData: [string, string][] = [['en', 'EN'], ['ru', 'RU']]
+        const lang = ref(i18n.global.locale.value);
+        const langData: [string, string][] = [
+            ['en', 'EN'],
+            ['ru', 'RU'],
+        ];
 
-        watch(() => lang.value, () => {
+        watchEffect(() => {
             i18n.global.locale.value = lang.value;
         });
 
         return {
             lang,
-            langData
-        }
-    }
-
+            langData,
+        };
+    },
 });
 </script>
 

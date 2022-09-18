@@ -1,27 +1,45 @@
 <template>
     <div class="tag-input-wrapper" ref="input">
-        <input-text :important="true" :label="t('LABEL.TAGS')" :placeholder="t('PLACEHOLDER.TAGS')" :active="true"
-            class="input-tag" v-model.trim="item" @enterKey="createTag" @quickSuggestion="quickSuggestion"
-            :tabindex="tabindex" />
+        <input-text
+            :important="true"
+            :label="t('LABEL.TAGS')"
+            :placeholder="t('PLACEHOLDER.TAGS')"
+            :active="true"
+            class="input-tag"
+            v-model.trim="item"
+            @enterKey="createTag"
+            @quickSuggestion="quickSuggestion"
+            :tabindex="tabindex"
+        />
         <div class="tag-container">
             <div class="container">
-                <card-tag-small v-for="(tag, i) in tags" :key="i" :tag="getTagObject(tag)" @click="removeTag(tag, i)"
-                    data-test="tag-container" />
+                <card-tag-small
+                    v-for="(tag, i) in tags"
+                    :key="i"
+                    :tag="getTagObject(tag)"
+                    @click="removeTag(tag, i)"
+                    data-test="tag-container"
+                />
             </div>
         </div>
         <div class="suggestions" v-if="suggestionsVisible">
-            <card-tag-small v-for="(tag, i) in suggestedTags" :key="i" :tag="tag" @click="getTag(tag)"
-                data-test="input-tag-suggestion" />
+            <card-tag-small
+                v-for="(tag, i) in suggestedTags"
+                :key="i"
+                :tag="tag"
+                @click="getTag(tag)"
+                data-test="input-tag-suggestion"
+            />
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from "vue";
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import InputText from "@/components/InputText.vue";
-import CardTagSmall from "@/components/CardTagSmall.vue";
-import { useI18n } from "vue-i18n";
+import InputText from '@/components/InputText.vue';
+import CardTagSmall from '@/components/CardTagSmall.vue';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
     components: {
@@ -50,13 +68,13 @@ export default defineComponent({
         },
     },
 
-    emits: ["add", "remove"],
+    emits: ['add', 'remove'],
 
     setup(props, { emit }) {
         /**
          * Ref для InputText, хранит введенный текст.
          */
-        const item = ref("");
+        const item = ref('');
         const input = ref<HTMLElement | null>(null);
         const { t } = useI18n();
 
@@ -64,7 +82,7 @@ export default defineComponent({
          * Существующие теги, подходящие под запрос.
          */
         const filteredTags = computed(() => {
-            if (item.value == "") {
+            if (item.value == '') {
                 return [];
             } else {
                 const input = item.value.toLowerCase();
@@ -81,8 +99,8 @@ export default defineComponent({
         const suggestedTags = computed(() => {
             return filteredTags.value
                 .filter((tag) => {
-                    for (let i = 0; i < props.tags!.length; i++) {
-                        let a = props.tags![i] as string;
+                    for (let i = 0; i < props.tags.length; i++) {
+                        let a = props.tags[i];
                         if (a == tag.name) {
                             return false;
                         }
@@ -106,25 +124,25 @@ export default defineComponent({
         function createTag() {
             for (const tag of props.tags as Array<string>) {
                 if (tag == item.value) {
-                    item.value = "";
+                    item.value = '';
                     return;
                 }
             }
-            emit("add", item.value);
-            item.value = "";
+            emit('add', item.value);
+            item.value = '';
         }
 
         /**
          * Событие на удаление тега.
          */
-        function removeTag(tag: any, index: number) {
-            emit("remove", tag, index);
+        function removeTag(tag: Tag | string, index: number) {
+            emit('remove', tag, index);
         }
 
         function tagName(tag: Tag | string) {
-            if (typeof tag == "string") {
+            if (typeof tag == 'string') {
                 return tag;
-            } else if (typeof tag == "object") {
+            } else if (typeof tag == 'object') {
                 return tag.name;
             }
         }
@@ -133,11 +151,11 @@ export default defineComponent({
          */
         function getTag(tag: Tag) {
             if (!props.tags?.includes(tag.name)) {
-                emit("add", tag);
+                emit('add', tag);
             }
-            item.value = "";
+            item.value = '';
             input.value
-                ?.querySelector<HTMLInputElement>(".input > .focusable")
+                ?.querySelector<HTMLInputElement>('.input > .focusable')
                 ?.focus();
         }
 
@@ -178,7 +196,7 @@ export default defineComponent({
             getTag,
             quickSuggestion,
             getTagObject,
-            t
+            t,
         };
     },
 });

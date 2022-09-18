@@ -1,11 +1,12 @@
 interface Callback {
-    (value: any, oldValue: any): void;
+    (value: string[], oldValue: string[]): void;
 }
 
-import { Ref, ref, watch } from "vue";
+import { Ref, ref, watch } from 'vue';
 
-import { useCollections } from "@/store/collections";
+import { useCollections } from '@/store/collections';
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function () {
     const storeCollections = useCollections();
 
@@ -38,8 +39,8 @@ export default function () {
      * В массиве изображения тег должен быть строкой.
      * @param data Тег, который нужно добавить.
      */
-    function addTag(data: string | Tag) {
-        if (typeof data == "string") {
+    function addTag(data: string | Tag): void {
+        if (typeof data == 'string') {
             tags.value.push(data);
         } else {
             tags.value.push(data.name);
@@ -50,7 +51,7 @@ export default function () {
      * @param tag Удаляемый тег.
      * @param index Индекс тега в массиве.
      */
-    function removeTag(tag: Tag | string, index: number) {
+    function removeTag(tag: Tag | string, index: number): void {
         tags.value.splice(index, 1);
     }
 
@@ -58,7 +59,7 @@ export default function () {
      * выполняет действие при изменении массива с тегами.
      * @param callback Функция, вызываемая при добавлении или удалении тегов.
      */
-    function tagsOnChange(callback: Callback) {
+    function tagsOnChange(callback: Callback): void {
         watch(
             () => [...tags.value],
             (value, oldValue) => {
@@ -72,11 +73,11 @@ export default function () {
      * Позволяет внутренним функциям работать с внешним массивом тегов.
      * @param ref Ref на массив с тегами.
      */
-    function setTagRef(ref: Ref<Array<string>>) {
+    function setTagRef(ref: Ref<Array<string>>): void {
         tags = ref;
     }
 
-    function setDefinedTags(tags: Array<Tag>) {
+    function setDefinedTags(tags: Array<Tag>): void {
         definedTags.value = tags;
         customDefinedTags.value = true;
     }

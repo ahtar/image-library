@@ -1,41 +1,71 @@
 <template>
     <modal-dark @close="store.close" data-test="modal">
         <div class="content-wrapper" data-test="collection-edit-wrapper">
-            <input-text class="section" :label="t('LABEL.NAME')" :placeholder="t('PLACEHOLDER.NAME')"
-                :important="true" v-model="data.name" data-test="collection-edit-name" />
-            <input-text class="section" :label="t('LABEL.THEME')" :placeholder="t('PLACEHOLDER.THEME')"
-                v-model="data.theme" data-test="collection-edit-theme" />
-            <input-text class="section input-description" :label="t('LABEL.DESC')"
-                :placeholder="t('PLACEHOLDER.DESC')" v-model="data.description" :textarea="true"
-                data-test="collection-edit-description" />
+            <input-text
+                class="section"
+                :label="t('LABEL.NAME')"
+                :placeholder="t('PLACEHOLDER.NAME')"
+                :important="true"
+                v-model="data.name"
+                data-test="collection-edit-name"
+            />
+            <input-text
+                class="section"
+                :label="t('LABEL.THEME')"
+                :placeholder="t('PLACEHOLDER.THEME')"
+                v-model="data.theme"
+                data-test="collection-edit-theme"
+            />
+            <input-text
+                class="section input-description"
+                :label="t('LABEL.DESC')"
+                :placeholder="t('PLACEHOLDER.DESC')"
+                v-model="data.description"
+                :textarea="true"
+                data-test="collection-edit-description"
+            />
             <div class="section section-checkbox">
-                <input-checkbox v-model="store.form.options.corrupted" :label="t('LABEL.CORR')" v-tooltip.auto="t('TOOLTIP.CORRUPTED')"
-                    data-test="collection-edit-corrupted" />
+                <input-checkbox
+                    v-model="store.form.options.corrupted"
+                    :label="t('LABEL.CORR')"
+                    v-tooltip.auto="t('TOOLTIP.CORRUPTED')"
+                    data-test="collection-edit-corrupted"
+                />
             </div>
             <div class="section section-button">
-                <button-small @click="store.save" :blocked="!buttonSaveActive" data-test="collection-edit-save">
+                <button-small
+                    @click="store.save"
+                    :blocked="!buttonSaveActive"
+                    data-test="collection-edit-save"
+                >
                     {{ t('BUTTON.SAVE') }}
                 </button-small>
             </div>
         </div>
 
         <div class="image-wrapper wrapper">
-            <input-image :active="true" :acceptVideo="false" :fileData="data.file!" @paste="imagePasteEvent" data-test="collection-edit-image" />
+            <input-image
+                :active="true"
+                :acceptVideo="false"
+                :fileData="data.file!"
+                @paste="imagePasteEvent"
+                data-test="collection-edit-image"
+            />
         </div>
     </modal-dark>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "vue";
-import { useI18n } from "vue-i18n";
+import { defineComponent, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-import ModalDark from "@/components/ModalDark.vue";
-import InputText from "@/components/InputText.vue";
-import InputImage from "@/components/InputImage.vue";
-import InputCheckbox from "@/components/InputCheckbox.vue";
-import ButtonSmall from "@/components/ButtonSmall.vue";
+import ModalDark from '@/components/ModalDark.vue';
+import InputText from '@/components/InputText.vue';
+import InputImage from '@/components/InputImage.vue';
+import InputCheckbox from '@/components/InputCheckbox.vue';
+import ButtonSmall from '@/components/ButtonSmall.vue';
 
-import { useCollectionEditStore } from "@/store/forms/form-collection-edit";
+import { useCollectionEditStore } from '@/store/forms/form-collection-edit';
 
 export default defineComponent({
     components: {
@@ -50,11 +80,11 @@ export default defineComponent({
         const { t } = useI18n();
 
         const buttonSaveActive = computed(() => {
-            return store.form.name != "";
+            return store.form.name != '';
         });
 
         async function imagePasteEvent(data: File) {
-            if(!data.type.includes('image')) return;
+            if (!data.type.includes('image')) return;
             store.form.file = data;
         }
 
@@ -63,7 +93,7 @@ export default defineComponent({
             data: store.form,
             imagePasteEvent,
             buttonSaveActive,
-            t
+            t,
         };
     },
 });

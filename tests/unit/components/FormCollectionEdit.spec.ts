@@ -1,21 +1,20 @@
-import { DOMWrapper, mount, VueWrapper } from "@vue/test-utils";
-import userEvent from "@testing-library/user-event";
-import { createTestingPinia } from "@pinia/testing";
+import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
+import userEvent from '@testing-library/user-event';
+import { createTestingPinia } from '@pinia/testing';
 
-import FormCollectionEdit from "@/components/FormCollectionEdit.vue";
-import tooltip from '@/directives/v-tooltip'
-import { useCollectionEditStore } from "@/store/forms/form-collection-edit";
-import { usePromptStore } from "@/store/modals/modal-prompt";
+import FormCollectionEdit from '@/components/FormCollectionEdit.vue';
+import tooltip from '@/directives/v-tooltip';
+import { useCollectionEditStore } from '@/store/forms/form-collection-edit';
+import { usePromptStore } from '@/store/modals/modal-prompt';
 
-import Collection from "@/classes/Collection";
+import Collection from '@/classes/Collection';
 
-jest.mock("@/classes/Collection");
-jest.mock("@/composables/clipboard");
-jest.mock("@/modules/jimp.ts");
-jest.mock("@/composables/image-rendering");
+jest.mock('@/classes/Collection');
+jest.mock('@/composables/clipboard');
+jest.mock('@/modules/jimp.ts');
+jest.mock('@/composables/image-rendering');
 
-describe("FormCollectionEdit", () => {
-
+describe('FormCollectionEdit', () => {
     let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
@@ -27,19 +26,23 @@ describe("FormCollectionEdit", () => {
                             collectionEdit: {
                                 visible: true,
                                 form: {
-                                    name: "mock name",
-                                    theme: "mock theme",
-                                    description: "mock description",
+                                    name: 'mock name',
+                                    theme: 'mock theme',
+                                    description: 'mock description',
                                     file: new Blob(),
                                 },
-                                collection: new Collection(jest.fn(), {} as any, {} as any),
+                                collection: new Collection(
+                                    jest.fn(),
+                                    {} as any,
+                                    {} as any
+                                ),
                             },
                         },
                     }),
                 ],
                 directives: {
-                    tooltip: tooltip()
-                }
+                    tooltip: tooltip(),
+                },
             },
             attachTo: document.body,
         });
@@ -50,12 +53,14 @@ describe("FormCollectionEdit", () => {
     });
 
     it('рендерится', () => {
-        expect(wrapper.find('[data-test="collection-edit-wrapper"]').exists()).toBe(true);
+        expect(
+            wrapper.find('[data-test="collection-edit-wrapper"]').exists()
+        ).toBe(true);
     });
 
-    it("форма закрывается", async () => {
+    it('форма закрывается', async () => {
         const store = useCollectionEditStore();
-        jest.spyOn(store, "close");
+        jest.spyOn(store, 'close');
         await wrapper.vm.$nextTick();
 
         await userEvent.click(wrapper.find('[data-test="modal"]').element);
@@ -63,91 +68,107 @@ describe("FormCollectionEdit", () => {
         expect(store.close).toBeCalledTimes(1);
     });
 
-    it("название вводится", async () => {
+    it('название вводится', async () => {
         const store = useCollectionEditStore();
         await wrapper.vm.$nextTick();
 
-        expect(store.form.name).toBe("mock name");
+        expect(store.form.name).toBe('mock name');
         await wrapper
             .find<HTMLInputElement>('[data-test="collection-edit-name"] input')
-            .setValue("new name");
-        expect(store.form.name).toBe("new name");
+            .setValue('new name');
+        expect(store.form.name).toBe('new name');
     });
 
-    it("тема вводится", async () => {
+    it('тема вводится', async () => {
         const store = useCollectionEditStore();
         await wrapper.vm.$nextTick();
 
-        expect(store.form.theme).toBe("mock theme");
+        expect(store.form.theme).toBe('mock theme');
         await wrapper
             .find<HTMLInputElement>('[data-test="collection-edit-theme"] input')
-            .setValue("new theme");
-        expect(store.form.theme).toBe("new theme");
+            .setValue('new theme');
+        expect(store.form.theme).toBe('new theme');
     });
 
-    it("описание вводится", async () => {
+    it('описание вводится', async () => {
         const store = useCollectionEditStore();
         await wrapper.vm.$nextTick();
 
-        expect(store.form.description).toBe("mock description");
+        expect(store.form.description).toBe('mock description');
         await wrapper
             .find<HTMLInputElement>(
                 '[data-test="collection-edit-description"] textarea'
             )
-            .setValue("new description");
-        expect(store.form.description).toBe("new description");
+            .setValue('new description');
+        expect(store.form.description).toBe('new description');
     });
 
-    it("изображение меняется", async () => {
+    it('изображение меняется', async () => {
         await wrapper.vm.$nextTick();
 
-        const imgSrc = wrapper.find<HTMLImageElement>("img").element.src;
-        const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
+        const imgSrc = wrapper.find<HTMLImageElement>('img').element.src;
+        const input = wrapper.find<HTMLInputElement>(
+            '[data-test="input-file"]'
+        );
 
-        expect(imgSrc).not.toBe("");
+        expect(imgSrc).not.toBe('');
 
-        await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' }));
+        await userEvent.upload(
+            input.element,
+            new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' })
+        );
 
-        expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe("");
-        expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe(imgSrc);
+        expect(wrapper.find<HTMLImageElement>('img').element.src).not.toBe('');
+        expect(wrapper.find<HTMLImageElement>('img').element.src).not.toBe(
+            imgSrc
+        );
     });
 
     it('видео не вставляется', async () => {
-        const imgSrc = wrapper.find<HTMLImageElement>("img").element.src;
-        const input = wrapper.find<HTMLInputElement>('[data-test="input-file"]');
+        const imgSrc = wrapper.find<HTMLImageElement>('img').element.src;
+        const input = wrapper.find<HTMLInputElement>(
+            '[data-test="input-file"]'
+        );
 
-        expect(imgSrc).not.toBe("");
+        expect(imgSrc).not.toBe('');
 
         //пользователь загружает файл
-        await userEvent.upload(input.element, new File(['(⌐□_□)'], 'chucknorris.mp4', { type: 'video/mp4' }));
+        await userEvent.upload(
+            input.element,
+            new File(['(⌐□_□)'], 'chucknorris.mp4', { type: 'video/mp4' })
+        );
 
         //src изображения не меняется
-        expect(wrapper.find<HTMLImageElement>("img").element.src).not.toBe("");
-        expect(wrapper.find<HTMLImageElement>("img").element.src).toBe(imgSrc);
+        expect(wrapper.find<HTMLImageElement>('img').element.src).not.toBe('');
+        expect(wrapper.find<HTMLImageElement>('img').element.src).toBe(imgSrc);
     });
 
-    it("изменения в коллекции сохраняются", async () => {
+    it('изменения в коллекции сохраняются', async () => {
         const store = useCollectionEditStore();
-        jest.spyOn(store, "save");
+        jest.spyOn(store, 'save');
         await wrapper.vm.$nextTick();
 
-        await userEvent.click(wrapper.find<HTMLButtonElement>("button").element);
+        await userEvent.click(
+            wrapper.find<HTMLButtonElement>('button').element
+        );
         expect(store.save).toBeCalledTimes(1);
     });
 
-    it("изменения в коллекции не сохраняются, если название коллекции не введено", async () => {
+    it('изменения в коллекции не сохраняются, если название коллекции не введено', async () => {
         const store = useCollectionEditStore();
-        jest.spyOn(store, "save");
+        jest.spyOn(store, 'save');
         await wrapper.vm.$nextTick();
 
         await wrapper
             .find<HTMLInputElement>('[data-test="collection-edit-name"] input')
-            .setValue("");
-        await userEvent.click(wrapper.find<HTMLButtonElement>("button").element);
+            .setValue('');
+        await userEvent.click(
+            wrapper.find<HTMLButtonElement>('button').element
+        );
         expect(store.save).toBeCalledTimes(0);
     });
 
-    it("Настройка corrupted меняется", async () => {
+    it('Настройка corrupted меняется', async () => {
         const store = useCollectionEditStore();
         const checkbox = wrapper.find<HTMLInputElement>(
             '[data-test="collection-edit-corrupted"] input'
@@ -157,7 +178,7 @@ describe("FormCollectionEdit", () => {
         expect(store.form.options.corrupted).toBe(false);
 
         await userEvent.click(checkbox.element);
-        await checkbox.trigger("change");
+        await checkbox.trigger('change');
 
         expect(checkbox.element.checked).toBe(true);
         expect(store.form.options.corrupted).toBe(true);
@@ -178,8 +199,8 @@ describe("FormCollectionEdit", () => {
                         }),
                     ],
                     directives: {
-                        tooltip: tooltip()
-                    }
+                        tooltip: tooltip(),
+                    },
                 },
             });
 
@@ -193,43 +214,43 @@ describe("FormCollectionEdit", () => {
             );
         });
 
-        it("У пользователя не спрашивают, нужно ли менять существующие изображения, если  параметр corrupted не был изменен", async () => {
+        it('У пользователя не спрашивают, нужно ли менять существующие изображения, если  параметр corrupted не был изменен', async () => {
             const store = useCollectionEditStore();
             const storePrompt = usePromptStore();
 
             //Инициализация.
             store.open(collection);
-    
+
             //Окно prompt не показано.
             expect(storePrompt.visible).toBe(false);
-    
+
             //Сохранение коллекции.
             await userEvent.click(saveButton.element);
-    
+
             //Окно prompt всё ещё показано.
             expect(storePrompt.visible).toBe(false);
         });
-    
-        it("У пользователя спрашивают, нужно ли менять существующие изображения, если  параметр corrupted был изменен", async () => {
+
+        it('У пользователя спрашивают, нужно ли менять существующие изображения, если  параметр corrupted был изменен', async () => {
             const store = useCollectionEditStore();
             const storePrompt = usePromptStore();
-    
+
             //Инициализация.
             store.open(collection);
-    
+
             //Окно prompt не показано.
             expect(storePrompt.visible).toBe(false);
-    
+
             //Изменение corrupted.
             await userEvent.click(checkbox.element);
-            await checkbox.trigger("change");
-    
+            await checkbox.trigger('change');
+
             //Сохранение коллекции.
             await userEvent.click(saveButton.element);
-    
+
             //Окно prompt показано.
             expect(storePrompt.visible).toBe(true);
             expect(storePrompt.message).toBe('PROMPT.COLL_CORR_CONVERT_IMAGES');
         });
-    })
+    });
 });

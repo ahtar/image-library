@@ -1,10 +1,10 @@
-import { mount, VueWrapper } from "@vue/test-utils";
+import { mount, VueWrapper } from '@vue/test-utils';
 
-import CardCollectionBig from "@/components/cardCollectionBig.vue";
+import CardCollectionBig from '@/components/cardCollectionBig.vue';
 
-jest.mock("@/composables/image-rendering");
+jest.mock('@/composables/image-rendering');
 
-describe("cardCollectionBig.vue", () => {
+describe('cardCollectionBig.vue', () => {
     let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
@@ -14,12 +14,14 @@ describe("cardCollectionBig.vue", () => {
             },
         });
     });
-    
+
     it('рендерится', () => {
-        expect(wrapper.find('[data-test="collection-card-big"]').exists()).toBe(true);
+        expect(wrapper.find('[data-test="collection-card-big"]').exists()).toBe(
+            true
+        );
     });
 
-    it("рендерит изображение из props.fileHandle", () => {
-        expect(wrapper.find<HTMLImageElement>("img").element.src).toBeTruthy();
+    it('рендерит изображение из props.fileHandle', () => {
+        expect(wrapper.find<HTMLImageElement>('img').element.src).toBeTruthy();
     });
 });

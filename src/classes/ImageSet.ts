@@ -4,7 +4,7 @@ interface Options {
     dateEdited?: string;
 }
 
-import memento from "@/modules/memento";
+import memento from '@/modules/memento';
 
 class ImageSetObject implements ImageSet {
     manifest: ImageSetData;
@@ -23,7 +23,7 @@ class ImageSetObject implements ImageSet {
      * Добавление изображения в сет.
      * @param image Объект изображения.
      */
-    addImage(image: ImageSingle) {
+    addImage(image: ImageSingle): void {
         this.arr.push(image);
     }
 
@@ -31,7 +31,7 @@ class ImageSetObject implements ImageSet {
      * Удаление зображения из сета.
      * @param image Объект изображения.
      */
-    removeImage(image: ImageSingle) {
+    removeImage(image: ImageSingle): void {
         const index = this.arr.findIndex(
             (img) => img.manifest.id == image.manifest.id
         );
@@ -41,9 +41,12 @@ class ImageSetObject implements ImageSet {
     /**
      * Сохранение состояния данных изображения для последующего восстановления.
      */
-    saveState() {
+    saveState(): void {
         memento.save(
-            { manifest: this.manifest, arrOrder: this.arr.map((i) => i.manifest.id) },
+            {
+                manifest: this.manifest,
+                arrOrder: this.arr.map((i) => i.manifest.id),
+            },
             this.manifest.id
         );
         for (const image of this.arr) {
@@ -54,9 +57,10 @@ class ImageSetObject implements ImageSet {
     /**
      * Восстановление изображения в сохраненное состояние
      */
-    restoreState() {
-        const restoredData = memento.restore<any>(this.manifest.id);
-
+    restoreState(): void {
+        const restoredData = memento.restore<ImageSetRestoredData>(
+            this.manifest.id
+        );
         if (restoredData) {
             this.manifest = restoredData.manifest;
 
@@ -73,7 +77,7 @@ class ImageSetObject implements ImageSet {
         }
     }
 
-    checkChanges() {
+    checkChanges(): boolean {
         const restoredStringData = memento.getString(this.manifest.id);
         const stringData = JSON.stringify({
             manifest: this.manifest,

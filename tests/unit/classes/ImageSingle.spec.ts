@@ -1,18 +1,18 @@
-import ImageSingle from "@/classes/ImageSingle";
-import handles from "../../helpers/handles";
-import memento from "@/modules/memento";
+import ImageSingle from '@/classes/ImageSingle';
+import handles from '../../helpers/handles';
+import memento from '@/modules/memento';
 
-describe("ImageSingle.ts", () => {
+describe('ImageSingle.ts', () => {
     let image: ImageSingle | null = null;
     beforeEach(() => {
         const options = {
-            id: "mock id",
-            hash: "mock hash",
-            tags: ["mock tag 1", "mock tag 2"],
+            id: 'mock id',
+            hash: 'mock hash',
+            tags: ['mock tag 1', 'mock tag 2'],
             type: 'image/png',
-            dateCreated: "mock dateCreated",
-            dateEdited: "mock dateEdited",
-            description: "mock description",
+            dateCreated: 'mock dateCreated',
+            dateEdited: 'mock dateEdited',
+            description: 'mock description',
         };
         image = new ImageSingle(options, handles.getNewDirectoryHandle());
     });
@@ -21,15 +21,15 @@ describe("ImageSingle.ts", () => {
         jest.clearAllMocks();
     });
 
-    it("создается", () => {
+    it('создается', () => {
         const options = {
-            id: "mock id",
-            hash: "mock hash",
-            tags: ["mock tag 1", "mock tag 2"],
+            id: 'mock id',
+            hash: 'mock hash',
+            tags: ['mock tag 1', 'mock tag 2'],
             type: 'image/png',
-            dateCreated: "mock dateCreated",
-            dateEdited: "mock dateEdited",
-            description: "mock description",
+            dateCreated: 'mock dateCreated',
+            dateEdited: 'mock dateEdited',
+            description: 'mock description',
         };
         const image = new ImageSingle(options, handles.getNewDirectoryHandle());
 
@@ -41,7 +41,7 @@ describe("ImageSingle.ts", () => {
         expect(image.manifest.description).toBe(options.description);
     });
 
-    it("loadImage загружает FileHandle изображения", async () => {
+    it('loadImage загружает FileHandle изображения', async () => {
         expect(image!.imageHandle).toBeNull();
 
         await image!.loadImage();
@@ -49,7 +49,7 @@ describe("ImageSingle.ts", () => {
         expect(image!.imageHandle).toBeDefined();
     });
 
-    it("loadThumbnail загружает FileHandle thumbnail изображения", async () => {
+    it('loadThumbnail загружает FileHandle thumbnail изображения', async () => {
         expect(image!.thumbnailHandle).toBeNull();
 
         await image!.loadThumbnail();
@@ -57,35 +57,35 @@ describe("ImageSingle.ts", () => {
         expect(image!.thumbnailHandle).toBeDefined();
     });
 
-    it("getImage возвращает FileHandle изображения", async () => {
+    it('getImage возвращает FileHandle изображения', async () => {
         const handle = await image!.getImage();
         expect(handle).toBeDefined();
     });
 
-    it("getThumbnail возвращает FileHandle thumbnail изображения", async () => {
+    it('getThumbnail возвращает FileHandle thumbnail изображения', async () => {
         const handle = await image!.getThumbnail();
         expect(handle).toBeDefined();
     });
 
-    it("saveState сохраняет состояние изображения", () => {
-        const spySave = jest.spyOn(memento, "save");
+    it('saveState сохраняет состояние изображения', () => {
+        const spySave = jest.spyOn(memento, 'save');
 
         image!.saveState();
 
         expect(spySave).toBeCalledTimes(1);
     });
 
-    it("restoreState восстанавливает сохраненное состояние изображения", () => {
+    it('restoreState восстанавливает сохраненное состояние изображения', () => {
         image!.saveState();
-        image!.manifest.hash = "new mock hash";
+        image!.manifest.hash = 'new mock hash';
         image!.restoreState();
 
-        expect(image!.manifest.hash).not.toBe("new mock hash");
+        expect(image!.manifest.hash).not.toBe('new mock hash');
     });
 
-    it("checkChanges проверяет на наличие изменений в изображении", () => {
+    it('checkChanges проверяет на наличие изменений в изображении', () => {
         image!.saveState();
-        image!.manifest.hash = "new mock hash";
+        image!.manifest.hash = 'new mock hash';
 
         expect(image!.checkChanges()).toBe(true);
 

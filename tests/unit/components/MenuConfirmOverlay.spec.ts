@@ -1,10 +1,10 @@
-import { mount, VueWrapper } from "@vue/test-utils";
-import userEvent from "@testing-library/user-event";
-import { createTestingPinia } from "@pinia/testing";
+import { mount, VueWrapper } from '@vue/test-utils';
+import userEvent from '@testing-library/user-event';
+import { createTestingPinia } from '@pinia/testing';
 
-import MenuConfirmOverlay from "@/components/MenuConfirmOverlay.vue";
+import MenuConfirmOverlay from '@/components/MenuConfirmOverlay.vue';
 
-describe("MenuConfirmOverlay.vue", () => {
+describe('MenuConfirmOverlay.vue', () => {
     let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
@@ -15,18 +15,18 @@ describe("MenuConfirmOverlay.vue", () => {
         });
     });
 
-    it("рендерится", () => {
-        expect(wrapper.html()).toContain("BUTTON.CONFIRM");
-        expect(wrapper.html()).toContain("BUTTON.CANCEL");
+    it('рендерится', () => {
+        expect(wrapper.html()).toContain('BUTTON.CONFIRM');
+        expect(wrapper.html()).toContain('BUTTON.CANCEL');
     });
 
-    it("событие save отправляется при подтверждении", async () => {
+    it('событие save отправляется при подтверждении', async () => {
         await userEvent.click(wrapper.element.children[1]);
 
         expect(wrapper.emitted().save).toBeDefined();
     });
 
-    it("событие cancel отправляется при отрицании", async () => {
+    it('событие cancel отправляется при отрицании', async () => {
         await userEvent.click(wrapper.element.children[0]);
 
         expect(wrapper.emitted().cancel).toBeDefined();

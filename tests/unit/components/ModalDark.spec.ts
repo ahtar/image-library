@@ -1,10 +1,10 @@
-import { mount, VueWrapper } from "@vue/test-utils";
-import userEvent from "@testing-library/user-event";
-import { createTestingPinia } from "@pinia/testing";
+import { mount, VueWrapper } from '@vue/test-utils';
+import userEvent from '@testing-library/user-event';
+import { createTestingPinia } from '@pinia/testing';
 
-import ModalDark from "@/components/ModalDark.vue";
+import ModalDark from '@/components/ModalDark.vue';
 
-describe("ModalDark.vue", () => {
+describe('ModalDark.vue', () => {
     let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
@@ -13,7 +13,7 @@ describe("ModalDark.vue", () => {
                 plugins: [createTestingPinia({})],
             },
             slots: {
-                default: "<div>test content</div>",
+                default: '<div>test content</div>',
             },
         });
     });
@@ -21,12 +21,12 @@ describe("ModalDark.vue", () => {
     it('рендерится', () => {
         expect(wrapper.find('[data-test="modal-dark"]').exists()).toBe(true);
     });
-    
-    it("slot рендерится", () => {
-        expect(wrapper.html()).toContain("test content");
+
+    it('slot рендерится', () => {
+        expect(wrapper.html()).toContain('test content');
     });
 
-    it("закрывается", async () => {
+    it('закрывается', async () => {
         await userEvent.click(wrapper.element);
 
         expect(wrapper.emitted().close).toBeDefined();

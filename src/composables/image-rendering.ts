@@ -1,4 +1,4 @@
-import crypto from "@/modules/crypto";
+import crypto from '@/modules/crypto';
 
 /**
  * Изменение src изображения.
@@ -9,12 +9,12 @@ async function renderImage(
     image: HTMLImageElement | undefined,
     file: FileSystemFileHandle | string | Blob | File | undefined
 ) {
-    if(typeof image == 'undefined' || image === null) {
+    if (typeof image == 'undefined' || image === null) {
         return;
     }
 
     if (typeof file == 'undefined') {
-        if(image.src) image.src = "";
+        if (image.src) image.src = '';
         return;
     }
 
@@ -26,7 +26,7 @@ async function renderImage(
 
     //File
     if ('lastModified' in file) {
-        if (file.name.includes(".dpx") || file.name.includes(".tpx")) {
+        if (file.name.includes('.dpx') || file.name.includes('.tpx')) {
             const arrayBuffer = await file.arrayBuffer();
             image.src = URL.createObjectURL(await crypto.recover(arrayBuffer));
             return;
@@ -42,7 +42,7 @@ async function renderImage(
     }
 
     //FileSystemFileHandle
-    if(file.name.includes(".dpx") || file.name.includes(".tpx")) {
+    if (file.name.includes('.dpx') || file.name.includes('.tpx')) {
         const arrayBuffer = await (await file.getFile()).arrayBuffer();
         image.src = URL.createObjectURL(await crypto.recover(arrayBuffer));
         return;
@@ -52,11 +52,12 @@ async function renderImage(
 }
 
 function releaseImage(image: HTMLImageElement) {
-    if (image.src != "") {
+    if (image.src != '') {
         URL.revokeObjectURL(image.src);
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function () {
     return {
         renderImage,

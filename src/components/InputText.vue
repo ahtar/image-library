@@ -1,23 +1,53 @@
 <template>
-    <div class="input-wrapper" :class="{ 'input-wrapper-textarea': textarea, 'input-focused': focused }">
-        <div class="label" :class="{ important: important, 'label-textarea': textarea }" v-if="labelActive"
-            data-test="input-text-label">
+    <div
+        class="input-wrapper"
+        :class="{
+            'input-wrapper-textarea': textarea,
+            'input-focused': focused,
+        }"
+    >
+        <div
+            class="label"
+            :class="{ important: important, 'label-textarea': textarea }"
+            v-if="labelActive"
+            data-test="input-text-label"
+        >
             {{ label }}
         </div>
         <div class="input-textarea" v-if="textarea">
-            <textarea :placeholder="placeholder" :value="modelValue" @input="input" @focus="focus" @blur="unfocus" />
+            <textarea
+                :placeholder="placeholder"
+                :value="modelValue"
+                @input="input"
+                @focus="focus"
+                @blur="unfocus"
+            />
         </div>
         <div class="input-text" v-else>
-            <input type="text" class="focusable" :placeholder="placeholder" :value="modelValue" @input="input"
-                @keydown.down="quickSuggestion" :disabled="active != true" :tabindex="tabIndex"
-                @keypress.enter="enterKeypress" @focus="focus" @blur="unfocus" />
+            <input
+                type="text"
+                class="focusable"
+                :placeholder="placeholder"
+                :value="modelValue"
+                @input="input"
+                @keydown.down="quickSuggestion"
+                :disabled="active != true"
+                :tabindex="tabIndex"
+                @keypress.enter="enterKeypress"
+                @focus="focus"
+                @blur="unfocus"
+            />
         </div>
-        <div class="wrapper-disabled" v-if="!active" data-test="input-test-disabled" />
+        <div
+            class="wrapper-disabled"
+            v-if="!active"
+            data-test="input-test-disabled"
+        />
     </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
     props: {
@@ -38,7 +68,7 @@ export default defineComponent({
 
         placeholder: {
             type: String,
-            default: "",
+            default: '',
         },
 
         modelValue: String,
@@ -64,7 +94,7 @@ export default defineComponent({
         },
     },
 
-    emits: ["update:modelValue", "enterKey", "quickSuggestion"],
+    emits: ['update:modelValue', 'enterKey', 'quickSuggestion'],
 
     setup(props, { emit }) {
         const focused = ref(false);
@@ -83,15 +113,15 @@ export default defineComponent({
         });
 
         function input(value: Event) {
-            emit("update:modelValue", (value.target as HTMLInputElement).value);
+            emit('update:modelValue', (value.target as HTMLInputElement).value);
         }
 
-        function enterKeypress(value: KeyboardEvent) {
-            emit("enterKey");
+        function enterKeypress() {
+            emit('enterKey');
         }
 
         function quickSuggestion() {
-            emit("quickSuggestion");
+            emit('quickSuggestion');
         }
 
         function focus() {
@@ -110,7 +140,7 @@ export default defineComponent({
             tabIndex,
             focus,
             unfocus,
-            focused
+            focused,
         };
     },
 });

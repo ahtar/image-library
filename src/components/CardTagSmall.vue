@@ -5,9 +5,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from "vue";
+import { defineComponent, PropType, computed } from 'vue';
 
-import BaseCard from "@/components/base/BaseCard.vue";
+import BaseCard from '@/components/base/BaseCard.vue';
 
 export default defineComponent({
     props: {
@@ -22,23 +22,23 @@ export default defineComponent({
     setup(props) {
         const name = computed(() => {
             if (props.tag) {
-                if (typeof props.tag == "string") {
-                    return "Error";
+                if (typeof props.tag == 'string') {
+                    return 'Error';
                 } else {
                     return props.tag.name;
                 }
             }
-            return "Error";
+            return 'Error';
         });
         const count = computed(() => {
             if (props.tag) {
-                if (typeof props.tag == "string") {
-                    return "0";
+                if (typeof props.tag == 'string') {
+                    return '0';
                 } else {
                     return props.tag.count;
                 }
             }
-            return "0";
+            return '0';
         });
 
         const content = computed(() => {

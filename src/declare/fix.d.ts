@@ -1,6 +1,6 @@
 interface ClipboardItem {
     readonly types: string[];
-    readonly presentationStyle: "unspecified" | "inline" | "attachment";
+    readonly presentationStyle: 'unspecified' | 'inline' | 'attachment';
     getType(): Promise<Blob>;
 }
 
@@ -13,13 +13,13 @@ interface Clipboard {
     write(data: ClipboardItem[]): Promise<void>;
 }
 
-declare var ClipboardItem: {
+declare let ClipboardItem: {
     prototype: ClipboardItem;
-    new(itemData: ClipboardItemData): ClipboardItem;
+    new (itemData: ClipboardItemData): ClipboardItem;
 };
 
-declare module "vue-virtual-scroller" { }
+declare module 'vue-virtual-scroller' {}
 
-declare module "blob-polyfill" {
+declare module 'blob-polyfill' {
     export = Blob;
 }

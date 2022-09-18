@@ -1,12 +1,11 @@
-import { mount } from "@vue/test-utils";
-import userEvent from "@testing-library/user-event";
-import { createTestingPinia } from "@pinia/testing";
+import { mount } from '@vue/test-utils';
+import userEvent from '@testing-library/user-event';
+import { createTestingPinia } from '@pinia/testing';
 
-import MessageNotification from "@/components/MessageNotification.vue";
-import { useNotificationStore } from "@/store/modals/modal-notification";
+import MessageNotification from '@/components/MessageNotification.vue';
+import { useNotificationStore } from '@/store/modals/modal-notification';
 
-describe("MessageNotification.vue", () => {
-
+describe('MessageNotification.vue', () => {
     it('рендерится', () => {
         const wrapper = mount(MessageNotification, {
             global: {
@@ -14,10 +13,12 @@ describe("MessageNotification.vue", () => {
             },
         });
 
-        expect(wrapper.find('[class="notification-container"]').exists()).toBe(true);
+        expect(wrapper.find('[class="notification-container"]').exists()).toBe(
+            true
+        );
     });
 
-    it("Оповещения рендерятся", async () => {
+    it('Оповещения рендерятся', async () => {
         const wrapper = mount(MessageNotification, {
             global: {
                 plugins: [createTestingPinia({})],
@@ -26,21 +27,21 @@ describe("MessageNotification.vue", () => {
         const store = useNotificationStore();
 
         //изначально никаких оповещений нет
-        expect(wrapper.text()).toBe("");
+        expect(wrapper.text()).toBe('');
 
         //показываем новое оповещение
         store.activeNotifications.push({
-            message: "test notification",
+            message: 'test notification',
             status: true,
             id: 0,
         });
         await wrapper.vm.$nextTick();
 
         //оповещение должно отобразиться
-        expect(wrapper.text()).toContain("test notification");
+        expect(wrapper.text()).toContain('test notification');
     });
 
-    it("Оповещения закрываются", async () => {
+    it('Оповещения закрываются', async () => {
         const wrapper = mount(MessageNotification, {
             global: {
                 plugins: [
@@ -54,18 +55,18 @@ describe("MessageNotification.vue", () => {
 
         //показываем новое оповещение
         store.activeNotifications.push({
-            message: "test notification",
+            message: 'test notification',
             status: true,
             id: 0,
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.text()).toContain("test notification");
+        expect(wrapper.text()).toContain('test notification');
 
         //нажимаем на оповещение
         await userEvent.click(wrapper.element.children[0].children[0]);
 
         //оповещение должно закрыться
-        expect(wrapper.text()).toBe("");
+        expect(wrapper.text()).toBe('');
     });
 });

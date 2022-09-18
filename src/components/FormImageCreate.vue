@@ -1,51 +1,92 @@
 <template>
     <modal-dark @close="store.close" data-test="modal">
-        <div class="form-image-create-wrapper wrapper" :class="{ 'margin-big': oldTagsCopy.length == 0 }"
-            data-test="form-wrapper">
-            <div class="prior-tag-wrapper" v-if="oldTagsCopy.length > 0" data-test="old-tags">
-                <card-tag-small v-for="(tag, i) in oldTagsCopy" :key="i" :tag="tag" @click="reuseOldTag(i)" />
+        <div
+            class="form-image-create-wrapper wrapper"
+            :class="{ 'margin-big': oldTagsCopy.length == 0 }"
+            data-test="form-wrapper"
+        >
+            <div
+                class="prior-tag-wrapper"
+                v-if="oldTagsCopy.length > 0"
+                data-test="old-tags"
+            >
+                <card-tag-small
+                    v-for="(tag, i) in oldTagsCopy"
+                    :key="i"
+                    :tag="tag"
+                    @click="reuseOldTag(i)"
+                />
             </div>
             <div class="form-image-create" data-test="form-create-wrapper">
                 <div class="section">
-                    <input-text v-model="store.form.fileUrl" :label="t('LABEL.ID')" :important="true"
-                        :active="false" :placeholder="t('PLACEHOLDER.ID')" />
+                    <input-text
+                        v-model="store.form.fileUrl"
+                        :label="t('LABEL.ID')"
+                        :important="true"
+                        :active="false"
+                        :placeholder="t('PLACEHOLDER.ID')"
+                    />
                 </div>
-                <input-tags class="section" :tags="store.form.tags" :definedTags="definedTags" @add="addTag"
-                    @remove="removeTag" data-test="input-tags" />
+                <input-tags
+                    class="section"
+                    :tags="store.form.tags"
+                    :definedTags="definedTags"
+                    @add="addTag"
+                    @remove="removeTag"
+                    data-test="input-tags"
+                />
                 <div class="section-button section">
-                    <button-small @click="store.clearForm" data-test="form-clear">{{ t('BUTTON.CLEAR') }}</button-small>
-                    <button-small @click="store.submitImage" :blocked="saveButtonBlocked" data-test="form-save">
-                        {{ t('BUTTON.SAVE') }}</button-small>
+                    <button-small
+                        @click="store.clearForm"
+                        data-test="form-clear"
+                        >{{ t('BUTTON.CLEAR') }}</button-small
+                    >
+                    <button-small
+                        @click="store.submitImage"
+                        :blocked="saveButtonBlocked"
+                        data-test="form-save"
+                    >
+                        {{ t('BUTTON.SAVE') }}</button-small
+                    >
                 </div>
                 <div class="similar-images section" v-if="haveDoubles">
-                    <card-image-small v-for="image in doublicateImages" :image="image" :key="image.manifest.id"
-                        class="image-card" />
+                    <card-image-small
+                        v-for="image in doublicateImages"
+                        :image="image"
+                        :key="image.manifest.id"
+                        class="image-card"
+                    />
                 </div>
             </div>
         </div>
         <div class="image-wrapper wrapper">
-            <input-image :active="true" :fileData="store.form.file" @paste="imagePasteEvent" data-test="input-image" />
+            <input-image
+                :active="true"
+                :fileData="store.form.file"
+                @paste="imagePasteEvent"
+                data-test="input-image"
+            />
         </div>
     </modal-dark>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, Ref, computed } from "vue";
-import { useI18n } from "vue-i18n";
-import jimp from "@/modules/jimp";
+import { defineComponent, PropType, ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import jimp from '@/modules/jimp';
 
-import ModalDark from "@/components/ModalDark.vue";
-import InputText from "@/components/InputText.vue";
-import InputTags from "@/components/InputTag.vue";
-import InputImage from "@/components/InputImage.vue";
-import CardImageSmall from "@/components/CardImageSmall.vue";
-import CardTagSmall from "@/components/CardTagSmall.vue";
-import ButtonSmall from "@/components/ButtonSmall.vue";
+import ModalDark from '@/components/ModalDark.vue';
+import InputText from '@/components/InputText.vue';
+import InputTags from '@/components/InputTag.vue';
+import InputImage from '@/components/InputImage.vue';
+import CardImageSmall from '@/components/CardImageSmall.vue';
+import CardTagSmall from '@/components/CardTagSmall.vue';
+import ButtonSmall from '@/components/ButtonSmall.vue';
 
-import { useImageCreateStore } from "@/store/forms/form-create-image";
+import { useImageCreateStore } from '@/store/forms/form-create-image';
 
-import useTagActions from "@/composables/tags";
-import useDublicateImages from "@/composables/dublicate-images";
+import useTagActions from '@/composables/tags';
+import useDublicateImages from '@/composables/dublicate-images';
 
 export default defineComponent({
     components: {
@@ -81,7 +122,9 @@ export default defineComponent({
 
         //Предложенные теги, использованные в создании предыдущего изображения.
         const oldTagsCopy = computed(() => {
-            return props.priorTags.filter((t) => !store.form.tags.includes(t.name))
+            return props.priorTags.filter(
+                (t) => !store.form.tags.includes(t.name)
+            );
         });
 
         setTagRef(ref(store.form.tags));
@@ -109,7 +152,7 @@ export default defineComponent({
             saveButtonBlocked,
             oldTagsCopy,
             reuseOldTag,
-            t
+            t,
         };
     },
 });
@@ -151,7 +194,7 @@ export default defineComponent({
 
     .section-button {
         @include flex-space-around();
-        
+
         .button-small {
             flex-grow: 1;
             margin: 2px;

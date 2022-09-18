@@ -1,28 +1,30 @@
-import { mount, VueWrapper } from "@vue/test-utils";
+import { mount, VueWrapper } from '@vue/test-utils';
 
-import CardNotificationError from "@/components/CardNotificationError.vue";
+import CardNotificationError from '@/components/CardNotificationError.vue';
 
-describe("CardNotificationError.vue", () => {
+describe('CardNotificationError.vue', () => {
     let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(CardNotificationError, {
             props: {
-                message: "Hello World",
+                message: 'Hello World',
             },
         });
     });
 
     it('рендерится', () => {
-        expect(wrapper.find('[data-test="card-notification-error"]').exists()).toBe(true);
+        expect(
+            wrapper.find('[data-test="card-notification-error"]').exists()
+        ).toBe(true);
     });
 
-    it("рендерит текст, полученный из  props.message", () => {
-        expect(wrapper.html()).toContain("Hello World");
+    it('рендерит текст, полученный из  props.message', () => {
+        expect(wrapper.html()).toContain('Hello World');
     });
 
-    it("событие Close при нажатии", async () => {
-        await wrapper.trigger("click");
+    it('событие Close при нажатии', async () => {
+        await wrapper.trigger('click');
         expect(wrapper.emitted().close).toBeDefined();
     });
 });

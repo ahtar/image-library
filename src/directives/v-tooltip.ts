@@ -1,5 +1,13 @@
-
+/*eslint-disable */
 //https://github.com/vuejs/vue/issues/6385#issuecomment-1024312396
+
+/*import { Directive, DirectiveBinding } from 'vue'
+
+//https://github.com/microsoft/TypeScript/pull/44512
+interface HTMLElementDirective extends HTMLElement {
+    [key: symbol]: any
+}*/
+
 const tooltip = () => {
     //символы для сохранения данных в элементе
     const tooltip = Symbol();
@@ -41,17 +49,25 @@ const tooltip = () => {
          */
 
         function _left() {
-            el[tooltip].style.setProperty('--left', tooltipRect.width - 17 + 'px');
-            el[tooltip].style.left = -tooltipRect.width + (targetRect.width * 0.2) + 'px';
+            el[tooltip].style.setProperty(
+                '--left',
+                tooltipRect.width - 17 + 'px'
+            );
+            el[tooltip].style.left =
+                -tooltipRect.width + targetRect.width * 0.2 + 'px';
         }
 
         function _right() {
             el[tooltip].style.setProperty('--left', '4px');
-            el[tooltip].style.left = targetRect.width - targetRect.width * 0.2 + 'px';
+            el[tooltip].style.left =
+                targetRect.width - targetRect.width * 0.2 + 'px';
         }
 
         function _middle() {
-            el[tooltip].style.setProperty('--left', (tooltipRect.width / 2) - 6 + 'px');
+            el[tooltip].style.setProperty(
+                '--left',
+                tooltipRect.width / 2 - 6 + 'px'
+            );
             const diff = targetRect.width - tooltipRect.width;
             el[tooltip].style.left = diff / 2 + 'px';
         }
@@ -62,9 +78,18 @@ const tooltip = () => {
 
         function _bottom() {
             el[tooltip].style.top = targetRect.height + 13 + 'px';
-            el[tooltip].style.setProperty('--bottom-outer', tooltipRect.height - 2 + 'px');
-            el[tooltip].style.setProperty('--bottom-inner', tooltipRect.height - 2 + 'px');
-            el[tooltip].style.setProperty('--path', 'polygon(50% 0, 100% 100%, 0 100%)');
+            el[tooltip].style.setProperty(
+                '--bottom-outer',
+                tooltipRect.height - 2 + 'px'
+            );
+            el[tooltip].style.setProperty(
+                '--bottom-inner',
+                tooltipRect.height - 2 + 'px'
+            );
+            el[tooltip].style.setProperty(
+                '--path',
+                'polygon(50% 0, 100% 100%, 0 100%)'
+            );
         }
 
         function _auto() {
@@ -72,7 +97,9 @@ const tooltip = () => {
 
             //4vh от верхнего края экрана
             const topOffScreen = tooltipRect.top <= window.innerHeight * 0.04;
-            const rightOffScreen = tooltipRect.right >= (window.innerWidth || document.documentElement.clientWidth);
+            const rightOffScreen =
+                tooltipRect.right >=
+                (window.innerWidth || document.documentElement.clientWidth);
 
             if (topOffScreen) _bottom();
             if (rightOffScreen) _left();
@@ -84,7 +111,7 @@ const tooltip = () => {
             /**
              * создается новый родительский div, который добавляется к родителю el.
              * el удаляется из прежнего родительского элемента и добавляется в новый созданный div.
-             * при наведении на el в div добавляется tooltip элемент, положение которого относительно 
+             * при наведении на el в div добавляется tooltip элемент, положение которого относительно
              * el зависит от модификатора директивы.
              * при отведении курсора с el из div удаляется вставленный tooltip элемент.
              */
@@ -120,11 +147,10 @@ const tooltip = () => {
                 if (el[rendered]) parent.removeChild(el[tooltip]);
                 clearTimeout(el[timerHandle]);
                 el[rendered] = false;
-            }
+            };
 
             el.addEventListener('mouseenter', el[enterCallback]);
             el.addEventListener('mouseleave', el[leaveCallback]);
-
         },
         unmounted: (el: any, binding: any) => {
             el.removeEventListener('mouseenter', el[enterCallback]);
@@ -132,10 +158,8 @@ const tooltip = () => {
         },
         beforeUpdate: (el: any, binding: any) => {
             el[tooltip].innerHTML = `<p>${binding.value}</p>`;
-        }
-    }
-}
-
-
+        },
+    } /*as Directive<HTMLElementDirective, DirectiveBinding>*/;
+};
 
 export default tooltip;

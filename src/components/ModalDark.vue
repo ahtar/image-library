@@ -5,19 +5,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import BaseModal from "@/components/base/BaseModal.vue";
+import { defineComponent } from 'vue';
+import BaseModal from '@/components/base/BaseModal.vue';
 
 export default defineComponent({
     components: {
         BaseModal,
     },
-    emits: ["close"],
+    emits: ['close'],
 
     setup(props, { emit }) {
         return {
             close() {
-                emit("close");
+                emit('close');
             },
         };
     },

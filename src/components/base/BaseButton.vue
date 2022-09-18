@@ -6,8 +6,8 @@
 </template>
 
 <script lang="ts">
-import { computed } from "@vue/reactivity";
-import { defineComponent } from "vue";
+import { computed } from '@vue/reactivity';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     props: {
@@ -23,8 +23,8 @@ export default defineComponent({
                 return 1;
             }),
             classList() {
-                if (props.blocked) return "button-blocked";
-                return "button";
+                if (props.blocked) return 'button-blocked';
+                return 'button';
             },
         };
     },
