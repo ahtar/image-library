@@ -6,7 +6,9 @@
 //https://github.com/microsoft/TypeScript/pull/44512
 interface HTMLElementDirective extends HTMLElement {
     [key: symbol]: any
-}*/
+}
+
+*/
 
 const tooltip = () => {
     //символы для сохранения данных в элементе
@@ -108,43 +110,34 @@ const tooltip = () => {
 
     return {
         mounted: (el: any, binding: any) => {
-            /**
-             * создается новый родительский div, который добавляется к родителю el.
-             * el удаляется из прежнего родительского элемента и добавляется в новый созданный div.
-             * при наведении на el в div добавляется tooltip элемент, положение которого относительно
-             * el зависит от модификатора директивы.
-             * при отведении курсора с el из div удаляется вставленный tooltip элемент.
-             */
-
-            //parent
-            const parent = document.createElement('div');
-            parent.style.position = 'relative';
-            parent.style.display = 'inline-block';
-
-            //tooltip
+            el.style.position = 'relative';
+            //tooltip элемент
             el[tooltip] = document.createElement('div');
             el[tooltip].innerHTML = `<p>${binding.value}</p>`;
             el[tooltip].style.position = 'absolute';
             el[tooltip].style.zIndex = 10;
+            el[tooltip].style.fontSize = '1rem';
+            el[tooltip].style.opacity = '0';
+            el[tooltip].style.transition = 'transition: opacity 0.3 ease-out';
             el[tooltip].className = 'tooltip';
-
-            //замена div
-            el.parentNode!.insertBefore(parent, el);
-            el.parentNode!.removeChild(el);
-            parent.appendChild(el);
 
             //mouseenter callback
             el[enterCallback] = () => {
                 el[timerHandle] = setTimeout(() => {
                     el[rendered] = true;
-                    parent.appendChild(el[tooltip]);
+                    el.appendChild(el[tooltip]);
                     changeStyle(el, binding);
+                    el[tooltip].style.opacity = '1';
                 }, 800);
             };
-
             //mouseleave callback
             el[leaveCallback] = () => {
-                if (el[rendered]) parent.removeChild(el[tooltip]);
+                if (el[rendered]) {
+                    el[tooltip].style.opacity = '0';
+                    setTimeout(() => {
+                        el.removeChild(el[tooltip]);
+                    }, 350);
+                }
                 clearTimeout(el[timerHandle]);
                 el[rendered] = false;
             };
