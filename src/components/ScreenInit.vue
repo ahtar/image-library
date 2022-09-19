@@ -36,7 +36,21 @@ export default defineComponent({
         const { t } = useI18n();
 
         async function requestFolderAccess() {
-            emit('data', await store.requestFolderAccess());
+            try {
+                const data = await store.requestFolderAccess();
+                emit('data', data);
+            } catch (err) {
+                const error = err as Error;
+                if (
+                    !(
+                        error.name == 'AbortError' &&
+                        error.message == 'The user aborted a request.'
+                    )
+                ) {
+                    console.log(error);
+                    throw error;
+                }
+            }
         }
 
         onBeforeMount(() => {
