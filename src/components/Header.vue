@@ -1,16 +1,20 @@
 <template>
     <header class="header">
         <div class="section">
-            <select-list :data="langData" v-model="lang" />
+            <select-list
+                :data="store.language.languageData"
+                :model-value="store.language.appLanguage"
+                @update:model-value="store.changeLanguage"
+            />
         </div>
     </header>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watchEffect } from 'vue';
-import i18n from '@/locales/i18n';
+import { defineComponent } from 'vue';
 
 import SelectList from './SelectList.vue';
+import { useSettings } from '@/store/settings';
 
 export default defineComponent({
     components: {
@@ -18,19 +22,10 @@ export default defineComponent({
     },
 
     setup() {
-        const lang = ref(i18n.global.locale.value);
-        const langData: [string, string][] = [
-            ['en', 'EN'],
-            ['ru', 'RU'],
-        ];
-
-        watchEffect(() => {
-            i18n.global.locale.value = lang.value;
-        });
+        const store = useSettings();
 
         return {
-            lang,
-            langData,
+            store,
         };
     },
 });

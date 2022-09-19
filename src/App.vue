@@ -32,6 +32,7 @@ import { usePromptStore } from '@/store/modals/modal-prompt';
 import { useProgressBarStore } from '@/store/modals/modal-progress-bar';
 import { useInitStore } from '@/store/modals/modal-init';
 import { useCollections } from '@/store/collections';
+import { useSettings } from '@/store/settings';
 
 import useSwUpdate from '@/composables/swUpdate';
 
@@ -50,21 +51,14 @@ export default defineComponent({
         const storeProgressBar = useProgressBarStore();
         const storeInit = useInitStore();
         const storeCollections = useCollections();
+        const storeSettings = useSettings();
         const { listenForSwUpdate } = useSwUpdate();
 
         listenForSwUpdate();
 
         onMounted(async () => {
-            //Проверка, загруженны ли коллекции, если не загружены, то запросить доступ к коллекциям.
+            storeSettings.setupLanguage();
             if (!storeCollections.collectionsInitialized) {
-                /*const status = await checkMainFolderAccess();
-                if (!status) {
-                    storeInit.show();
-                } else {
-                    const data = await initLoadCollections();
-                    storeCollections.addCollection(data);
-                }*/
-
                 storeInit.show();
             }
         });
