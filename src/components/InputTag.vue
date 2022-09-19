@@ -87,6 +87,13 @@ export default defineComponent({
             } else {
                 const input = item.value.toLowerCase();
                 return props.definedTags.filter((tag) => {
+                    //старая структура тегов
+                    if (typeof tag.name == 'object') {
+                        const obj = tag.name as { tagName: string };
+                        if (obj.tagName.toLowerCase().includes(input))
+                            return true;
+                        return false;
+                    }
                     if (tag.name.toLowerCase().includes(input)) return true;
                     return false;
                 });
