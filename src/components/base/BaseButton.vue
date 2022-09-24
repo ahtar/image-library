@@ -20,7 +20,7 @@ export default defineComponent({
         return {
             tabIndex: computed(() => {
                 if (props.blocked) return -1;
-                return 1;
+                return 0;
             }),
             classList() {
                 if (props.blocked) return 'button-blocked';
