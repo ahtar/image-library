@@ -1,7 +1,7 @@
 <template>
-    <modal-dark @close="close">
+    <modal-dark @close="close" data-test="form-settings">
         <div class="form-settings-wrapper">
-            <input-checkbox
+            <input-checkbox data-test="tooltips-checkbox"
                 v-model="store.showTooltips"
                 :label="t('LABEL.SHOW_TOOLTIPS')"
             />
