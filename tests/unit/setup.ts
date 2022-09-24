@@ -13,3 +13,5 @@ globalThis.URL.createObjectURL = jest.fn((data: Blob | File) => {
     return (Math.random().toString(36) + '00000000000000000').slice(2, 8);
 });
 globalThis.URL.revokeObjectURL = jest.fn();
+
+jest.mock('@/locales/i18n');
