@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { useNotificationStore } from '@/store/modals/modal-notification';
 import i18n from '@/locales/i18n';
+import CollectionClass from '@/classes/Collection';
 
 export const useCollections = defineStore('collections', {
     state: () => {
@@ -72,6 +73,28 @@ export const useCollections = defineStore('collections', {
                     false
                 );
             }
+        },
+
+        /**
+         * Получение и инициализация коллекций из полученого FileSystemDirectoryHandle
+         * @param handle FileSystemDirectoryHandle папки с коллекциями.
+         * @returns Массив с полученными коллекциями.
+         */
+        async loadCollections(handle: FileSystemDirectoryHandle) {
+            const arr: Array<Collection> = [];
+
+            for await (const [key, h] of handle.entries()) {
+                key;
+                if (h.kind == 'directory') {
+                    const collection = await CollectionClass.fromFolderHandle(
+                        h
+                    );
+                    if (collection) arr.push(collection);
+                }
+            }
+
+            this.addCollection(arr);
+            return arr;
         },
     },
 });
