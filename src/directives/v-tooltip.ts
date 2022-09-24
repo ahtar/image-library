@@ -10,7 +10,10 @@ interface HTMLElementDirective extends HTMLElement {
 
 */
 
+import { useSettings } from '@/store/settings';
+
 const tooltip = () => {
+    const store = useSettings();
     //символы для сохранения данных в элементе
     const tooltip = Symbol();
     const timerHandle = Symbol();
@@ -124,10 +127,12 @@ const tooltip = () => {
             //mouseenter callback
             el[enterCallback] = () => {
                 el[timerHandle] = setTimeout(() => {
-                    el[rendered] = true;
-                    el.appendChild(el[tooltip]);
-                    changeStyle(el, binding);
-                    el[tooltip].style.opacity = '1';
+                    if (store.showTooltips) {
+                        el[rendered] = true;
+                        el.appendChild(el[tooltip]);
+                        changeStyle(el, binding);
+                        el[tooltip].style.opacity = '1';
+                    }
                 }, 800);
             };
             //mouseleave callback
