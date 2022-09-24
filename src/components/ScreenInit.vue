@@ -2,7 +2,7 @@
     <modal-dark data-test="screen-init">
         <div class="init-wrapper" v-if="compatibility">
             <p>{{ t('INIT_SCREEN.MESSAGE') }}</p>
-            <button-small @click="requestFolderAccess()">
+            <button-small @click="getCollections()">
                 {{ t('BUTTON.PICK_FOLDER') }}</button-small
             >
         </div>
@@ -20,6 +20,8 @@ import { defineComponent, onBeforeMount, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { useInitStore } from '@/store/modals/modal-init';
+import { useSettings } from '@/store/settings';
+import { useCollections } from '@/store/collections';
 
 import ModalDark from '@/components/ModalDark.vue';
 import ButtonSmall from '@/components/ButtonSmall.vue';
@@ -29,16 +31,18 @@ export default defineComponent({
         ModalDark,
         ButtonSmall,
     },
-    emits: ['data'],
-    setup(props, { emit }) {
+    setup() {
         const store = useInitStore();
+        const storeSettings = useSettings();
+        const storeCollections = useCollections();
         const compatibility = ref(true);
         const { t } = useI18n();
 
-        async function requestFolderAccess() {
+        async function getCollections() {
             try {
-                const data = await store.requestFolderAccess();
-                emit('data', data);
+                const handle = await storeSettings.getDirectoryHandle();
+                await storeCollections.loadCollections(handle);
+                store.hide();
             } catch (err) {
                 const error = err as Error;
                 if (
@@ -58,8 +62,8 @@ export default defineComponent({
         });
 
         return {
-            requestFolderAccess,
             compatibility,
+            getCollections,
             t,
         };
     },
