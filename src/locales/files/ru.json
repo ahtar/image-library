@@ -24,6 +24,7 @@
     "LABEL.DESC": "Описание",
     "LABEL.CORR": "Испортить",
     "LABEL.TAGS": "Теги",
+    "LABEL.SHOW_TOOLTIPS": "Показывать всплывающие подсказки",
     "PLACEHOLDER.NAME": "Введите название...",
     "PLACEHOLDER.ID": "Введите идентификатор...",
     "PLACEHOLDER.THEME": "Введите тему...",
