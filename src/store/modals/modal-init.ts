@@ -1,9 +1,5 @@
 import { defineStore } from 'pinia';
 
-import fs from '@/modules/file-system';
-
-const { requestMainFolderAccess, initLoadCollections } = fs;
-
 export const useInitStore = defineStore('init', {
     state: () => {
         return {
@@ -48,11 +44,6 @@ export const useInitStore = defineStore('init', {
         },
         hide() {
             this.visible = false;
-        },
-        async requestFolderAccess() {
-            await requestMainFolderAccess();
-            const data = await initLoadCollections();
-            return data;
         },
     },
 });

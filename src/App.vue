@@ -14,6 +14,10 @@
         <progress-bar v-if="storeProgressBar.visible" />
     </transition-fade>
 
+    <transition-fade>
+        <form-settings v-if="storeSettings.visible" />
+    </transition-fade>
+
     <screen-init v-if="storeInit.visible" @data="addCollections" />
 </template>
 
@@ -26,6 +30,7 @@ import MessageNotification from '@/components/MessageNotification.vue';
 import TransitionFade from '@/components/TransitionFade.vue';
 import ScreenInit from '@/components/ScreenInit.vue';
 import ProgressBar from '@/components/ProgressBar.vue';
+import FormSettings from './components/FormSettings.vue';
 
 //import { useModalStore } from '@/store/modals/store';
 import { usePromptStore } from '@/store/modals/modal-prompt';
@@ -35,6 +40,7 @@ import { useCollections } from '@/store/collections';
 import { useSettings } from '@/store/settings';
 
 import useSwUpdate from '@/composables/swUpdate';
+import useStoreWatch from '@/composables/storeWatch';
 
 export default defineComponent({
     components: {
@@ -44,6 +50,7 @@ export default defineComponent({
         TransitionFade,
         ScreenInit,
         ProgressBar,
+        FormSettings,
     },
     setup() {
         //const storeModal = useModalStore();
@@ -53,11 +60,27 @@ export default defineComponent({
         const storeCollections = useCollections();
         const storeSettings = useSettings();
         const { listenForSwUpdate } = useSwUpdate();
+        const { watchSettings } = useStoreWatch();
 
         listenForSwUpdate();
 
         onMounted(async () => {
+            await storeSettings.loadSettings();
             storeSettings.setupLanguage();
+            watchSettings();
+
+            //Если directoryHandle получен из idb и разрешение
+            // на чтение и запись предоставленно, то загрузить коллекции
+            if (
+                storeSettings.directoryHandle &&
+                (await storeSettings.verifyPermission())
+            ) {
+                await storeCollections.loadCollections(
+                    storeSettings.directoryHandle
+                );
+            }
+
+            //если коллекции не загруженны, то отобразить окно init
             if (!storeCollections.collectionsInitialized) {
                 storeInit.show();
             }
@@ -72,6 +95,7 @@ export default defineComponent({
             storePrompt,
             storeProgressBar,
             storeInit,
+            storeSettings,
             addCollections,
         };
     },
