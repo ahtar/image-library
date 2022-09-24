@@ -1,15 +1,21 @@
 import { mount } from '@vue/test-utils';
 import userEvent from '@testing-library/user-event';
-import { createTestingPinia } from '@pinia/testing';
+import { createTestingPinia, TestingPinia } from '@pinia/testing';
 
 import ScreenInit from '@/components/ScreenInit.vue';
 import { useInitStore } from '@/store/modals/modal-init';
+import { useCollections } from '@/store/collections';
+import { useSettings } from '@/store/settings';
 
 jest.mock('@/modules/file-system');
+jest.mock('@/locales/i18n');
 
 describe('ScreenInit.vue', () => {
+    let pinia: TestingPinia;
+    beforeEach(() => {
+        pinia = createTestingPinia();
+    })
     it('рендерится', () => {
-        const pinia = createTestingPinia();
         const store = useInitStore();
         (store.checkCompatibility as any) = true;
 
@@ -23,7 +29,6 @@ describe('ScreenInit.vue', () => {
     });
 
     it('Компонент активен, если браузер поддерживает функционал.', () => {
-        const pinia = createTestingPinia();
         const store = useInitStore();
         (store.checkCompatibility as any) = true;
 
@@ -37,7 +42,6 @@ describe('ScreenInit.vue', () => {
     });
 
     it('Компонент не активен, если браузер не поддерживает функционал.', () => {
-        const pinia = createTestingPinia();
         const store = useInitStore();
         (store.checkCompatibility as any) = false;
 
@@ -51,9 +55,14 @@ describe('ScreenInit.vue', () => {
     });
 
     it('коллекции загружаются', async () => {
-        const pinia = createTestingPinia();
         const store = useInitStore();
+        const storeCollections = useCollections();
+        const storeSettings = useSettings();
         (store.checkCompatibility as any) = true;
+
+        jest.spyOn(storeCollections, 'loadCollections');
+        jest.spyOn(store, 'hide');
+        jest.spyOn(storeSettings, 'getDirectoryHandle');
 
         const wrapper = mount(ScreenInit, {
             global: {
@@ -65,6 +74,8 @@ describe('ScreenInit.vue', () => {
 
         await userEvent.click(wrapper.find('button').element);
 
-        expect(wrapper.emitted().data).toBeDefined();
+        expect(storeCollections.loadCollections).toBeCalledTimes(1);
+        expect(store.hide).toBeCalledTimes(1);
+        expect(storeSettings.getDirectoryHandle).toBeCalledTimes(1);
     });
 });
