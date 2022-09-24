@@ -50,12 +50,19 @@ export default defineComponent({
             }
         });
 
+        /**
+         * Обработка нажатий клавиш
+         * @param event событие KeyboardEvent
+         */
         function keypressHandle(event: KeyboardEvent) {
             if (event.code == 'Enter') view();
             if (event.code == 'KeyS' || event.code == 'ArrowDown') iterate(1);
             if (event.code == 'KeyW' || event.code == 'ArrowUp') iterate(-1);
         }
 
+        /**
+         * Показать или спрятать список
+         */
         function view() {
             if (!optionsRef.value) return;
             if (visible) {
@@ -73,6 +80,11 @@ export default defineComponent({
             visible = false;
         }
 
+        /**
+         * Выбор элемента из списка
+         * @param option выбраный элемент
+         * @param index индекс выбраного элемента
+         */
         function select(option: [string, string], index: number) {
             view();
             activeIndex.value = index;
