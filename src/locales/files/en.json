@@ -25,6 +25,7 @@
     "LABEL.CORR": "Corrupt",
     "LABEL.TAGS": "Tags",
     "LABEL.SHOW_TOOLTIPS": "Show tooltips",
+    "LABEL.SHOW_CARD_ANIMATIONS": "Show animation when hovering over image cards",
     "PLACEHOLDER.NAME": "Input name...",
     "PLACEHOLDER.ID": "Input ID...",
     "PLACEHOLDER.THEME": "Input theme...",

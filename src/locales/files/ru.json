@@ -25,6 +25,7 @@
     "LABEL.CORR": "Испортить",
     "LABEL.TAGS": "Теги",
     "LABEL.SHOW_TOOLTIPS": "Показывать всплывающие подсказки",
+    "LABEL.SHOW_CARD_ANIMATIONS": "Показывать анимации при наведении на изображения",
     "PLACEHOLDER.NAME": "Введите название...",
     "PLACEHOLDER.ID": "Введите идентификатор...",
     "PLACEHOLDER.THEME": "Введите тему...",
