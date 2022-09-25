@@ -128,6 +128,9 @@ const tooltip = () => {
             el[enterCallback] = () => {
                 el[timerHandle] = setTimeout(() => {
                     if (store.showTooltips) {
+                        //TODO
+                        el.style.zIndex = 1;
+
                         el[rendered] = true;
                         el.appendChild(el[tooltip]);
                         changeStyle(el, binding);
@@ -141,6 +144,8 @@ const tooltip = () => {
                     el[tooltip].style.opacity = '0';
                     setTimeout(() => {
                         el.removeChild(el[tooltip]);
+                        //TODO
+                        el.style.zIndex = 'auto';
                     }, 350);
                 }
                 clearTimeout(el[timerHandle]);
