@@ -35,4 +35,18 @@ describe('FormSettings.vue', () => {
         expect(checkbox.element.checked).toBeFalsy();
         expect(store.showTooltips).toBeFalsy();
     });
+
+    it('значение showCardAnimations меняется', async () => {
+        const store = useSettings();
+        const checkbox = wrapper.find<HTMLInputElement>('[data-test="card-animations-checkbox"] input');
+
+        expect(store.showCardAnimations).toBeTruthy();
+        expect(checkbox.element.checked).toBeTruthy();
+        
+        await userEvent.click(checkbox.element);
+        await checkbox.trigger('change');
+
+        expect(checkbox.element.checked).toBeFalsy();
+        expect(store.showCardAnimations).toBeFalsy();
+    });
 });

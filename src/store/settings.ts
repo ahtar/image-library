@@ -18,6 +18,7 @@ export const useSettings = defineStore('settings', {
                 directoryHandle: false,
             },
             showTooltips: true,
+            showCardAnimations: true,
             visible: false,
             directoryHandle: null as FileSystemDirectoryHandle | null,
         };
@@ -33,6 +34,7 @@ export const useSettings = defineStore('settings', {
         async loadSettings() {
             const languageData = await get('language');
             const tooltipsData = await get('tooltips');
+            const cardAnimationsData = await get('cardAnimations');
             const directoryHandle = await get('directoryHandle');
 
             if (languageData !== undefined) {
@@ -41,6 +43,9 @@ export const useSettings = defineStore('settings', {
             }
 
             if (tooltipsData !== undefined) this.showTooltips = tooltipsData;
+
+            if (cardAnimationsData !== undefined)
+                this.showCardAnimations = cardAnimationsData;
 
             if (directoryHandle !== undefined) {
                 this.directoryHandle = directoryHandle;

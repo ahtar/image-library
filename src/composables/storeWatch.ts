@@ -30,6 +30,13 @@ export default function () {
                 }
             }
         );
+
+        watch(
+            () => storeSettings.showCardAnimations,
+            (data) => {
+                storeSettings.saveSettings('cardAnimations', data);
+            }
+        );
     }
 
     return {
