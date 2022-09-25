@@ -1,9 +1,15 @@
 <template>
     <modal-dark @close="close" data-test="form-settings">
         <div class="form-settings-wrapper">
-            <input-checkbox data-test="tooltips-checkbox"
+            <input-checkbox
+                data-test="tooltips-checkbox"
                 v-model="store.showTooltips"
                 :label="t('LABEL.SHOW_TOOLTIPS')"
+            />
+            <input-checkbox
+                data-test="card-animations-checkbox"
+                v-model="store.showCardAnimations"
+                :label="t('LABEL.SHOW_CARD_ANIMATIONS')"
             />
         </div>
     </modal-dark>
@@ -43,6 +49,12 @@ export default defineComponent({
 <style lang="scss" scope>
 .form-settings-wrapper {
     padding: 1.5vh;
+    align-items: flex-start;
     @include material(1);
+    @include flex-column();
+
+    .input-checkbox-wrapper {
+        margin: 1vh;
+    }
 }
 </style>
