@@ -21,6 +21,9 @@
                 <card-new-big
                     @click="storeImageCreate.open()"
                     v-tooltip.auto="t('TOOLTIP.NEW_IMAGE')"
+                    :class="{
+                        'card-animated': storeSettings.showCardAnimations,
+                    }"
                 />
                 <transition-fade-group
                     :items="filteredImages"
@@ -30,6 +33,9 @@
                         :image="slotProps.item"
                         @click="imageClickHandler(slotProps.item, $event)"
                         @contextmenu="contextMenuOpen(slotProps.item, $event)"
+                        :class="{
+                            'card-animated': storeSettings.showCardAnimations,
+                        }"
                     />
                 </transition-fade-group>
             </div>
@@ -86,6 +92,7 @@ import { useImageCreateStore } from '@/store/forms/form-create-image';
 import { useImageEditStore } from '@/store/forms/form-image-edit';
 import { useNotificationStore } from '@/store/modals/modal-notification';
 import { usePromptStore } from '@/store/modals/modal-prompt';
+import { useSettings } from '@/store/settings';
 
 import useImages from '@/composables/images';
 import UseTags from '@/composables/tags';
@@ -153,6 +160,7 @@ export default defineComponent({
         const storeImageEdit = useImageEditStore();
         const storeNotification = useNotificationStore();
         const storePrompt = usePromptStore();
+        const storeSettings = useSettings();
 
         const { images, filteredImages, setImages, setTagRef } = useImages();
         const { tags, definedTags, addTag, removeTag, tagsOnChange } =
@@ -356,6 +364,7 @@ export default defineComponent({
             storeImageView,
             storeImageCreate,
             storeImageEdit,
+            storeSettings,
 
             container,
             scrollToTop,
@@ -418,6 +427,10 @@ export default defineComponent({
 
         .image-card {
             margin: 15px;
+        }
+
+        .card-animated {
+            @include card-hover();
         }
     }
 }

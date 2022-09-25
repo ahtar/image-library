@@ -5,6 +5,7 @@
                 @click="storeCollectionCreate.open"
                 data-test="home-card-new"
                 v-tooltip.auto="t('TOOLTIP.NEW_COLLECTION')"
+                :class="{ 'card-animated': storeSettings.showCardAnimations }"
             />
             <router-link
                 :to="link(collection)"
@@ -12,7 +13,12 @@
                 :key="i"
                 @contextmenu="contextMenuOpen(collection, $event)"
             >
-                <card-collection-big :fileHandle="collection.thumbnail" />
+                <card-collection-big
+                    :fileHandle="collection.thumbnail"
+                    :class="{
+                        'card-animated': storeSettings.showCardAnimations,
+                    }"
+                />
             </router-link>
         </div>
     </div>
@@ -52,6 +58,7 @@ import { useCollections } from '@/store/collections';
 import { useCollectionCreateStore } from '@/store/forms/form-collection-create';
 import { usePromptStore } from '@/store/modals/modal-prompt';
 import { useCollectionEditStore } from '@/store/forms/form-collection-edit';
+import { useSettings } from '@/store/settings';
 
 import { useHead } from '@vueuse/head';
 import useContextMenu from '@/composables/context-menu';
@@ -72,6 +79,7 @@ export default defineComponent({
         const storeCollectionCreate = useCollectionCreateStore();
         const storeCollectionEdit = useCollectionEditStore();
         const storePrompt = usePromptStore();
+        const storeSettings = useSettings();
         const {
             contextMenuActive,
             contextMenuEvent,
@@ -109,6 +117,7 @@ export default defineComponent({
             store,
             storeCollectionCreate,
             storeCollectionEdit,
+            storeSettings,
             editCollection,
             deleteCollection,
             link,
@@ -132,5 +141,9 @@ export default defineComponent({
 .block {
     flex-wrap: wrap;
     @include flex-center();
+
+    .card-animated {
+        @include card-hover();
+    }
 }
 </style>
