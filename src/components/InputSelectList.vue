@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { computed } from '@vue/reactivity';
-import { defineComponent, ref, PropType, onMounted } from 'vue';
+import { defineComponent, ref, PropType, watchEffect } from 'vue';
 
 export default defineComponent({
     props: {
@@ -34,13 +34,12 @@ export default defineComponent({
         let visible = false;
         const optionsRef = ref<HTMLElement>();
         const activeIndex = ref<number>();
-
         const selected = computed(() => {
             const item = props.data.find((item) => item[0] == props.modelValue);
             return item?.[1] || '';
         });
 
-        onMounted(() => {
+        watchEffect(() => {
             const index = props.data.findIndex(
                 (item) => item[0] == props.modelValue
             );
@@ -92,32 +91,36 @@ export default defineComponent({
         }
 
         /**
-         * Изменение выбранного элемента из списка элементов
+         * Изменение выбранного элемента
          * @param direction направление выбора, 1 - следующий элемент, -1 - предыдущий элемент
          */
         function iterate(direction: number) {
             if (activeIndex.value === undefined) {
                 if (direction == 1) {
-                    activeIndex.value = 0;
-                } else {
-                    activeIndex.value = props.data.length - 1;
+                    emit('update:modelValue', props.data[0][0]);
+                    return;
                 }
-            } else {
-                if (direction == 1) {
-                    if (activeIndex.value < props.data.length - 1) {
-                        activeIndex.value++;
-                    } else {
-                        activeIndex.value = 0;
-                    }
-                } else {
-                    if (activeIndex.value > 0) {
-                        activeIndex.value--;
-                    } else {
-                        activeIndex.value = props.data.length - 1;
-                    }
-                }
+                emit('update:modelValue', props.data[props.data.length - 1][0]);
+                return;
             }
-            emit('update:modelValue', props.data[activeIndex.value][0]);
+
+            if (direction == 1) {
+                if (activeIndex.value < props.data.length - 1) {
+                    emit(
+                        'update:modelValue',
+                        props.data[activeIndex.value + 1][0]
+                    );
+                    return;
+                }
+                emit('update:modelValue', props.data[0][0]);
+                return;
+            }
+
+            if (activeIndex.value > 0) {
+                emit('update:modelValue', props.data[activeIndex.value - 1][0]);
+                return;
+            }
+            emit('update:modelValue', props.data[props.data.length - 1][0]);
         }
 
         return {
