@@ -1,7 +1,7 @@
 <template>
     <header class="header">
         <div class="section">
-            <select-list
+            <input-select-list
                 :data="store.language.languageData"
                 :model-value="store.language.appLanguage"
                 @update:model-value="store.changeLanguage"
@@ -22,13 +22,13 @@
 <script lang="ts">
 import { ComponentPublicInstance, defineComponent, ref } from 'vue';
 
-import SelectList from './SelectList.vue';
+import InputSelectList from './InputSelectList.vue';
 import ButtonSmall from './ButtonSmall.vue';
 import { useSettings } from '@/store/settings';
 
 export default defineComponent({
     components: {
-        SelectList,
+        InputSelectList,
         ButtonSmall,
     },
 
