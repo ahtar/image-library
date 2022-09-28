@@ -409,7 +409,7 @@ export default defineComponent({
         flex-grow: 1;
         display: flex;
         flex-wrap: wrap;
-        //justify-content: space-between;
+        justify-content: space-between;
         align-items: center;
         align-content: flex-start;
 
@@ -421,10 +421,10 @@ export default defineComponent({
             @include card-hover();
         }
 
-        /*&::after {
+        &::after {
             content: "";
             flex: auto;
-        }*/
+        }
     }
 }
 
