@@ -1,6 +1,6 @@
 <template>
     <header class="header">
-        <div class="section section-left" v-if="storeCollections.activeCollection != null"
+        <div class="section section-left" v-if="displaySidebarButton"
             @click="storeSettings.collectionSidebarVisible = !storeSettings.collectionSidebarVisible">
             <button-small class="button-settings">
                 <img src="@/assets/show-sidebar.svg" />
@@ -19,12 +19,12 @@
 </template>
 
 <script lang="ts">
-import { ComponentPublicInstance, defineComponent, ref } from 'vue';
+import { ComponentPublicInstance, defineComponent, ref, computed } from 'vue';
 
 import InputSelectList from './InputSelectList.vue';
 import ButtonSmall from './ButtonSmall.vue';
 import { useSettings } from '@/store/settings';
-import { useCollections } from '@/store/collections'
+import { useCollections } from '@/store/collections';
 
 export default defineComponent({
     components: {
@@ -36,6 +36,9 @@ export default defineComponent({
         const storeSettings = useSettings();
         const storeCollections = useCollections();
         const buttonSettings = ref<ComponentPublicInstance>();
+        const displaySidebarButton = computed(() => {
+            return (storeCollections.activeCollection != null && !storeSettings.collectionUseSlideSidebar);
+        });
 
         function showSettings() {
             storeSettings.visible = true;
@@ -48,6 +51,7 @@ export default defineComponent({
             storeCollections,
             buttonSettings,
             showSettings,
+            displaySidebarButton,
         };
     },
 });
