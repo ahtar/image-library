@@ -28,7 +28,7 @@ describe('FormSettings.vue', () => {
 
         expect(store.showTooltips).toBeTruthy();
         expect(checkbox.element.checked).toBeTruthy();
-        
+
         await userEvent.click(checkbox.element);
         await checkbox.trigger('change');
 
@@ -42,11 +42,25 @@ describe('FormSettings.vue', () => {
 
         expect(store.showCardAnimations).toBeTruthy();
         expect(checkbox.element.checked).toBeTruthy();
-        
+
         await userEvent.click(checkbox.element);
         await checkbox.trigger('change');
 
         expect(checkbox.element.checked).toBeFalsy();
         expect(store.showCardAnimations).toBeFalsy();
+    });
+
+    it('значение collectionUseSlideSidebar меняется', async () => {
+        const store = useSettings();
+        const checkbox = wrapper.find<HTMLInputElement>('[data-test="collection-slide-bar"] input');
+
+        expect(store.collectionUseSlideSidebar).toBeFalsy();
+        expect(checkbox.element.checked).toBeFalsy();
+
+        await userEvent.click(checkbox.element);
+        await checkbox.trigger('change');
+
+        expect(checkbox.element.checked).toBeTruthy();
+        expect(store.collectionUseSlideSidebar).toBeTruthy();
     });
 });
