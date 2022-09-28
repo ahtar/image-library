@@ -1,24 +1,14 @@
 <template>
     <div class="home">
         <div class="block">
-            <card-new-big
-                @click="storeCollectionCreate.open"
-                data-test="home-card-new"
+            <card-new-big @click="storeCollectionCreate.open" data-test="home-card-new"
                 v-tooltip.auto="t('TOOLTIP.NEW_COLLECTION')"
-                :class="{ 'card-animated': storeSettings.showCardAnimations }"
-            />
-            <router-link
-                :to="link(collection)"
-                v-for="(collection, i) in store.collections"
-                :key="i"
-                @contextmenu="contextMenuOpen(collection, $event)"
-            >
-                <card-collection-big
-                    :fileHandle="collection.thumbnail"
-                    :class="{
-                        'card-animated': storeSettings.showCardAnimations,
-                    }"
-                />
+                :class="{ 'card-animated': storeSettings.showCardAnimations }" />
+            <router-link :to="link(collection)" v-for="(collection, i) in storeCollections.collections" :key="i"
+                @contextmenu="contextMenuOpen(collection, $event)">
+                <card-collection-big :fileHandle="collection.thumbnail" :class="{
+                    'card-animated': storeSettings.showCardAnimations,
+                }" />
             </router-link>
         </div>
     </div>
@@ -32,11 +22,7 @@
     </transition-fade>
 
     <transition-fade>
-        <menu-context
-            :event="contextMenuEvent!"
-            v-if="contextMenuActive"
-            @close="contextMenuClose"
-        >
+        <menu-context :event="contextMenuEvent!" v-if="contextMenuActive" @close="contextMenuClose">
             <div @click="editCollection">{{ t('BUTTON.EDIT') }}</div>
             <div @click="deleteCollection">{{ t('BUTTON.DELETE') }}</div>
         </menu-context>
@@ -75,7 +61,7 @@ export default defineComponent({
 
     setup() {
         const { t } = useI18n();
-        const store = useCollections();
+        const storeCollections = useCollections();
         const storeCollectionCreate = useCollectionCreateStore();
         const storeCollectionEdit = useCollectionEditStore();
         const storePrompt = usePromptStore();
@@ -108,13 +94,13 @@ export default defineComponent({
                     t('PROMPT.DELETE_COLLECTION')
                 );
                 if (answer) {
-                    store.deleteCollection(item);
+                    storeCollections.deleteCollection(item);
                 }
             });
         }
 
         return {
-            store,
+            storeCollections,
             storeCollectionCreate,
             storeCollectionEdit,
             storeSettings,
