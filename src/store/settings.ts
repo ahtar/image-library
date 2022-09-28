@@ -21,6 +21,8 @@ export const useSettings = defineStore('settings', {
             showCardAnimations: true,
             visible: false,
             directoryHandle: null as FileSystemDirectoryHandle | null,
+            collectionSidebarVisible: true,
+            collectionUseSlideSidebar: false,
         };
     },
     actions: {
@@ -36,6 +38,7 @@ export const useSettings = defineStore('settings', {
             const tooltipsData = await get('tooltips');
             const cardAnimationsData = await get('cardAnimations');
             const directoryHandle = await get('directoryHandle');
+            const collectionUseSlideSidebar = await get('useSlideSidebar');
 
             if (languageData !== undefined) {
                 this.changeLanguage(languageData);
@@ -50,6 +53,10 @@ export const useSettings = defineStore('settings', {
             if (directoryHandle !== undefined) {
                 this.directoryHandle = directoryHandle;
                 this.idb.directoryHandle = directoryHandle;
+            }
+
+            if (collectionUseSlideSidebar !== undefined) {
+                this.collectionUseSlideSidebar = collectionUseSlideSidebar;
             }
         },
 
