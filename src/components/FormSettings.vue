@@ -1,16 +1,12 @@
 <template>
     <modal-dark @close="close" data-test="form-settings">
         <div class="form-settings-wrapper">
-            <input-checkbox
-                data-test="tooltips-checkbox"
-                v-model="store.showTooltips"
-                :label="t('LABEL.SHOW_TOOLTIPS')"
-            />
-            <input-checkbox
-                data-test="card-animations-checkbox"
-                v-model="store.showCardAnimations"
-                :label="t('LABEL.SHOW_CARD_ANIMATIONS')"
-            />
+            <input-checkbox data-test="tooltips-checkbox" v-model="store.showTooltips"
+                :label="t('LABEL.SHOW_TOOLTIPS')" />
+            <input-checkbox data-test="card-animations-checkbox" v-model="store.showCardAnimations"
+                :label="t('LABEL.SHOW_CARD_ANIMATIONS')" />
+            <input-checkbox data-test="collection-slide-bar" v-model="store.collectionUseSlideSidebar"
+                :label="t('LABEL.SLIDE_SIDEBAR')" />
         </div>
     </modal-dark>
 </template>
