@@ -1,42 +1,34 @@
 <template>
     <div class="wrapper">
-        <sidebar>
+        <sidebar v-if="storeSettings.collectionUseSlideSidebar">
             <router-link to="/">
                 <button-small>{{ t('BUTTON.BACK') }}</button-small>
             </router-link>
-            <input-tag
-                :tags="tags"
-                @add="addTag"
-                @remove="removeTag"
-                :definedTags="definedTags"
-            />
-            <button-small
-                @click="startSetCreation"
-                v-tooltip.auto="t('TOOLTIP.NEW_SET')"
-                >{{ t('BUTTON.CREATE_SET') }}
+            <input-tag :tags="tags" @add="addTag" @remove="removeTag" :definedTags="definedTags" />
+            <button-small @click="startSetCreation" v-tooltip.auto="t('TOOLTIP.NEW_SET')">{{ t('BUTTON.CREATE_SET') }}
             </button-small>
         </sidebar>
+        <transition name="slide" v-else>
+            <sidebar-static v-if="storeSettings.collectionSidebarVisible">
+                <router-link to="/">
+                    <button-small style="margin-bottom: 2vh;">{{ t('BUTTON.BACK') }}</button-small>
+                </router-link>
+                <input-tag :tags="tags" @add="addTag" @remove="removeTag" :definedTags="definedTags" />
+                <button-small @click="startSetCreation" v-tooltip.auto="t('TOOLTIP.NEW_SET')">{{
+                t('BUTTON.CREATE_SET')}}
+                </button-small>
+            </sidebar-static>
+        </transition>
         <div class="content-wrapper" ref="container">
             <div class="content" v-if="loaded">
-                <card-new-big
-                    @click="storeImageCreate.open()"
-                    v-tooltip.auto="t('TOOLTIP.NEW_IMAGE')"
-                    :class="{
-                        'card-animated': storeSettings.showCardAnimations,
-                    }"
-                />
-                <transition-fade-group
-                    :items="filteredImages"
-                    v-slot="slotProps"
-                >
-                    <card-image-small
-                        :image="slotProps.item"
-                        @click="imageClickHandler(slotProps.item, $event)"
-                        @contextmenu="contextMenuOpen(slotProps.item, $event)"
-                        :class="{
+                <card-new-big @click="storeImageCreate.open()" v-tooltip.auto="t('TOOLTIP.NEW_IMAGE')" :class="{
+                    'card-animated': storeSettings.showCardAnimations,
+                }" />
+                <transition-fade-group :items="filteredImages" v-slot="slotProps">
+                    <card-image-small :image="slotProps.item" @click="imageClickHandler(slotProps.item, $event)"
+                        @contextmenu="contextMenuOpen(slotProps.item, $event)" :class="{
                             'card-animated': storeSettings.showCardAnimations,
-                        }"
-                    />
+                        }" />
                 </transition-fade-group>
             </div>
             <screen-loading v-else />
@@ -49,11 +41,7 @@
     </transition-fade>
 
     <transition-fade>
-        <form-image-create
-            :definedTags="definedTags"
-            :priorTags="lastTags"
-            v-if="storeImageCreate.visible"
-        />
+        <form-image-create :definedTags="definedTags" :priorTags="lastTags" v-if="storeImageCreate.visible" />
     </transition-fade>
 
     <transition-fade>
@@ -61,19 +49,12 @@
     </transition-fade>
 
     <transition-fade>
-        <menu-confirm-overlay
-            v-if="imageHandlerState == 'setCreation'"
-            @save="saveSetCreation"
-            @cancel="cancelSetCreation"
-        />
+        <menu-confirm-overlay v-if="imageHandlerState == 'setCreation'" @save="saveSetCreation"
+            @cancel="cancelSetCreation" />
     </transition-fade>
 
     <transition-fade>
-        <menu-context
-            v-if="contextMenuActive"
-            :event="contextMenuEvent!"
-            @close="contextMenuClose"
-        >
+        <menu-context v-if="contextMenuActive" :event="contextMenuEvent!" @close="contextMenuClose">
             <div @click="editImage">{{ t('BUTTON.EDIT') }}</div>
             <div @click="copyImage">{{ t('BUTTON.COPY') }}</div>
             <div @click="deleteImage">{{ t('BUTTON.DELETE') }}</div>
@@ -82,7 +63,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch, computed } from 'vue';
+import { defineComponent, onMounted, ref, watch, computed, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 
@@ -102,6 +83,7 @@ import useQuery from '@/composables/query';
 import { useHead } from '@vueuse/head';
 
 import Sidebar from '@/components/Sidebar.vue';
+import SidebarStatic from '@/components/SidebarStatic.vue';
 import TransitionFade from '@/components/TransitionFade.vue';
 import TransitionFadeGroup from '@/components/TransitionFadeGroup.vue';
 import CardImageSmall from '@/components/CardImageSmall.vue';
@@ -119,6 +101,7 @@ import ScrollBar from '@/components/ScrollBar.vue';
 export default defineComponent({
     components: {
         Sidebar,
+        SidebarStatic,
         TransitionFade,
         TransitionFadeGroup,
         CardImageSmall,
@@ -188,6 +171,7 @@ export default defineComponent({
         });
 
         onMounted(async () => {
+            storeSettings.collectionSidebarVisible = true;
             //Получение тегов из query параметров
             const query = getQuery();
             if (query.tags) {
@@ -215,6 +199,10 @@ export default defineComponent({
                 setImages(ref(collection.value.arr));
             }
         });
+
+        onBeforeUnmount(() => {
+            storeCollections.activeCollection = null;
+        })
 
         //Смена активной коллекции при изменении route.params.name
         watch(
@@ -421,7 +409,7 @@ export default defineComponent({
         flex-grow: 1;
         display: flex;
         flex-wrap: wrap;
-        justify-content: flex-start;
+        //justify-content: space-between;
         align-items: center;
         align-content: flex-start;
 
@@ -432,6 +420,25 @@ export default defineComponent({
         .card-animated {
             @include card-hover();
         }
+
+        /*&::after {
+            content: "";
+            flex: auto;
+        }*/
     }
+}
+
+.slide-enter-active,
+.slide-leave-active {
+    transition: all 0.15s;
+}
+
+.slide-leave-to {
+    transform: translateX(0);
+}
+
+.slide-enter-from,
+.slide-leave-to {
+    transform: translateX(-15vw);
 }
 </style>
