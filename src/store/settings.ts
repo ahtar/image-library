@@ -21,6 +21,7 @@ export const useSettings = defineStore('settings', {
             showCardAnimations: true,
             visible: false,
             directoryHandle: null as FileSystemDirectoryHandle | null,
+            collectionSidebarVisible: true,
         };
     },
     actions: {
