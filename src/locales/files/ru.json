@@ -26,6 +26,7 @@
     "LABEL.TAGS": "Теги",
     "LABEL.SHOW_TOOLTIPS": "Показывать всплывающие подсказки",
     "LABEL.SHOW_CARD_ANIMATIONS": "Показывать анимации при наведении на изображения",
+    "LABEL.SLIDE_SIDEBAR": "Показывать боковую панель при наведении мыши",
     "PLACEHOLDER.NAME": "Введите название...",
     "PLACEHOLDER.ID": "Введите идентификатор...",
     "PLACEHOLDER.THEME": "Введите тему...",
