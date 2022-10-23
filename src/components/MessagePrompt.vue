@@ -4,10 +4,10 @@
             {{ store.message }}
             <div class="button-box">
                 <button-small @click="store.close">{{
-                    t('BUTTON.CANCEL')
+                t('BUTTON.CANCEL')
                 }}</button-small>
                 <button-small @click="store.confirm">{{
-                    t('BUTTON.CONFIRM')
+                t('BUTTON.CONFIRM')
                 }}</button-small>
             </div>
         </div>
@@ -42,6 +42,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .prompt-wrapper {
     color: $color-text-main;
+    white-space: pre-line;
     font-size: 1.5rem;
     padding: 15px;
     @include material(2);
