@@ -24,8 +24,6 @@ export const useProgressBarStore = defineStore('progressBar', {
             this.max = max;
             this.value = 0;
             this.show();
-
-            console.log(this);
         },
 
         increment(num = 1) {
