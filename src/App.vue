@@ -103,7 +103,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-html {
+/*html {
     font-size: $base-font-size * 0.6;
     line-height: $base-line-height;
 
@@ -123,7 +123,7 @@ html {
     @media #{$mq-xxlarge} {
         font-size: $base-font-size * 2;
     }
-}
+}*/
 
 body {
     margin: 0;
