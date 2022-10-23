@@ -563,7 +563,6 @@ class CollectionOjbect implements Collection {
         }
 
         //Удаление сета, если в нем не осталось изображений.
-        //Обновление manifest файла сета, если в нем остались изображения.
         if (image.arr.length == 0) {
             await this.deleteImage(image);
         } else {
@@ -589,7 +588,6 @@ class CollectionOjbect implements Collection {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const promises: Promise<any>[] = [];
-        let manifestChanged = false;
 
         if ('arr' in image) {
             for (const imageSingle of image.arr) {
@@ -600,10 +598,7 @@ class CollectionOjbect implements Collection {
         }
 
         await Promise.allSettled(promises);
-        //Обновление manifest изображения, если были проведены какие либо операции.
-        if (manifestChanged) {
-            await this._updateManifest(image);
-        }
+        await this._updateManifest(image);
 
         async function __corrupt(image: ImageSingle) {
             const oldUrl = image.getUrl();
@@ -621,94 +616,36 @@ class CollectionOjbect implements Collection {
                 thumbnailBuffer
             );
 
-            //Превью или изображение испорчены.
-            if (imageCorrupted || thumbnailCorrupted) {
-                if (corrupt) {
-                    //Изображения испорчены, но это не указано в manifest файле.
-                    //Исправление manifest файла.
-                    if (!image.manifest.corrupted) {
-                        image.manifest.corrupted = true;
-                        manifestChanged = true;
-                    }
-                    return;
-                }
-
-                image.manifest.corrupted = false;
-                manifestChanged = true;
-
-                //Восстановление изображения.
-                if (imageCorrupted) {
-                    const imageNewData = await crypto.recover(imageBuffer);
-                    promises.push(imageFolderHandle.removeEntry(oldUrl.file));
-                    promises.push(
-                        fs.writeFile(
-                            imageFolderHandle,
-                            image.getUrl().file,
-                            imageNewData
-                        )
-                    );
-                    image.imageHandle = null;
-                }
-
-                //Восстановление превью.
-                if (thumbnailCorrupted) {
-                    const thumbnailNewData = await crypto.recover(
-                        thumbnailBuffer
-                    );
-                    promises.push(
-                        thumbnailFolderHandle.removeEntry(oldUrl.thumbnail)
-                    );
-                    promises.push(
-                        fs.writeFile(
-                            thumbnailFolderHandle,
-                            image.getUrl().thumbnail,
-                            thumbnailNewData
-                        )
-                    );
-                    image.thumbnailHandle = null;
-                }
-
-                return;
+            image.manifest.corrupted = corrupt;
+            //Порча изображения
+            if (corrupt && !imageCorrupted) {
+                const data = await crypto.corrupt(imageBuffer);
+                rewrite(imageFolderHandle, oldUrl.file, image.getUrl().file, data);
             }
 
-            //Изображение не испорчено
-            if (corrupt) {
-                image.manifest.corrupted = true;
-                manifestChanged = true;
+            //Порча превью
+            if (corrupt && !thumbnailCorrupted) {
+                const data = await crypto.corrupt(thumbnailBuffer);
+                rewrite(thumbnailFolderHandle, oldUrl.thumbnail, image.getUrl().thumbnail, data);
+            }
 
-                //Порча изображения.
-                if (!imageCorrupted) {
-                    const imageNewData = await crypto.corrupt(imageBuffer);
-                    promises.push(imageFolderHandle.removeEntry(oldUrl.file));
-                    promises.push(
-                        fs.writeFile(
-                            imageFolderHandle,
-                            image.getUrl().file,
-                            imageNewData
-                        )
-                    );
-                    image.imageHandle = null;
-                }
+            //Восстановление изображения
+            if (!corrupt && imageCorrupted) {
+                const data = await crypto.recover(imageBuffer);
+                rewrite(imageFolderHandle, oldUrl.file, image.getUrl().file, data);
+            }
 
-                //Порча превью.
-                if (!thumbnailCorrupted) {
-                    const thumbnailNewData = await crypto.corrupt(
-                        thumbnailBuffer
-                    );
-                    promises.push(
-                        thumbnailFolderHandle.removeEntry(oldUrl.thumbnail)
-                    );
-                    promises.push(
-                        fs.writeFile(
-                            thumbnailFolderHandle,
-                            image.getUrl().thumbnail,
-                            thumbnailNewData
-                        )
-                    );
-                    image.thumbnailHandle = null;
-                }
+            //Восстановление превью
+            if (!corrupt && thumbnailCorrupted) {
+                const data = await crypto.recover(thumbnailBuffer);
+                rewrite(thumbnailFolderHandle, oldUrl.thumbnail, image.getUrl().thumbnail, data);
+            }
 
-                return;
+            function rewrite(handle: FileSystemDirectoryHandle, oldUrl: string, url: string, newData: Blob) {
+                promises.push(handle.removeEntry(oldUrl));
+                promises.push(fs.writeFile(handle, url, newData));
+                image.imageHandle = null;
+                image.thumbnailHandle = null;
             }
         }
     }
