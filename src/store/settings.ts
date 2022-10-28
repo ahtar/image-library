@@ -1,6 +1,14 @@
 import { defineStore } from 'pinia';
 import i18n from '@/locales/i18n';
+import fs from '@/modules/file-system';
 import { set, get } from 'idb-keyval';
+
+
+/**
+ * TODO
+ * главный handle используется и в file-system.ts и в settings.ts 
+ * надо что-то с этим сделать
+ */
 
 export const useSettings = defineStore('settings', {
     state: () => {
@@ -91,7 +99,7 @@ export const useSettings = defineStore('settings', {
          * @returns Выбранный каталог.
          */
         async getDirectoryHandle() {
-            this.directoryHandle = await window.showDirectoryPicker();
+            this.directoryHandle = await fs.requestMainFolderAccess();
             return this.directoryHandle;
         },
 
