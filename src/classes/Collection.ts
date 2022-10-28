@@ -212,7 +212,6 @@ class CollectionOjbect implements Collection {
     ): Promise<ImageSingle> {
         const img = new ImageSingle(manifest, this.handle);
 
-        console.info('Collection:createImage: ', manifest, image);
         const imageDataFolderHandle = await this.handle.getDirectoryHandle(
             'imageData',
             { create: true }
